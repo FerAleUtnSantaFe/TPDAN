@@ -5,4 +5,8 @@ cd ..
 cd servicio-productos
 docker-compose down
 cd ..
+cd servicio-pedidos
+docker-compose down
+cd ..
+
 

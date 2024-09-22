@@ -3,6 +3,7 @@ package backend.servicio_productos.servicio;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import backend.servicio_productos.dao.ProductoRepository;
@@ -10,6 +11,8 @@ import backend.servicio_productos.exception.ProductoNotFoundException;
 import backend.servicio_productos.modelo.Producto;
 
 @Service
+@ComponentScan(basePackages = "backend.servicio_productos.controller," +
+"backend.servicio_productos.servicio")
 public class ProductoService {
     @Autowired
     private ProductoRepository productoRepository;

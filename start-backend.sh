@@ -5,4 +5,7 @@ cd ..
 cd servicio-productos
 docker-compose up -d
 cd ..
+cd servicio-pedidos
+docker-compose up -d
+cd ..
 
