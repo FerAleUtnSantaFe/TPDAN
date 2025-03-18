@@ -3,6 +3,8 @@ package isi.dan.msclientes.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import isi.dan.msclientes.model.Cliente;
+import isi.dan.msclientes.model.Obra;
+import isi.dan.msclientes.model.Usuario;
 import isi.dan.msclientes.servicios.ClienteService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -28,16 +31,29 @@ public class ClienteControllerTest {
 
     @MockBean
     private ClienteService clienteService;
-
     private Cliente cliente;
 
     @BeforeEach
     void setUp() {
         cliente = new Cliente();
-        cliente.setId(1);
         cliente.setNombre("Test Cliente");
         cliente.setCorreoElectronico("test@cliente.com");
         cliente.setCuit("12998887776");
+        cliente.setMaximoDescubierto(150000.00);
+        cliente.setMaximoDeObras(10);
+        cliente.setObrasActivas(0);
+        
+        Obra obra = new Obra();
+        obra.setDireccion("Direccion Test Obra");
+        obra.setPresupuesto(BigDecimal.valueOf(100));
+        cliente.getObras().add(obra);
+
+        Usuario usuario = new Usuario();
+        usuario.setNombre("Test Usuario");
+        usuario.setApellido("Test Apellido");
+        usuario.setCorreoElectronico("test@usuario.com");
+        usuario.setDni("12345678");
+        usuario.getClientes().add(cliente);
     }
 
     @Test
@@ -60,6 +76,7 @@ public class ClienteControllerTest {
                 .andExpect(jsonPath("$.nombre").value("Test Cliente"))
                 .andExpect(jsonPath("$.cuit").value("12998887776"));
     }
+
     @Test
     void testGetById_NotFound() throws Exception {
         Mockito.when(clienteService.findById(2)).thenReturn(Optional.empty());

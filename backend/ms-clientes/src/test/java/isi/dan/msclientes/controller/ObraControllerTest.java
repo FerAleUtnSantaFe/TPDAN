@@ -35,7 +35,6 @@ public class ObraControllerTest {
     @BeforeEach
     void setUp() {
         obra = new Obra();
-        obra.setId(1);
         obra.setDireccion("Direccion Test Obra");
         obra.setPresupuesto(BigDecimal.valueOf(100));
     }

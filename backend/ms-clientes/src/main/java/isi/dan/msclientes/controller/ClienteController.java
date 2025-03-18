@@ -12,9 +12,7 @@ import isi.dan.msclientes.aop.LogExecutionTime;
 import isi.dan.msclientes.exception.ClienteNotFoundException;
 import isi.dan.msclientes.model.Cliente;
 import isi.dan.msclientes.servicios.ClienteService;
-import jakarta.servlet.http.HttpServletRequest;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,21 +25,21 @@ public class ClienteController {
     @Value("${dan.clientes.instancia}")
     private String instancia;
 
-
     @Autowired
     private ClienteService clienteService;
-
-    @GetMapping
-    @LogExecutionTime
-    public List<Cliente> getAll() {
-        return clienteService.findAll();
-    }
-    
+/* 
     @GetMapping("/echo")
     @LogExecutionTime
     public String getEcho() {
         log.debug("Recibiendo un echo ----- {}",instancia);
         return Instant.now()+" - "+instancia;
+    }
+*/
+
+    @GetMapping
+    @LogExecutionTime
+    public List<Cliente> getAll() {
+        return clienteService.findAll();
     }
 
     @GetMapping("/{id}")

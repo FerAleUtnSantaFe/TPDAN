@@ -21,9 +21,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import isi.dan.msclientes.model.Obra;
-
-import java.math.BigDecimal;
+import isi.dan.msclientes.model.Usuario;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("db")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ObraRepositoryTest {
+public class UsuarioRepositoryTest {
 
     Logger log = LoggerFactory.getLogger(ObraRepositoryTest.class);
 
@@ -47,9 +45,9 @@ public class ObraRepositoryTest {
             .withPassword("test");
 
     @Autowired
-    private ObraRepository obraRepository;
-    private static final Integer CANTIDAD_OBRAS = 5;
-    private static List<Obra> obras;
+    private UsuarioRepository usuarioRepository;
+    private static final Integer CANTIDAD_USUARIOS = 5;
+    private static List<Usuario> usuarios;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -60,31 +58,33 @@ public class ObraRepositoryTest {
 
     @BeforeAll
     static void inicializar(){
-        obras = new ArrayList<>();
-        for(int i=0; i<CANTIDAD_OBRAS; i++){
-            Obra obra = new Obra();
-            obra.setDireccion("Test Obra "+i);
-            obra.setPresupuesto(BigDecimal.valueOf(100*(i+1)));
-            obras.add(obra);
+        usuarios = new ArrayList<>();
+        for(int i=0; i<CANTIDAD_USUARIOS; i++){
+            Usuario usuario = new Usuario();
+            usuario.setNombre("Test Usuario "+i);
+            usuario.setDni("1234567"+i);
+            usuario.setApellido("Apellido "+i);
+            usuario.setCorreoElectronico("test" + i + "@test.com");
+            usuarios.add(usuario);
         }
     }
 
     @BeforeEach
     void init() {
         try {
-            obraRepository.saveAll(obras);
-            obraRepository.flush();
-            log.info("Obras guardadas: {}", obraRepository.count());
+            usuarioRepository.saveAll(usuarios);
+            usuarioRepository.flush();
+            log.info("Usuarios guardados: {}", usuarioRepository.count());
         } catch (Exception e) {
-            log.error("Error al guardar las obras");
+            log.error("Error al guardar los usuarios");
         }
     }
 
     @AfterEach
     void clean() {
-        obraRepository.flush(); // Fuerza la escritura de transacciones pendientes
-        obraRepository.deleteAll();
-        obraRepository.flush();
+        usuarioRepository.flush(); // Fuerza la escritura de transacciones pendientes
+        usuarioRepository.deleteAll();
+        usuarioRepository.flush();
     } 
 
     @AfterAll
@@ -95,45 +95,44 @@ public class ObraRepositoryTest {
     @Test
     @Order(1)
     void testFindById() {
-//       List<Obra> todasLasObras = obraRepository.findAll();
-//       todasLasObras.forEach(obra -> log.info("Obra ID en DB: {}", obra.getId()));
+//       List<Usuario> todasLasObras = usuarioRepository.findAll();
+//       todasLasObras.forEach(usuario -> log.info("Usuario ID en DB: {}", usuario.getId()));
 
-        Optional<Obra> foundObra = obraRepository.findById(1);
+        Optional<Usuario> foundObra = usuarioRepository.findById(1);
         log.info("ENCONTRE: {} ",foundObra);
         assertThat(foundObra).isPresent();
-        assertThat(foundObra.get().getDireccion()).isEqualTo("Test Obra 0");
+        assertThat(foundObra.get().getNombre()).isEqualTo("Test Usuario 0");
     }
 
     @Test
     @Order(2)
     void testUpdate() {
 
-        Optional<Obra> foundObra = obraRepository.findById(6);
+        Optional<Usuario> foundObra = usuarioRepository.findById(6);
         log.info("ENCONTRE: {} ",foundObra);
-        Obra obra = foundObra.get();
-        obra.setDireccion("Test Obra 1 modificado");
-        obraRepository.save(obra);
-        foundObra = obraRepository.findById(6);
+        Usuario usuario = foundObra.get();
+        usuario.setNombre("Test Usuario 1 modificado");
+        usuarioRepository.save(usuario);
+        foundObra = usuarioRepository.findById(6);
         assertThat(foundObra).isPresent();
-        assertThat(foundObra.get().getDireccion()).isEqualTo("Test Obra 1 modificado");
+        assertThat(foundObra.get().getNombre()).isEqualTo("Test Usuario 1 modificado");
     }
 
     @Test
     @Order(3)
     void testDelete() {
-
-        obraRepository.deleteById(11);
-        log.info("No se encontro la obra");
-        Optional<Obra> foundObra = obraRepository.findById(11);
+        usuarioRepository.deleteById(11);
+        log.info("No se encontro la usuario");
+        Optional<Usuario> foundObra = usuarioRepository.findById(11);
         assertThat(foundObra).isNotPresent();
     }
 
     @Test
     @Order(4)
     void testFindAll() {
-        List<Obra> foundObra = obraRepository.findAll();
+        List<Usuario> foundObra = usuarioRepository.findAll();
         log.info("ENCONTRE: {} ",foundObra.size());
-        log.info("ID obra: {} ",foundObra.get(0).getId());
+        log.info("ID usuario: {} ",foundObra.get(0).getId());
         assertThat(foundObra).isNotEmpty();
     }
 

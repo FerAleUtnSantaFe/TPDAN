@@ -2,7 +2,6 @@ package isi.dan.ms.pedidos.modelo;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -18,8 +17,6 @@ public class Pedido {
     private Integer numeroPedido;
     private String usuario;
     private String observaciones;
-
-    private Cliente cliente;
     private BigDecimal total;
 
     @Field("detalle")

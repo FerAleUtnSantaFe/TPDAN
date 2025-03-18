@@ -2,8 +2,11 @@ package isi.dan.msclientes.model;
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,21 +26,30 @@ public class Obra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
+    @ManyToOne()
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
+
+    @Column(name = "DIRECCION")
+    @NotNull(message = "La direccion es obligatoria")
     private String direccion;
 
     @Column(name = "ES_REMODELACION")
-    private Boolean esRemodelacion;
+    private Boolean esRemodelacion = false;
     
-    private float lat;
+    @Column(name = "LATITUD")
+    private double lat;
     
-    private float lng;
+    @Column(name = "LONGITUD")
+    private double lng;
     
-    @ManyToOne
-    @JoinColumn(name = "ID_CLIENTE")
-    private Cliente cliente;
-    
+    @Column(name = "PRESUPUESTO")
     @NotNull(message = "El presupuesto es obligatorio")
-    @Min(value=100, message = "El presupuesto debe ser al menos de 100")
+    @Min(value=0, message = "El presupuesto debe ser positivo")
     private BigDecimal presupuesto;
+
+    @Column(name = "ESTADO")
+    @Enumerated(EnumType.STRING)
+    private Estado estado = Estado.PENDIENTE;
 
 }

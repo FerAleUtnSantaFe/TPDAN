@@ -15,12 +15,6 @@ public class PedidoController {
     @Autowired
     private PedidoService pedidoService;
 
-    @PostMapping
-    public ResponseEntity<Pedido> createPedido(@RequestBody Pedido pedido) {
-        Pedido savedPedido = pedidoService.savePedido(pedido);
-        return ResponseEntity.ok(savedPedido);
-    }
-
     @GetMapping
     public List<Pedido> getAllPedidos() {
         return pedidoService.getAllPedidos();
