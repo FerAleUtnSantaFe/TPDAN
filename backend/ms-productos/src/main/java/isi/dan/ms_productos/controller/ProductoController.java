@@ -21,7 +21,6 @@ import isi.dan.ms_productos.aop.LogExecutionTime;
 import isi.dan.ms_productos.exception.ProductoNotFoundException;
 import isi.dan.ms_productos.modelo.Categoria;
 import isi.dan.ms_productos.modelo.Producto;
-import isi.dan.ms_productos.servicio.EchoClientFeign;
 import isi.dan.ms_productos.servicio.ProductoService;
 
 @RestController
@@ -32,8 +31,6 @@ public class ProductoController {
 
     Logger log = LoggerFactory.getLogger(ProductoController.class);
 
-    @Autowired
-    EchoClientFeign echoSvc;
 
 
     @PostMapping
@@ -69,7 +66,7 @@ public class ProductoController {
 
     @GetMapping("/{id}")
     @LogExecutionTime
-    public ResponseEntity<Producto> getProductoById(@PathVariable Long id) {
+    public ResponseEntity<Producto> getProductoById(@PathVariable Integer id) {
         Optional<Producto> producto = productoService.getProductoById(id);
         return producto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -88,7 +85,7 @@ public class ProductoController {
 
     @DeleteMapping("/{id}")
     @LogExecutionTime
-    public ResponseEntity<Void> deleteProducto(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProducto(@PathVariable Integer id) {
         productoService.deleteProducto(id);
         return ResponseEntity.noContent().build();
     }
@@ -108,12 +105,12 @@ public class ProductoController {
 
     @PutMapping("/{id}")
     @LogExecutionTime
-    public ResponseEntity<Producto> updateProducto(@PathVariable Long id, @RequestBody Producto producto) throws ProductoNotFoundException{
+    public ResponseEntity<Producto> updateProducto(@PathVariable final Integer id, @RequestBody Producto producto) throws ProductoNotFoundException{
         if(!productoService.getProductoById(id).isPresent()){
-            return ResponseEntity.notFound().build();
+            throw new ProductoNotFoundException("Producto "+id+" no encontrado");
         }
-        productoService.deleteProducto(id);
-        return ResponseEntity.noContent().build();
+        producto.setId(id);
+        return ResponseEntity.ok(productoService.updateProducto(producto));
     }
 
 }

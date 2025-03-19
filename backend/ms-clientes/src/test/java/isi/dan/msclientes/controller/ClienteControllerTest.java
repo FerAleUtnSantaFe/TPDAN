@@ -101,11 +101,12 @@ public class ClienteControllerTest {
         Mockito.when(clienteService.findById(1)).thenReturn(Optional.of(cliente));
         Mockito.when(clienteService.update(Mockito.any(Cliente.class))).thenReturn(cliente);
 
+        cliente.setNombre("Test Cliente Updated");
         mockMvc.perform(put("/api/clientes/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(cliente)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nombre").value("Test Cliente"));
+                .andExpect(jsonPath("$.nombre").value("Test Cliente Updated"));
     }
 
     @Test

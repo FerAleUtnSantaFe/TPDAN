@@ -44,7 +44,7 @@ public class ProductoControllerTest {
         producto.setPrecio(new BigDecimal("100.00"));
         producto.setStockActual(10);
         producto.setStockMinimo(1);
-        producto.setDescripcion("Descripción del producto");
+        producto.setDescripcion("Descripcion");
     }
 
     @Test
@@ -54,17 +54,17 @@ public class ProductoControllerTest {
         mockMvc.perform(get("/api/productos"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].direccion").value("Direccion Test Producto"));
+                .andExpect(jsonPath("$[0].descripcion").value("Descripcion"));
     }
 
     @Test
     void testGetById() throws Exception {
-        Mockito.when(productoService.getProductoById((long) 1)).thenReturn(Optional.of(producto));
+        Mockito.when(productoService.getProductoById( 1)).thenReturn(Optional.of(producto));
 
         mockMvc.perform(get("/api/productos/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.direccion").value("Direccion Test Producto"));
+                .andExpect(jsonPath("$.descripcion").value("Descripcion"));
     }
 
     @Test
@@ -75,25 +75,26 @@ public class ProductoControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(producto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.direccion").value("Direccion Test Producto"));
+                .andExpect(jsonPath("$.descripcion").value("Descripcion"));
     }
 
     @Test
     void testUpdate() throws Exception {
-        Mockito.when(productoService.getProductoById((long) 1)).thenReturn(Optional.of(producto));
+        Mockito.when(productoService.getProductoById( 1)).thenReturn(Optional.of(producto));
         Mockito.when(productoService.updateProducto(Mockito.any(Producto.class))).thenReturn(producto);
 
+        producto.setDescripcion("Descripcion Updated");
         mockMvc.perform(put("/api/productos/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(producto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.direccion").value("Direccion Test Producto"));
+                .andExpect(jsonPath("$.descripcion").value("Descripcion Updated"));
     }
 
     @Test
     void testDelete() throws Exception {
-        Mockito.when(productoService.getProductoById((long) 1)).thenReturn(Optional.of(producto));
-        Mockito.doNothing().when(productoService).deleteProducto((long) 1);
+        Mockito.when(productoService.getProductoById( 1)).thenReturn(Optional.of(producto));
+        Mockito.doNothing().when(productoService).deleteProducto( 1);
 
         mockMvc.perform(delete("/api/productos/1"))
                 .andExpect(status().isNoContent());

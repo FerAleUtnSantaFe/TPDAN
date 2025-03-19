@@ -45,7 +45,7 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
-    public Optional<Producto> getProductoById(Long id) {
+    public Optional<Producto> getProductoById(Integer id) {
         return productoRepository.findById(id);
     }
 
@@ -59,7 +59,7 @@ public class ProductoService {
         }
     }
 
-    public void deleteProducto(Long id) {
+    public void deleteProducto(Integer id) {
         productoRepository.deleteById(id);
     }
 
@@ -67,7 +67,7 @@ public class ProductoService {
         productoRepository.deleteByCategoria(categoria);
     }
 
-    public Producto updateProducto(Producto producto) throws ProductoNotFoundException {
+    public Producto updateProducto(Producto producto) {
         return productoRepository.save(producto);
     }
 }

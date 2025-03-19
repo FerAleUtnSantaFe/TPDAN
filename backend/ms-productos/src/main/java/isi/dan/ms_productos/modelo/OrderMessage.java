@@ -16,16 +16,16 @@ public class OrderMessage {
     }
 
     public static class OrderItem {
-        private Long productId;
+        private Integer productId;
         private Integer quantity;
 
         // Getters y setters
 
-        public Long getProductId() {
+        public Integer getProductId() {
             return productId;
         }
 
-        public void setProductId(Long productId) {
+        public void setProductId(Integer productId) {
             this.productId = productId;
         }
 

@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import isi.dan.ms_productos.modelo.Categoria;
 import isi.dan.ms_productos.modelo.Producto;
 
-public interface ProductoRepository extends JpaRepository<Producto, Long> {
+public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 
     List<Producto> findByCategoria(Categoria categoria);
     
