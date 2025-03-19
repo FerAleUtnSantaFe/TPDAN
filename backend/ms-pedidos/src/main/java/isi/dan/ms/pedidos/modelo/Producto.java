@@ -12,7 +12,11 @@ public class Producto {
     private Long id;
     private String nombre;
     private String descripcion;
-    private BigDecimal precio;
-    
+
+    // detalles de la compra
+    private Integer cantidad;
+    private BigDecimal precioUnitario;
+    private BigDecimal descuento;
+    private BigDecimal precioFinal;
 
 }

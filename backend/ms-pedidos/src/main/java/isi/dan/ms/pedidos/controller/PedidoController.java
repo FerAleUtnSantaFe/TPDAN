@@ -3,6 +3,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import isi.dan.ms.pedidos.modelo.Estado;
 import isi.dan.ms.pedidos.modelo.Pedido;
 import isi.dan.ms.pedidos.servicio.PedidoService;
 
@@ -22,7 +23,7 @@ public class PedidoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Pedido> getPedidoById(@PathVariable String id) {
-        Pedido pedido = pedidoService.getPedidoById(id);
+        Pedido pedido = pedidoService.getPedido(id);
         return pedido != null ? ResponseEntity.ok(pedido) : ResponseEntity.notFound().build();
     }
 
@@ -31,5 +32,17 @@ public class PedidoController {
         pedidoService.deletePedido(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/cliente/{id}")
+    public List<Pedido> getPedidosByCliente(@PathVariable Integer id) {
+        return pedidoService.getPedido(id);
+        
+    }
+
+    @GetMapping("/estado/{estado}")
+    public List<Pedido> getPedidosByEstado(@PathVariable Estado estado) {
+        return pedidoService.getPedido(estado);
+    }
+
 }
 

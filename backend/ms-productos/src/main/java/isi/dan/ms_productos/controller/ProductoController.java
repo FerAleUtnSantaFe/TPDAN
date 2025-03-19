@@ -31,32 +31,12 @@ public class ProductoController {
 
     Logger log = LoggerFactory.getLogger(ProductoController.class);
 
-
-
     @PostMapping
     @LogExecutionTime
     public ResponseEntity<Producto> createProducto(@RequestBody @Validated Producto producto) {
         Producto savedProducto = productoService.saveProducto(producto);
         return ResponseEntity.ok(savedProducto);
     }
-
-    // @GetMapping("/test")
-    // @LogExecutionTime
-    // public String getEcho() {
-    //     String resultado = echoSvc.echo();
-    //     log.info("Log en test 1!!!! {}",resultado);
-    //     return resultado;
-    // }
-
-    // @GetMapping("/test2")
-    // @LogExecutionTime
-    // public String getEcho2() {
-    //     RestTemplate restTemplate = new RestTemplate();
-    //     String gatewayURL = "http://ms-gateway-svc:8080";
-    //     String resultado = restTemplate.getForObject(gatewayURL+"/clientes/api/clientes/echo", String.class);
-    //     log.info("Log en test 2 {}",resultado);
-    //     return resultado;
-    // }
 
     @GetMapping
     @LogExecutionTime
