@@ -1,10 +1,16 @@
 package isi.dan.ms_productos.modelo;
-import jakarta.persistence.*;
+import java.math.BigDecimal;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Entity
 @Table(name = "MS_PRD_PRODUCTO")
@@ -13,15 +19,24 @@ public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(name ="NOMBRE")
     @NotNull
     private String nombre;
+
+    @Column(name ="DESCRIPCION")
     private String descripcion;
+
     @Column(name ="STOCK_ACTUAL")
-    private int stockActual;
+    private Integer stockActual = 0;
+
     @Column(name ="STOCK_MINIMO")
-    private int stockMinimo;
+    private Integer stockMinimo;
+
+    @Column(name ="PRECIO")
     private BigDecimal precio;
     
+    @Column(name ="CATEGORIA")
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
 
