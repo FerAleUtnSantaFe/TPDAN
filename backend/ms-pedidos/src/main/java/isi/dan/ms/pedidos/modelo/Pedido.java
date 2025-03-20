@@ -22,20 +22,18 @@ public class Pedido {
     private Obra obra;
     private Cliente cliente;
 
-    @Field("detalle")
-    private ArrayList<Producto> listaProductos;
-    private ArrayList<HistorialEstado> estadosPedido;
-
+    @Field("Lista Productos")
+    private ArrayList<Producto> listaProductos = new ArrayList<>();
+    @Field("Lista Estados")
+    private ArrayList<HistorialEstado> estadosPedido = new ArrayList<>();
+    // cambiar, es medio crotera
+    private Estado estado = Estado.EN_PREPARACION;
 
     public void agregarEstado(Estado estado) {
         HistorialEstado nuevo = new HistorialEstado();
         nuevo.setEstado(estado);
-
         estadosPedido.add(nuevo);
     }
-
-
-    
 
 }
 

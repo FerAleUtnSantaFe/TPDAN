@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import isi.dan.ms.pedidos.modelo.Cliente;
 import isi.dan.ms.pedidos.modelo.Estado;
 import isi.dan.ms.pedidos.modelo.Pedido;
 
@@ -15,6 +14,6 @@ public interface PedidoRepository extends MongoRepository<Pedido, String> {
 
     Optional<List<Pedido>> findByEstado(Estado estado);
 
-    Optional<List<Pedido>> findByClienteEstado(Cliente cliente, Estado estado);
+    Optional<List<Pedido>> findByCliente_IdAndEstado(Integer clienteId, Estado estado);
 }
 

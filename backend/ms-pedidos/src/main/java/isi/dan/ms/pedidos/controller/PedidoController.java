@@ -16,11 +16,22 @@ public class PedidoController {
     @Autowired
     private PedidoService pedidoService;
 
+    // EJEMPLO DE RUTA /api/pedidos/?clienteId=5&estado=EN_PROCESO
     @GetMapping
-    public List<Pedido> getAllPedidos() {
-        return pedidoService.getAllPedidos();
-    }
+    public List<Pedido> getAllPedidos( 
+        @RequestParam(required = false) Integer clienteId,
+        @RequestParam(required = false) Estado estado) {
 
+        if (clienteId != null && estado != null) {
+            return pedidoService.getPedidos(clienteId, estado);
+        } else if (clienteId != null) {
+            return pedidoService.getPedidos(clienteId);
+        } else if (estado != null) {
+            return pedidoService.getPedidos(estado);
+        }
+
+        return pedidoService.getAllPedidos(); // Devuelve todos si no hay filtros
+    }
     @GetMapping("/{id}")
     public ResponseEntity<Pedido> getPedidoById(@PathVariable String id) {
         Pedido pedido = pedidoService.getPedido(id);
@@ -32,17 +43,5 @@ public class PedidoController {
         pedidoService.deletePedido(id);
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/cliente/{id}")
-    public List<Pedido> getPedidosByCliente(@PathVariable Integer id) {
-        return pedidoService.getPedido(id);
-        
-    }
-
-    @GetMapping("/estado/{estado}")
-    public List<Pedido> getPedidosByEstado(@PathVariable Estado estado) {
-        return pedidoService.getPedido(estado);
-    }
-
 }
 

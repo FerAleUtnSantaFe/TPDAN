@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import isi.dan.ms.pedidos.dao.PedidoRepository;
-import isi.dan.ms.pedidos.modelo.Cliente;
 import isi.dan.ms.pedidos.modelo.Estado;
 import isi.dan.ms.pedidos.modelo.Pedido;
 @Service
@@ -35,16 +34,16 @@ public class PedidoService {
         return pedidoRepository.findById(id).orElse(null);
     }
     
-    public List<Pedido> getPedido(Integer id) {
-        return pedidoRepository.findByCliente(id).orElse(null);
+    public List<Pedido> getPedidos(Integer cliente) {
+        return pedidoRepository.findByCliente(cliente).orElse(null);
     }
 
-    public List<Pedido> getPedido(Estado estado) {
+    public List<Pedido> getPedidos(Estado estado) {
         return pedidoRepository.findByEstado(estado).orElse(null);
     }
 
-    public List<Pedido> getPedido(Cliente cliente, Estado estado) {
-        return pedidoRepository.findByClienteEstado(cliente, estado).orElse(null);
+    public List<Pedido> getPedidos(Integer clienteId, Estado estado) {
+        return pedidoRepository.findByCliente_IdAndEstado(clienteId, estado).orElse(null);
     }
 
     public void deletePedido(String id) {
@@ -52,13 +51,9 @@ public class PedidoService {
     }
 
     public Pedido updateEstado(String id, Estado estado){
-        Pedido pedido = pedidoRepository.findById(id).get();
-        
+        Pedido pedido = pedidoRepository.findById(id).get();        
         pedido.agregarEstado(estado);
-
         return pedidoRepository.save(pedido);
     }
-
-
 
 }

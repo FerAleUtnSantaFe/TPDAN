@@ -8,12 +8,10 @@ import lombok.Data;
 
 @Data
 public class Producto {
-
-    private Long id;
+    @Id
+    private Integer id;
     private String nombre;
     private String descripcion;
-
-    // detalles de la compra
     private Integer cantidad;
     private BigDecimal precioUnitario;
     private BigDecimal descuento;

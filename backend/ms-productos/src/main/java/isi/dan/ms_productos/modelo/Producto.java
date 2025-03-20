@@ -19,7 +19,7 @@ public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     @Column(name ="NOMBRE")
     @NotNull
     private String nombre;
@@ -35,7 +35,7 @@ public class Producto {
 
     @Column(name ="PRECIO")
     private BigDecimal precio;
-    
+
     @Column(name ="CATEGORIA")
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
