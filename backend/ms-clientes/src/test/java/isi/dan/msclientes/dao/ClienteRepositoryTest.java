@@ -178,6 +178,7 @@ public class ClienteRepositoryTest {
         assertThat(clienteConUsuario).isPresent();
         assertThat(clienteConUsuario.get().getUsuarios().size()).isEqualTo(1);
         assertThat(clienteConUsuario.get().getUsuarios().get(0).getNombre()).isEqualTo("Test Usuario ");
+        log.info(foundCliente.toString());
     }
 
 

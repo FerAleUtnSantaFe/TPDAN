@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { DataGrid } from '@mui/x-data-grid';
 import { styled, alpha } from '@mui/material/styles';
-import NavBar from "../Components/NavBar";
+import NavBar from "../../Components/NavBar";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,11 +17,11 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { fetchClientes, deleteCliente } from './APIs/ClientesAPI';
+import { fetchClientes, deleteCliente } from '../../clientes/APIs/ClientesAPI';
 import Link from 'next/link';
 import { Container } from '@mui/material';
 
-export default function ClientePage() {
+export default function PedidosPage() {
     const paginationModel = { page: 0, pageSize: 5 };
     const [rows, setRows] = React.useState([]);
     const [snackbar, setSnackbar] = React.useState({ open: false, message: '', severity: 'success' });
@@ -105,7 +105,7 @@ export default function ClientePage() {
             <NavBar />
             <Container>
                 <Typography variant="h3" gutterBottom sx={{ margin: 1, textAlign: 'center' }}>
-                    Gestión de clientes
+                    Gestión de pedidos
                 </Typography>
 
                 <Box sx={{ flexGrow: 1 }}>
