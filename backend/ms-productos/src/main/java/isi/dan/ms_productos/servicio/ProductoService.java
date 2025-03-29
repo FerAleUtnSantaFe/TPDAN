@@ -22,23 +22,23 @@ public class ProductoService {
     private ProductoRepository productoRepository;
     Logger log = LoggerFactory.getLogger(ProductoService.class);
 
-     @RabbitListener(queues = RabbitMQConfig.STOCK_UPDATE_QUEUE)
-     public void handleStockUpdate(OrderMessage orderMessage) {
-         log.info("Recibido {}", orderMessage);
-         orderMessage.getOrderItems().forEach(orderItem -> {
-             Optional<Producto> productoOptional = productoRepository.findById(orderItem.getProductId());
-             if (productoOptional.isPresent()) {
-                 Producto producto = productoOptional.get();
-                 //producto.setStockActual(producto.getStockActual() - orderItem.getQuantity()); // posiblemente necesite el caso de que no haya suficiente stock, aunque 
-                 //posiblemente se maneje en frontend
-                 producto.setStockActual(1);
-                 productoRepository.save(producto);
-             } else {
-                 log.warn("Producto no encontrado con id: {}", orderItem.getProductId());
-             }
-         });
-     }
-
+    @RabbitListener(queues = RabbitMQConfig.STOCK_UPDATE_QUEUE)
+    public void handleStockUpdate(OrderMessage orderMessage) {
+        log.info("Recibido {}", orderMessage);
+        orderMessage.getOrderItems().forEach(orderItem -> {
+            Optional<Producto> productoOptional = productoRepository.findById(orderItem.getProductId());
+            if (productoOptional.isPresent()) {
+                Producto producto = productoOptional.get();
+                // producto.setStockActual(producto.getStockActual() - orderItem.getQuantity());
+                // // posiblemente necesite el caso de que no haya suficiente stock, aunque
+                // posiblemente se maneje en frontend
+                producto.setStockActual(1);
+                productoRepository.save(producto);
+            } else {
+                log.warn("Producto no encontrado con id: {}", orderItem.getProductId());
+            }
+        });
+    }
 
     public Producto saveProducto(Producto producto) {
         return productoRepository.save(producto);
@@ -55,7 +55,7 @@ public class ProductoService {
     public List<Producto> getProductosByCategoria(Categoria categoria) throws ProductoNotFoundException {
         Optional<List<Producto>> productos = Optional.ofNullable(productoRepository.findByCategoria(categoria));
 
-        if(productos.isPresent()){
+        if (productos.isPresent()) {
             return productos.get();
         } else {
             throw new ProductoNotFoundException(categoria);
@@ -73,5 +73,8 @@ public class ProductoService {
     public Producto updateProducto(Producto producto) {
         return productoRepository.save(producto);
     }
-}
 
+    public List<Producto> saveAll(List<Producto> productos) {
+        return productoRepository.saveAll(productos);
+    }
+}

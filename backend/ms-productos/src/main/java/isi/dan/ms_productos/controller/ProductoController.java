@@ -80,20 +80,26 @@ public class ProductoController {
             Categoria cat = Categoria.valueOf(categoria.toUpperCase());
             productoService.deleteByCategoria(cat);
             return ResponseEntity.noContent().build();
-        } catch(IllegalArgumentException e ){
+        } catch (IllegalArgumentException e) {
             throw new ProductoNotFoundException(categoria);
         }
     }
 
     @PutMapping("/{id}")
     @LogExecutionTime
-    public ResponseEntity<Producto> updateProducto(@PathVariable final Integer id, @RequestBody Producto producto) throws ProductoNotFoundException{
-        if(!productoService.getProductoById(id).isPresent()){
-            throw new ProductoNotFoundException("Producto "+id+" no encontrado");
+    public ResponseEntity<Producto> updateProducto(@PathVariable final Integer id, @RequestBody Producto producto)
+            throws ProductoNotFoundException {
+        if (!productoService.getProductoById(id).isPresent()) {
+            throw new ProductoNotFoundException("Producto " + id + " no encontrado");
         }
         producto.setId(id);
         return ResponseEntity.ok(productoService.updateProducto(producto));
     }
 
-}
+    @PostMapping("/batch")
+    public ResponseEntity<List<Producto>> saveProductos(@RequestBody List<Producto> productos) {
+        List<Producto> savedProductos = productoService.saveAll(productos);
+        return ResponseEntity.ok(savedProductos);
+    }
 
+}

@@ -17,7 +17,7 @@ import { alpha, styled } from "@mui/material/styles";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import NavBar from "../Components/NavBar";
-import { handleSearchProducto } from "./controllers/Controllers";
+import { handleDelete, handleSearchProducto } from "./controllers/Controllers";
 import { fetchProductos } from "./ProductosAPI";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -29,14 +29,14 @@ import IconButton from "@mui/material/IconButton";
 export default function ProductosTarjetas() {
   const [productos, setProductos] = React.useState([]);
   const [searchProducto, setSearchProducto] = React.useState("");
-  const [searchCodigo, setSearchCodigo] = React.useState("");
+  const [searchCategoria, setSearchCategoria] = React.useState("");
   const [priceRange, setPriceRange] = React.useState([0, 1000]);
 
   const router = useRouter();
 
   React.useEffect(() => {
     async function fetchData() {
-      console.log("antes de fetchear")
+      console.log("antes de fetchear");
       const data = await fetchProductos();
       console.log("fetcheo los datos");
       setProductos(data);
@@ -44,17 +44,37 @@ export default function ProductosTarjetas() {
     fetchData();
   }, []);
 
-  const handleSearch = () => {
-    handleSearchProducto(searchProducto, searchCodigo, priceRange);
+  const handleSearch = async () => {
+    const result = await handleSearchProducto(
+      searchProducto,
+      searchCategoria,
+      priceRange
+    );
+    if (result.success) {
+      setProductos(result.data); // Actualiza la lista de productos con los resultados de la búsqueda
+    } else {
+      alert(result.message); // Muestra un mensaje de error si ocurre un problema
+    }
   };
 
   const handleEdit = (id) => {
     router.push(`/productos/modificar?id=${id}`);
   };
 
-  const handleDelete = (id) => {
+  const handleDeleteProducto = async (id) => {
     console.log("Eliminar producto con ID:", id);
-    // Aquí puedes implementar la lógica para eliminar el producto
+
+    // Llamar a la función handleDelete
+    const result = await handleDelete(id);
+
+    // Mostrar el mensaje al usuario
+    alert(result.message);
+
+    // Si la eliminación fue exitosa, recargar la lista de productos
+    if (result.success) {
+      const updatedProductos = await fetchProductos();
+      setProductos(updatedProductos);
+    }
   };
 
   const handleNew = () => {
@@ -94,31 +114,21 @@ export default function ProductosTarjetas() {
                 <StyledInputBase
                   placeholder="Producto..."
                   inputProps={{ "aria-label": "search" }}
-                  value={searchProducto}
-                  onChange={(e) => setSearchProducto(e.target.value)}
+                  value={searchProducto} // Usa el estado correcto
+                  onChange={(e) => setSearchProducto(e.target.value)} // Actualiza el estado de producto
                 />
               </Search>
 
-              {/* Campo de búsqueda por código */}
-              <Search sx={{ ml: 2, width: 200 }}>
+              {/* Campo de búsqueda por Categoría */}
+              <Search sx={{ width: 200 }}>
                 <SearchIconWrapper>
                   <SearchIcon />
                 </SearchIconWrapper>
                 <StyledInputBase
-                  type="number"
-                  placeholder="Código..."
-                  inputProps={{
-                    "aria-label": "search",
-                    min: 0,
-                    step: 1,
-                  }}
-                  value={searchCodigo}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (/^\d*$/.test(value)) {
-                      setSearchCodigo(value);
-                    }
-                  }}
+                  placeholder="Categoria..."
+                  inputProps={{ "aria-label": "search" }}
+                  value={searchCategoria} // Usa el estado correcto
+                  onChange={(e) => setSearchCategoria(e.target.value)} // Actualiza el estado de categoría
                 />
               </Search>
 
@@ -184,7 +194,7 @@ export default function ProductosTarjetas() {
           >
             {productos.map((producto) => (
               <Grid2 item xs={12} sm={6} md={4} lg={2} key={producto.id}>
-                <Card sx={{ height: "100%", minWidth: 350}}>
+                <Card sx={{ height: "100%", minWidth: 350 }}>
                   <CardContent>
                     <Typography variant="h6" component="div">
                       {producto.nombre}
@@ -220,7 +230,7 @@ export default function ProductosTarjetas() {
                     <IconButton
                       size="small"
                       color="error"
-                      onClick={() => handleDelete(producto.id)}
+                      onClick={() => handleDeleteProducto(producto.id)}
                     >
                       <DeleteIcon />
                     </IconButton>
