@@ -132,9 +132,7 @@
 
 export async function fetchProductos() {
     try {
-        console.log("entro al fetch pa??");
-        console.log("buildeo bien el frontend paa??");
-        const response = await fetch('http://localhost:6180/api/productos');
+        const response = await fetch('http://localhost:80/api/productos');
         if (!response.ok) {
             throw new Error(`Error al obtener los productos : ${response.statusText}`);
         }

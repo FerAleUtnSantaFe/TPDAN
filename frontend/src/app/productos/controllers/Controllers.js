@@ -6,7 +6,7 @@ export const handleEdit = async (id, nombre, descripcion, precio) => {
   try {
     console.log("ID:", id);
     console.log("Nombre:", nombre);  
-    const response = await fetch(`http://localhost:8080/productos/${id}`, {
+    const response = await fetch(`http://localhost:80/api/productos/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
