@@ -4,7 +4,9 @@ export const handleRowSelection = (selection, setSelectedRow) => {
 
 export const handleEdit = async (id, nombre, descripcion, precio) => {
   try {
-    const response = await fetch(`http://localhost:6180/api/productos/${id}`, {
+    console.log("ID:", id);
+    console.log("Nombre:", nombre);  
+    const response = await fetch(`http://localhost:8080/productos/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

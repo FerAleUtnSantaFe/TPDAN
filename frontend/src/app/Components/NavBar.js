@@ -1,22 +1,23 @@
-import * as React from "react";
+import MenuIcon from "@mui/icons-material/Menu";
+import { SvgIcon } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import { SvgIcon } from "@mui/material";
 import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Link from "next/link";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { useRouter } from "next/navigation"; // Importar useRouter
+import * as React from "react";
 import Logo from "../../../public/Logo.svg";
 
 const pages = ["clientes", "productos", "pedidos"];
 
 function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const router = useRouter(); // Inicializar useRouter
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -24,6 +25,11 @@ function NavBar() {
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+  };
+
+  const handleNavigation = (page) => {
+    router.push(`/${page.toLowerCase()}`); // Navegar programáticamente
+    handleCloseNavMenu(); // Cerrar el menú
   };
 
   return (
@@ -40,13 +46,13 @@ function NavBar() {
             <Typography
               variant="h6"
               noWrap
-              component={Link}
-              href="/"
+              onClick={() => router.push("/")} // Navegar al inicio
               sx={{
                 ml: 2,
                 fontWeight: 700,
                 color: "inherit",
                 textDecoration: "none",
+                cursor: "pointer",
               }}
             >
               UTN
@@ -82,12 +88,8 @@ function NavBar() {
               sx={{ display: { xs: "block", md: "none" } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Link href={`/${page.toLowerCase()}`} passHref legacyBehavior>
-                    <a style={{ textDecoration: "none", color: "inherit", width: "100%" }}>
-                      <Typography sx={{ textAlign: "center", width: "100%" }}>{page}</Typography>
-                    </a>
-                  </Link>
+                <MenuItem key={page} onClick={() => handleNavigation(page)}>
+                  <Typography sx={{ textAlign: "center", width: "100%" }}>{page}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -98,8 +100,7 @@ function NavBar() {
             {pages.map((page) => (
               <Button
                 key={page}
-                component={Link}
-                href={`/${page.toLowerCase()}`}
+                onClick={() => handleNavigation(page)} // Navegar programáticamente
                 sx={{ my: 2, color: "white", display: "block" }}
               >
                 {page}

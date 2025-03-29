@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from 'react';
+import { Suspense, useState } from "react";
 import { handleEdit } from "../controllers/Controllers";
 
 import { Box, Button, TextField, Typography } from "@mui/material";
 
-export default function Modificar() {
+function ModificarProducto() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id"); // Obtener el ID del producto desde la URL
@@ -28,9 +28,7 @@ export default function Modificar() {
     }
   };
 
-
   return (
-    <Suspense fallback={<div>Cargando...</div>}>
     <Box
       sx={{
         maxWidth: 500,
@@ -56,7 +54,7 @@ export default function Modificar() {
             onChange={(e) => setNombre(e.target.value)}
             required
           />
-  
+
           {/* Campo Descripción */}
           <TextField
             label="Descripción"
@@ -65,7 +63,7 @@ export default function Modificar() {
             onChange={(e) => setDescripcion(e.target.value)}
             required
           />
-  
+
           {/* Campo Precio */}
           <TextField
             label="Precio"
@@ -75,7 +73,7 @@ export default function Modificar() {
             onChange={(e) => setPrecio(e.target.value)}
             required
           />
-  
+
           {/* Botón Guardar Cambios */}
           <Button
             type="submit"
@@ -89,6 +87,13 @@ export default function Modificar() {
         </Box>
       </form>
     </Box>
+  );
+}
+
+export default function Modificar() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <ModificarProducto />
     </Suspense>
   );
 }

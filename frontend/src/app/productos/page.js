@@ -1,177 +1,237 @@
 "use client";
 
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
+import {
+  AppBar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Grid2,
+  Slider,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import InputBase from "@mui/material/InputBase";
-import Slider from "@mui/material/Slider";
 import { alpha, styled } from "@mui/material/styles";
-import { DataGrid } from "@mui/x-data-grid";
-import { useRouter } from "next/navigation"; // Importar useRouter
+import { useRouter } from "next/navigation";
 import * as React from "react";
 import NavBar from "../Components/NavBar";
-import {
-  handleRowSelection,
-  handleSearchProducto,
-} from "./controllers/Controllers";
+import { handleSearchProducto } from "./controllers/Controllers";
 import { fetchProductos } from "./ProductosAPI";
 
-const columns = [
-  { field: "nombre", headerName: "Nombre", flex: 1 },
-  { field: "descripcion", headerName: "Descripción", flex: 1 },
-  { field: "stockActual", headerName: "Stock Actual", flex: 1 },
-  { field: "stockMinimo", headerName: "Stock Mínimo", flex: 1 },
-  { field: "precio", headerName: "Precio", flex: 1 },
-  { field: "categoria", headerName: "Categoría", flex: 1 },
-];
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
+import SettingsIcon from "@mui/icons-material/Settings";
+import IconButton from "@mui/material/IconButton";
 
-export default function SingleRowSelectionGrid() {
-  const [rows, setRows] = React.useState([]);
-  const [selectedRow, setSelectedRow] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+export default function ProductosTarjetas() {
+  const [productos, setProductos] = React.useState([]);
   const [searchProducto, setSearchProducto] = React.useState("");
   const [searchCodigo, setSearchCodigo] = React.useState("");
   const [priceRange, setPriceRange] = React.useState([0, 1000]);
 
-  const router = useRouter(); // Inicializar el router
+  const router = useRouter();
 
   React.useEffect(() => {
     async function fetchData() {
+      console.log("antes de fetchear")
       const data = await fetchProductos();
-      const formattedData = data.map((producto, index) => ({
-        id: index + 1,
-        nombre: producto.nombre,
-        descripcion: producto.descripcion,
-        stockActual: producto.stockActual,
-        stockMinimo: producto.stockMinimo,
-        precio: producto.precio,
-        categoria: producto.categoria,
-      }));
-      setRows(formattedData);
-      setIsLoading(false);
+      console.log("fetcheo los datos");
+      setProductos(data);
     }
     fetchData();
   }, []);
-
-  const handleRowSelectionInternal = (selection) => {
-    handleRowSelection(selection, setSelectedRow);
-  };
-
-  const handleEditInternal = () => {
-    if (selectedRow) {
-      router.push(`/productos/modificar?id=${selectedRow}`); // Redirigir a la página modificar con el ID del producto
-    }
-  };
-
-  const handleDeleteInternal = () => {
-    handleDelete(selectedRow);
-  };
-
-  const handlePriceChange = (event, newValue) => {
-    setPriceRange(newValue);
-  };
 
   const handleSearch = () => {
     handleSearchProducto(searchProducto, searchCodigo, priceRange);
   };
 
+  const handleEdit = (id) => {
+    router.push(`/productos/modificar?id=${id}`);
+  };
+
+  const handleDelete = (id) => {
+    console.log("Eliminar producto con ID:", id);
+    // Aquí puedes implementar la lógica para eliminar el producto
+  };
+
+  const handleNew = () => {
+    router.push(`/productos/nuevo`);
+  };
+
   return (
-    <Box
-      sx={{
-        width: "100%",
-        height: isLoading ? 300 : rows.length * 30,
-        transition: "height 0.3s ease-in-out",
-      }}
-    >
+    <div>
       <NavBar />
-      <Box
-        sx={{
-          display: "flex",
-          gap: 2,
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 2,
-          padding: 2,
-        }}
-      >
-        <Box
+      <Container>
+        {/* Título de la página */}
+        <Typography
+          variant="h3"
+          gutterBottom
           sx={{
-            display: "flex",
-            gap: 2,
-            alignItems: "center",
+            margin: 2,
+            textAlign: "center",
+            fontWeight: "bold", // Título más destacado
+            fontSize: "2.5rem", // Tamaño más grande
+            textTransform: "uppercase", // Texto en mayúsculas
+            color: "primary.main", // Color principal del tema
           }}
         >
-          <Box sx={{ flexGrow: 0 }}>
-            <Search>
-              <StyledInputBase
-                placeholder="Producto..."
-                inputProps={{ "aria-label": "search" }}
-                value={searchProducto}
-                onChange={(e) => setSearchProducto(e.target.value)}
-              />
-            </Search>
-          </Box>
-          <Box sx={{ flexGrow: 0 }}>
-            <Search>
-              <StyledInputBase
-                type="number"
-                placeholder="Código..."
-                inputProps={{
-                  "aria-label": "search",
-                  min: 0,
-                  step: 1,
+          Gestión de Producto
+        </Typography>
+
+        {/* Contenedor común para alinear Toolbar y Cards */}
+        <Box sx={{ maxWidth: 1200, margin: "0 auto" }}>
+          {/* Barra de búsqueda */}
+          <AppBar position="static" sx={{ borderRadius: 2 }}>
+            <Toolbar sx>
+              {/* Campo de búsqueda por producto */}
+              <Search sx={{ width: 200 }}>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder="Producto..."
+                  inputProps={{ "aria-label": "search" }}
+                  value={searchProducto}
+                  onChange={(e) => setSearchProducto(e.target.value)}
+                />
+              </Search>
+
+              {/* Campo de búsqueda por código */}
+              <Search sx={{ ml: 2, width: 200 }}>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  type="number"
+                  placeholder="Código..."
+                  inputProps={{
+                    "aria-label": "search",
+                    min: 0,
+                    step: 1,
+                  }}
+                  value={searchCodigo}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value)) {
+                      setSearchCodigo(value);
+                    }
+                  }}
+                />
+              </Search>
+
+              {/* Slider para rango de precios */}
+              <Box
+                sx={{
+                  flexGrow: 0,
+                  minWidth: 200,
+                  ml: 4, // Mayor separación a la izquierda
+                  display: { xs: "none", sm: "block" }, // Ocultar en pantallas pequeñas
                 }}
-                value={searchCodigo}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (/^\d*$/.test(value)) {
-                    setSearchCodigo(value);
-                  }
-                }}
-              />
-            </Search>
-          </Box>
-          <Box sx={{ flexGrow: 0, minWidth: 200 }}>
-            <Slider
-              value={priceRange}
-              onChange={handlePriceChange}
-              valueLabelDisplay="auto"
-              min={0}
-              max={1000}
-            />
-          </Box>
+              >
+                <Slider
+                  value={priceRange}
+                  onChange={(e, newValue) => setPriceRange(newValue)}
+                  valueLabelDisplay="auto"
+                  min={0}
+                  max={1000}
+                  sx={{
+                    backgroundColor: "#lightgrey", // Color de fondo personalizado
+                    color: "#ffffff", // Color del texto
+                    "&:hover": {
+                      backgroundColor: "#grey", // Color de fondo al pasar el mouse
+                    },
+                  }} // Cambiar color del slider // Cambiar color del slider
+                />
+              </Box>
+
+              {/* Botón Buscar */}
+              <Button
+                variant="contained"
+                size="large"
+                color="info" // Cambiar color del botón (opciones: secondary, info, warning, success)
+                sx={{ ml: "auto", padding: "0.75rem 1.5rem" }}
+                onClick={handleSearch}
+              >
+                Buscar
+              </Button>
+
+              {/* Botón Nuevo */}
+              <Button
+                variant="contained"
+                color="success"
+                size="large"
+                sx={{ ml: "1rem", padding: "0.75rem 1.5rem" }}
+                startIcon={<AddIcon />}
+                onClick={handleNew}
+              >
+                Nuevo
+              </Button>
+            </Toolbar>
+          </AppBar>
+
+          {/* Mostrar productos como tarjetas */}
+          <Grid2
+            container
+            spacing={3}
+            sx={{
+              marginTop: 2,
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            {productos.map((producto) => (
+              <Grid2 item xs={12} sm={6} md={4} lg={2} key={producto.id}>
+                <Card sx={{ height: "100%", minWidth: 350}}>
+                  <CardContent>
+                    <Typography variant="h6" component="div">
+                      {producto.nombre}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {producto.descripcion}
+                    </Typography>
+                    <Typography variant="body1" color="text.primary">
+                      Precio: ${producto.precio}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Stock Actual: {producto.stockActual}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Categoría: {producto.categoria}
+                    </Typography>
+                  </CardContent>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end", // Alinea los botones al lado izquierdo
+                      gap: 1, // Espaciado entre los botones
+                      padding: 1,
+                    }}
+                  >
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => handleEdit(producto.id)}
+                    >
+                      <SettingsIcon />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDelete(producto.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Card>
+              </Grid2>
+            ))}
+          </Grid2>
         </Box>
-        <Button variant="contained" color="primary" onClick={handleSearch}>
-          Buscar
-        </Button>
-      </Box>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={10}
-        rowsPerPageOptions={[10]}
-        onSelectionModelChange={handleRowSelectionInternal}
-        selectionModel={selectedRow ? [selectedRow] : []}
-        checkboxSelection
-        disableSelectionOnClick
-        autoHeight
-      />
-      <Button
-        onClick={handleEditInternal}
-        disabled={!selectedRow}
-        variant="contained"
-        color="primary"
-      >
-        Modificar
-      </Button>
-      <Button
-        onClick={handleDeleteInternal}
-        disabled={!selectedRow}
-        variant="contained"
-        color="secondary"
-      >
-        Eliminar
-      </Button>
-    </Box>
+      </Container>
+    </div>
   );
 }
 
@@ -185,11 +245,21 @@ const Search = styled("div")(({ theme }) => ({
   width: "100%",
 }));
 
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}));
+
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
   width: "100%",
   "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 1),
+    padding: theme.spacing(1, 1, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
     width: "100%",
