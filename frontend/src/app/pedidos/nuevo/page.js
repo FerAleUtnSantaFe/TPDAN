@@ -17,7 +17,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { fetchClientes, deleteCliente } from '../../clientes/APIs/ClientesAPI';
 import Link from 'next/link';
 import { Container } from '@mui/material';
 
@@ -31,6 +30,8 @@ export default function PedidosPage() {
         { field: 'cuil', headerName: 'CUIL', flex: 1 },
         { field: 'nombre', headerName: 'Nombre', flex: 1 },
         { field: 'correo', headerName: 'Correo', flex: 1 },
+        { field: 'maximoDescubierto', headerName: 'Maximo Descubierto', flex: 1 },
+        { field: 'maximoObras', headerName: 'Maximo de Obras', flex: 1 },
         {
             field: 'opciones', headerName: 'Opciones', sortable: false, flex: 1,
             renderCell: (params) => (

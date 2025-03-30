@@ -5,15 +5,14 @@ import { useRouter } from 'next/navigation';
 import { DataGrid } from '@mui/x-data-grid';
 import { styled, alpha } from '@mui/material/styles';
 import NavBar from "../Components/NavBar";
-import { AppBar, Box, Toolbar, Button, Typography, TextField, IconButton, Snackbar, Select, MenuItem } from '@mui/material';
+import { AppBar, Box, Toolbar, Button, Typography, IconButton, Snackbar, Select, MenuItem } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
-import { Container, Grid } from '@mui/material';
+import { Container } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import InputBase from '@mui/material/InputBase';
-import Link from 'next/link';
 
 export default function PedidosPage() {
     const [rows, setRows] = React.useState([]);
@@ -66,56 +65,41 @@ export default function PedidosPage() {
         <div>
             <NavBar />
             <Container>
-                <Typography variant="h3" gutterBottom sx={{ margin: 2, textAlign: 'center' }}>
-                    Gestión de Pedidos
+                <Typography variant="h3" color='primary' gutterBottom sx={{ margin: 2, textAlign: 'center' }}>
+                    Gestión de pedidos
                 </Typography>
-
-                <Box sx={{ flexGrow: 1, mb: 2 }}>
-                    <AppBar position="static" sx={{ p: 2 }}>
+                <Box sx={{ flexGrow: 1}}>
+                    <AppBar position="static">
                         <Toolbar>
-                            <Grid container spacing={2} alignItems="center">
-                                {/* Buscar por CUIL */}
-                                <Grid item xs={12} sm={4} md={3}>
-                                    <Search>
-                                        <SearchIconWrapper>
-                                            <SearchIcon />
-                                        </SearchIconWrapper>
-                                        <StyledInputBase
-                                            placeholder="Buscar por CUIL"
-                                            name="cuil"
-                                            value={searchParams.cuil}
-                                            onChange={handleSearchChange}
-                                            inputProps={{ 'aria-label': 'search' }}
-                                        />
-                                    </Search>
-                                </Grid>
-
-                                {/* Buscar por Estado con Select */}
-                                <Grid item xs={12} sm={4} md={3}>
-                                    <Search>
-                                        <StyledSelect
-                                            name="estado"
-                                            value={searchParams.estado}
-                                            onChange={handleSearchChange}
-                                            displayEmpty
-                                        >
-                                            <MenuItem value="">Buscar por Estado</MenuItem>
-                                            <MenuItem value="Habilitado">Habilitado</MenuItem>
-                                            <MenuItem value="Pendiente">Pendiente</MenuItem>
-                                            <MenuItem value="Finalizado">Finalizado</MenuItem>
-                                        </StyledSelect>
-                                    </Search>
-                                </Grid>
-
-                                {/* Botón Nuevo alineado a la derecha */}
-                                <Grid item xs={12} sm={4} md={6} textAlign="right">
-                                    <Link href="/pedidos/nuevo" passHref>
-                                        <Button variant="contained" color="success" startIcon={<AddCircleIcon />}>
-                                            Nuevo
-                                        </Button>
-                                    </Link>
-                                </Grid>
-                            </Grid>
+                            <Search>
+                                <SearchIconWrapper>
+                                    <SearchIcon />
+                                </SearchIconWrapper>
+                                <StyledInputBase
+                                    placeholder="Buscar por CUIL"
+                                    name="cuil"
+                                    value={searchParams.cuil}
+                                    onChange={handleSearchChange}
+                                    inputProps={{ 'aria-label': 'search' }}
+                                />
+                            </Search>
+                            <Search>
+                                <SearchIconWrapper>
+                                    <SearchIcon />
+                                </SearchIconWrapper>
+                                <StyledSelect
+                                    name="estado"
+                                    value={searchParams.estado}
+                                    onChange={handleSearchChange}
+                                    placeholder="Buscar por ESTADO"
+                                    displayEmpty>
+                                    <MenuItem value="">Todos</MenuItem>
+                                    <MenuItem value="Habilitado">Habilitado</MenuItem>
+                                    <MenuItem value="Pendiente">Pendiente</MenuItem>
+                                    <MenuItem value="Finalizado">Finalizado</MenuItem>
+                                </StyledSelect>
+                            </Search>
+                            <Button variant="contained" color="success" sx={{ ml: 'auto' }} startIcon={<AddCircleIcon />} onClick={() => router.push('/pedidos/nuevo')}> Nuevo </Button>
                         </Toolbar>
                     </AppBar>
                 </Box>
@@ -149,8 +133,10 @@ const Search = styled('div')(({ theme }) => ({
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
     '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.25) },
+    marginLeft: 0,
     width: '100%',
     minWidth: 200,
+    [theme.breakpoints.up('sm')]: { marginLeft: theme.spacing(1), width: 'auto' },
 }));
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
@@ -174,10 +160,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const StyledSelect = styled(Select)(({ theme }) => ({
     color: 'inherit',
-    width: '100%',
-    paddingLeft: theme.spacing(4),
+    width: '100%',    
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.05),
+    '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.15) },
     '& .MuiSelect-select': {
         padding: theme.spacing(1, 1, 1, 1),
+        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+        border: 'none',
     },
 }));
 

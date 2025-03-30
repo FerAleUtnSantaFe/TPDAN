@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import isi.dan.msclientes.aop.LogExecutionTime;
 import isi.dan.msclientes.exception.ClienteNotFoundException;
 import isi.dan.msclientes.model.Cliente;
@@ -43,7 +42,12 @@ public class ClienteController {
         log.debug("Recibiendo un echo ----- {}",instancia);
         return Instant.now()+" - "+instancia;
     }
-*/
+*/  
+    @PostMapping
+    @LogExecutionTime
+    public Cliente create(@RequestBody @Validated Cliente cliente) {
+        return clienteService.save(cliente);
+    }
 
     @GetMapping
     @LogExecutionTime
@@ -56,12 +60,6 @@ public class ClienteController {
     public ResponseEntity<Cliente> getById(@PathVariable Integer id)  throws ClienteNotFoundException {
         Optional<Cliente> cliente = clienteService.findById(id);
         return ResponseEntity.ok(cliente.orElseThrow(()-> new ClienteNotFoundException("Cliente "+id+" no encontrado")));
-    }
-
-    @PostMapping
-    @LogExecutionTime
-    public Cliente create(@RequestBody @Validated Cliente cliente) {
-        return clienteService.save(cliente);
     }
 
     @PutMapping("/{id}")

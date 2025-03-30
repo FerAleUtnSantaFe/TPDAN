@@ -11,6 +11,7 @@ import isi.dan.msclientes.aop.LogExecutionTime;
 import isi.dan.msclientes.model.Usuario;
 import isi.dan.msclientes.servicios.UsuarioService;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {

@@ -17,84 +17,62 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { fetchClientes, deleteCliente } from './APIs/ClientesAPI';
-import Link from 'next/link';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { findClientes, deleteCliente } from './APIs/ClientesAPI';
 import { Container } from '@mui/material';
 
 export default function ClientePage() {
     const paginationModel = { page: 0, pageSize: 5 };
-    const [rows, setRows] = React.useState([]);
+    const [clientes, setClientes] = React.useState([]);
+    const [filteredRows, setFilteredRows] = React.useState([]);
+    const [searchTerm, setSearchTerm] = React.useState('');
     const [snackbar, setSnackbar] = React.useState({ open: false, message: '', severity: 'success' });
     const router = useRouter();
 
-    const columns = [
-        { field: 'cuil', headerName: 'CUIL', flex: 1 },
-        { field: 'nombre', headerName: 'Nombre', flex: 1 },
-        { field: 'correo', headerName: 'Correo', flex: 1 },
-        {
-            field: 'opciones', headerName: 'Opciones', sortable: false, flex: 1,
-            renderCell: (params) => (
-                <Box>
-                    <IconButton size="small" color="primary" onClick={() => handleEdit(params.row)}>
-                        <SettingsIcon />
-                    </IconButton>
-                    <IconButton size="small" color="error" onClick={() => handleDelete(params.row)}>
-                        <DeleteIcon />
-                    </IconButton>
-                </Box>
-            )
-        },
-    ];
+    React.useEffect(() => {
+        cargarClientes();
+    }, []);
 
-    const handleEdit = (cliente) => {
-        const queryString = new URLSearchParams({
+    async function cargarClientes() {
+        const data = await findClientes();
+        const formattedData = data.map((cliente) => ({
+            id: cliente.id,
             cuil: cliente.cuil,
             nombre: cliente.nombre,
             correo: cliente.correo,
-            maximoDescubierto: cliente.maximoDescubierto,
-            maximoObras: cliente.maximoObras,
-            obras: JSON.stringify(cliente.obras),
-            usuarios: JSON.stringify(cliente.usuarios)
-        }).toString();
-
-        router.push(`/clientes/modificar?${queryString}`);
-    };
-
-    async function clientesFetch() {
-        const data = await fetchClientes();
-        const formattedData = data.map((cliente, index) => ({
-            id: index + 1,
-            cuil: cliente.cuil,
-            nombre: cliente.nombre,
-            correo: cliente.correo,
-            maximoDescubierto: cliente.maximoDescubierto,
-            maximoObras: cliente.maximoObras,
-            obras: cliente.obras,
-            usuarios: cliente.usuarios,
+            maximoDescuento: cliente.maximoDescuento,
+            obrasActivas: cliente.obrasActivas,
         }));
-        setRows(formattedData);
+        setClientes(formattedData);
+        setFilteredRows(formattedData);
     }
 
+    const handleSearch = (event) => {
+        const value = event.target.value.toLowerCase();
+        setSearchTerm(value);
+        
+        const filtered = clientes.filter(cliente =>
+            cliente.cuil.toLowerCase().includes(value) ||
+            cliente.nombre.toLowerCase().includes(value) ||
+            cliente.correo.toLowerCase().includes(value) ||
+            cliente.maximoDescuento.toString().includes(value) ||
+            cliente.obrasActivas.toString().includes(value)
+        );
+        setFilteredRows(filtered);
+    };
+
+    const handleEdit = (cliente) => {
+        router.push(`/clientes/modificar?id=${cliente.id}`);
+    };
+
     const handleDelete = async (cliente) => {
-        const confirmDelete = window.confirm(`¿Está seguro de que desea eliminar el cliente con CUIL: ${cliente.cuil} y Nombre: ${cliente.nombre}?`);
+        const confirmDelete = window.confirm(`¿Está seguro de que desea eliminar el cliente ${cliente.nombre}?`);
         if (!confirmDelete) return;
 
         try {
-            const data = await deleteCliente(cliente.cuil);
+            await deleteCliente(cliente.cuil);
             setSnackbar({ open: true, message: 'Cliente eliminado con éxito', severity: 'success' });
-            const formattedData = data.map((cliente, index) => ({
-              id: index + 1,
-              cuil: cliente.cuil,
-              nombre: cliente.nombre,
-              correo: cliente.correo,
-              maximoDescubierto: cliente.maximoDescubierto,
-              maximoObras: cliente.maximoObras,
-              obras: cliente.obras,
-              usuarios: cliente.usuarios,
-          }));
-          setRows(formattedData);
-            
-          //  clientesFetch(); // Recargar lista de clientes
+            cargarClientes();
         } catch (error) {
             setSnackbar({ open: true, message: 'Error al eliminar el cliente', severity: 'error' });
         }
@@ -104,10 +82,9 @@ export default function ClientePage() {
         <div>
             <NavBar />
             <Container>
-                <Typography variant="h3" gutterBottom sx={{ margin: 1, textAlign: 'center' }}>
+                <Typography variant="h3" color='primary' gutterBottom sx={{ margin: 1, textAlign: 'center' }}>
                     Gestión de clientes
                 </Typography>
-
                 <Box sx={{ flexGrow: 1 }}>
                     <AppBar position="static">
                         <Toolbar>
@@ -117,20 +94,38 @@ export default function ClientePage() {
                                 </SearchIconWrapper>
                                 <StyledInputBase
                                     placeholder="Buscar cliente…"
+                                    value={searchTerm}
+                                    onChange={handleSearch}
                                     inputProps={{ 'aria-label': 'search' }}
                                 />
                             </Search>
-                            <Button variant="contained" sx={{ ml: 'auto' }} onClick={clientesFetch}>Buscar</Button>
-                            <Link href="/clientes/nuevo" passHref>
-                                <Button variant="contained" color="success" sx={{ ml: '1rem' }}> Nuevo </Button>
-                            </Link>
+                            <Button variant="contained" color="success" sx={{ ml: 'auto' }} startIcon={<AddCircleIcon />} onClick={() => router.push('/clientes/nuevo')}> Nuevo </Button>
                         </Toolbar>
                     </AppBar>
                 </Box>
 
                 <DataGrid
-                    rows={rows}
-                    columns={columns}
+                    clientes={filteredRows}
+                    columns={[
+                        { field: 'cuil', headerName: 'CUIL', flex: 1 },
+                        { field: 'nombre', headerName: 'Nombre', flex: 1 },
+                        { field: 'correo', headerName: 'Correo', flex: 1 },
+                        { field: 'obrasActivas', headerName: 'Obras Activas', flex: 1 },
+                        { field: 'descubierto', headerName: 'Descubierto', flex: 1 },
+                        {
+                            field: 'opciones', headerName: 'Opciones', sortable: false, flex: 1,
+                            renderCell: (params) => (
+                                <Box>
+                                    <IconButton size="small" color="primary" onClick={() => handleEdit(params.row)}>
+                                        <SettingsIcon />
+                                    </IconButton>
+                                    <IconButton size="small" color="error" onClick={() => handleDelete(params.row)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Box>
+                            )
+                        },
+                    ]}
                     initialState={{ pagination: { paginationModel } }}
                     pageSizeOptions={[5, 10]}
                     checkboxSelection
@@ -142,7 +137,6 @@ export default function ClientePage() {
                     sx={{ width: '100%' }}
                 />
 
-                {/* Snackbar para mostrar mensajes */}
                 <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
                     <MuiAlert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
                         {snackbar.message}
@@ -153,7 +147,6 @@ export default function ClientePage() {
     );
 }
 
-// Estilos para la barra de búsqueda
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,

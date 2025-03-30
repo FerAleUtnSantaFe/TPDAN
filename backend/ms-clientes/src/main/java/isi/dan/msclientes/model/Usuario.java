@@ -3,6 +3,8 @@ package isi.dan.msclientes.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,6 +45,7 @@ public class Usuario {
     private String dni;
 
     @ManyToMany(mappedBy = "usuarios")
+    @JsonIgnore
     private List<Cliente> clientes = new ArrayList<>();
 
 }

@@ -11,6 +11,7 @@ import isi.dan.msclientes.servicios.ObraService;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/obras")
 public class ObraController {

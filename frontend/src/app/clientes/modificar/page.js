@@ -8,10 +8,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import NavBar from '@/app/Components/NavBar';
 import { useSearchParams } from 'next/navigation';
+import { findbyIdCliente } from '../APIs/ClientesAPI';
 
 const ModificarCliente = () => {
 
-  const [formData, setFormData] = useState({
+  const [formularioCliente, setFormularioCliente] = useState({
     cuil: '',
     correo: '',
     nombre: '',
@@ -28,44 +29,37 @@ const ModificarCliente = () => {
   const [newObra, setNewObra] = useState({ direccion: '', latitud: '', longitud: '', presupuesto: '', estado: '' });
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState({ open: false, message: '', severity: '' });
-
+  const searchParams = useSearchParams();
+  
   useEffect(() => {
-    
-    const searchParams = useSearchParams();
-    const usuariosParam = searchParams.get('usuarios');
-    const obrasParam = searchParams.get('obras');
-
-    let usuarios = [];
-    let obras = [];
-
-    try {
-        usuarios = usuariosParam ? JSON.parse(decodeURIComponent(usuariosParam)) : [];
-        obras = obrasParam ? JSON.parse(decodeURIComponent(obrasParam)) : [];
-    } catch (error) {
-        console.error("Error al parsear los parámetros de URL:", error);
-    }
-
-    const usuariosConId = usuarios.map(user => ({
-        ...user,
-        id: user.id || Date.now() + Math.random() 
-    }));
-    const obrasConId = obras.map(obra => ({
-        ...obra,
-        id: obra.id || Date.now() + Math.random()
-    }));
-
-    setFormData({
-        cuil: searchParams.get('cuil') || '',
-        nombre: searchParams.get('nombre') || '',
-        correo: searchParams.get('correo') || '',
-        maximoDescubierto: searchParams.get('maximoDescubierto') || '',
-        maximoObras: searchParams.get('maximoObras') || '',
-        obras: obrasConId,
-        usuarios: usuariosConId
-    });
-    console.log(obrasConId);
-    console.log(usuariosConId);
-  }, []);
+    const fetchCliente = async () => {
+      const id = searchParams.get('id'); // Obtiene el ID de la URL
+      console.log(`el id en modificar cliente: ${id}`);
+      if (id) {
+        try {
+          const cliente = await findbyIdCliente(id); // Llama a la API con el ID
+          console.log(`Recupere el cliente padre : ${cliente}`);
+          if (cliente) {
+            setFormularioCliente({
+              cuil: cliente.cuil,
+              nombre: cliente.nombre,
+              correo: cliente.correo,
+              maximoDescubierto: cliente.maximoDescubierto,
+              maximoObras: cliente.maximoObras,
+              obras: cliente.obras || [],
+              usuarios: cliente.usuarios || []
+            });
+          } else {
+            setAlert({ open: true, message: 'Cliente no encontrado', severity: 'error' });
+          }
+        } catch (error) {
+          console.error('Error al obtener el cliente:', error);
+          setAlert({ open: true, message: 'Error al cargar el cliente', severity: 'error' });
+        }
+      }
+    };
+    fetchCliente();
+  }, [searchParams]);
 
   const handleEstadoChange = (event) => {
     setEstado(event.target.value);
@@ -81,12 +75,12 @@ const ModificarCliente = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormularioCliente({ ...formularioCliente, [name]: value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    console.log(formularioCliente);
   };
 
   const handleAddUser = () => {
@@ -95,14 +89,18 @@ const ModificarCliente = () => {
       setErrors(newErrors);
       return;
     }
-    setFormData({ ...formData, usuarios: [...formData.usuarios, { id: Date.now(), ...newUser }] });
+    setFormularioCliente({ ...formularioCliente, usuarios: [...formularioCliente.usuarios, { id: Date.now(), ...newUser }] });
     cleanFormData();
     setOpenUserModal(false);
     setAlert({ open: true, message: 'Obra agregada correctamente', severity: 'success' });
   };
 
-  const handleDeleteUser = (id) => {
-    setFormData({ ...formData, usuarios: formData.usuarios.filter(user => user.id !== id) });
+  const handleDeleteUser = (userSelected) => {
+    const confirmDelete = window.confirm(`¿Está seguro de que desea eliminar el user ${userSelected.nombre}?`);
+    if (!confirmDelete) return;
+
+    setFormularioCliente({ ...formularioCliente, usuarios: formularioCliente.usuarios.filter(user => user.id !== userSelected.id) });
+    setAlert({ open: true, message: 'Usuario eliminado correctamente', severity: 'success' });
   };
 
   const handleAddObra = () => {
@@ -111,47 +109,51 @@ const ModificarCliente = () => {
       setErrors(newErrors);
       return;
     }
-    setFormData({ ...formData, obras: [...formData.obras, { id: Date.now(), ...newObra }] });
+    setFormularioCliente({ ...formularioCliente, obras: [...formularioCliente.obras, { id: Date.now(), ...newObra }] });
     cleanFormData();
     setOpenObraModal(false);
     setAlert({ open: true, message: 'Obra agregada correctamente', severity: 'success' });
   };
 
-  const handleDeleteObra = (id) => {
-    setFormData({ ...formData, obras: formData.obras.filter(obra => obra.id !== id) });
+  const handleDeleteObra = (obraSelected) => {
+    const confirmDelete = window.confirm(`¿Está seguro de que desea eliminar la obra con direccion ${obraSelected.direccion}?`);
+    if (!confirmDelete) return;
+
+    setFormularioCliente({ ...formularioCliente, obras: formularioCliente.obras.filter(obra => obra.id !== obraSelected.id) });
+    setAlert({ open: true, message: 'Obra eliminada correctamente', severity: 'success' });
   };
 
   const cleanFormData = () =>{
     setNewObra({ direccion: '', latitud: '', longitud: '', presupuesto: '', estado: '' });
     setNewUser({ dni: '', nombre: '', apellido: '', correo: '' });
+    setErrors(false);
   }
 
   return (
-    <Suspense fallback={<div>Cargando...</div>}>
     <div>
       <NavBar />
       <Container>
-        <Typography variant="h3" gutterBottom sx={{ margin: 1, textAlign: 'center' }}>
+        <Typography variant="h3" gutterBottom color='primary' sx={{ margin: 1, textAlign: 'center' }}>
           Gestión de clientes: Modificar Cliente
         </Typography>
         <form onSubmit={handleSubmit}>
-          <TextField fullWidth slotProps={{ readOnly: true }} label="CUIL" name="cuil" value={formData.cuil} margin="normal" />
-          <TextField fullWidth slotProps={{ readOnly: true }} label="Correo" name="correo" type="email" value={formData.correo} onChange={handleChange} margin="normal" />
-          <TextField fullWidth slotProps={{ readOnly: true }} label="Nombre" name="nombre" value={formData.nombre} onChange={handleChange} margin="normal" />
-          <TextField fullWidth slotProps={{ readOnly: true }} label="Máximo Descubierto" name="maximoDescubierto" type="number" value={formData.maximoDescubierto} onChange={handleChange} margin="normal" />
-          <TextField fullWidth slotProps={{ readOnly: true }} label="Máxima Cantidad de Obras" name="maximoObras" type="number" value={formData.maximoObras} onChange={handleChange} margin="normal" />
+          <TextField fullWidth slotProps={{ readOnly: true }} label="CUIL" name="cuil" value={formularioCliente.cuil} margin="normal" />
+          <TextField fullWidth slotProps={{ readOnly: true }} label="Correo" name="correo" type="email" value={formularioCliente.correo} onChange={handleChange} margin="normal" />
+          <TextField fullWidth slotProps={{ readOnly: true }} label="Nombre" name="nombre" value={formularioCliente.nombre} onChange={handleChange} margin="normal" />
+          <TextField fullWidth slotProps={{ readOnly: true }} label="Máximo Descubierto" name="maximoDescubierto" type="number" value={formularioCliente.maximoDescubierto} onChange={handleChange} margin="normal" />
+          <TextField fullWidth slotProps={{ readOnly: true }} label="Máxima Cantidad de Obras" name="maximoObras" type="number" value={formularioCliente.maximoObras} onChange={handleChange} margin="normal" />
 
           <Button variant="contained" color="success" startIcon={<PersonAddIcon />} onClick={() => setOpenUserModal(true)} sx={{ marginTop: 2, marginBottom: 1 }}>
             Agregar Usuario
           </Button>
-          <DataGrid rows={formData.usuarios} 
+          <DataGrid rows={formularioCliente.usuarios} 
             columns={[
             { field: 'dni', headerName: 'DNI', flex: 1 },
             { field: 'nombre', headerName: 'Nombre', flex: 1 },
             { field: 'apellido', headerName: 'Apellido', flex: 1 },
             { field: 'correo', headerName: 'Correo', flex: 1 },
             { field: 'acciones', headerName: '', sortable: false, renderCell: (params) => (
-              <Button color="error" onClick={() => handleDeleteUser(params.row.id)}>
+              <Button color="error" onClick={() => handleDeleteUser(params.row)}>
                 <DeleteIcon />
               </Button>
             ) }
@@ -168,7 +170,7 @@ const ModificarCliente = () => {
           <Button variant="contained" color="success" startIcon={<DomainAddIcon />} onClick={() => setOpenObraModal(true)} sx={{ marginTop: 2, marginBottom: 1 }}>
             Agregar Obra
           </Button>
-          <DataGrid rows={formData.obras} 
+          <DataGrid rows={formularioCliente.obras} 
             columns={[
             { field: 'direccion', headerName: 'Dirección', flex: 1 },
             { field: 'latitud', headerName: 'Latitud', flex: 1 },
@@ -176,7 +178,7 @@ const ModificarCliente = () => {
             { field: 'presupuesto', headerName: 'Presupuesto', flex: 1 },
             { field: 'estado', headerName: 'Estado', flex: 1 },
             { field: 'acciones', headerName: '', sortable: false, renderCell: (params) => (
-              <Button color="error" onClick={() => handleDeleteObra(params.row.id)}>
+              <Button color="error" onClick={() => handleDeleteObra(params.row)}>
                 <DeleteIcon />
               </Button>
             ) }
@@ -193,7 +195,7 @@ const ModificarCliente = () => {
           }} />
 
           <Button type="submit" variant="contained" color="primary" size='large' sx={{ marginTop: 2 }}>
-            Crear
+            Guardar
           </Button>
         </form>
       </Container>
@@ -226,8 +228,7 @@ const ModificarCliente = () => {
             <Select
               value={estado}
               label="Estado"
-              onChange={handleEstadoChange}
-            >
+              onChange={handleEstadoChange}>
               <MenuItem value={1}>HABILITADA</MenuItem>
               <MenuItem value={2}>PENDIENTE</MenuItem>
               <MenuItem value={3}>FINALIZADA</MenuItem>
@@ -244,8 +245,13 @@ const ModificarCliente = () => {
         <Alert severity={alert.severity}>{alert.message}</Alert>
       </Snackbar>
     </div>
-    </Suspense>
   );
 };
 
-export default ModificarCliente;
+export default function Modificar() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <ModificarCliente />
+    </Suspense>
+  );
+}
