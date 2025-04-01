@@ -36,9 +36,7 @@ export default function ProductosTarjetas() {
 
   React.useEffect(() => {
     async function fetchData() {
-      console.log("antes de fetchear");
       const data = await fetchProductos();
-      console.log("fetcheo los datos");
       setProductos(data);
     }
     fetchData();

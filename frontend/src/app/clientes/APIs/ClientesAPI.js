@@ -1,7 +1,5 @@
 const BASE_URL = "http://localhost:80/api/clientes"; // Cambia esto si tu backend tiene otra URL base
 
-
-
 // Obtener todos los clientes
 export async function findClientes() {
     try {
@@ -56,19 +54,21 @@ export async function updateCliente(idCli, cliente) {
         const response = await fetch(`${BASE_URL}/${idCli}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
             },
             body: JSON.stringify(cliente)
-        });
-        if (!response.ok) {
-            throw new Error(`Error al actualizar el cliente con ID ${idCli}: ${response.statusText}`);
-        }
-        return await response.json();
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error al actualizar el cliente con ID ${idCli}: ${response.statusText}`);
+      }
+  
+      return await response.json();
     } catch (error) {
-        console.error('Error en updateCliente:', error);
-        throw error;
+      console.error('Error en updateCliente:', error);
+      throw error;
     }
-}
+  }
 
 // Eliminar un cliente por ID
 export async function deleteCliente(idCli) {
