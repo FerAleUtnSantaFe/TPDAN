@@ -1,100 +1,86 @@
-export const handleRowSelection = (selection, setSelectedRow) => {
-  setSelectedRow(selection[0]);
-};
+import { deleteProducto, editProducto } from "../APIs/ProductosAPI";
 
-export const handleEdit = async (id, nombre, descripcion, precio) => {
+// Editar producto
+
+export const handleEdit = async (
+  id,
+  nombre,
+  descripcion,
+  precio,
+  stockActual,
+  stockMinimo
+) => {
   try {
-    console.log("ID:", id);
-    console.log("Nombre:", nombre);  
-    const response = await fetch(`http://localhost:80/api/productos/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nombre,
-        descripcion,
-        precio,
-      }),
-    });
+    const producto = { nombre, descripcion, precio, stockActual, stockMinimo };
+    const result = await editProducto(id, producto);
 
-    if (response.ok) {
-      return { success: true, message: "Producto modificado con éxito" };
-    } else {
-      const errorData = await response.json();
-      return { success: false, message: errorData.message || "Error al modificar el producto" };
-    }
+    return {
+      success: true,
+      message: "Producto modificado con éxito",
+      data: result,
+    };
   } catch (error) {
-    console.error("Error:", error);
-    return { success: false, message: "Error al conectar con el servidor" };
+    console.error("Error en handleEdit:", error);
+    return {
+      success: false,
+      message: error.message || "Error al modificar el producto",
+    };
   }
 };
 
+// Eliminar producto
 export const handleDelete = async (id) => {
   try {
     // Mostrar cuadro de confirmación
-    const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar este producto?");
+    const confirmDelete = window.confirm(
+      "¿Estás seguro de que deseas eliminar este producto?"
+    );
     if (!confirmDelete) {
-      return { success: false, message: "Eliminación cancelada por el usuario" };
+      return {
+        success: false,
+        message: "Eliminación cancelada por el usuario",
+      };
     }
 
     console.log("Eliminando producto con ID:", id);
 
-    // Realizar la solicitud DELETE
-    const response = await fetch(`http://localhost:80/api/productos/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.ok) {
-      return { success: true, message: "Producto eliminado con éxito" };
-    } else {
-      const errorData = await response.json();
-      return { success: false, message: errorData.message || "Error al eliminar el producto" };
-    }
+    const result = await deleteProducto(id);
+    return result;
   } catch (error) {
-    console.error("Error:", error);
-    return { success: false, message: "Error al conectar con el servidor" };
+    console.error("Error en handleDelete:", error);
+    return {
+      success: false,
+      message: error.message || "Error al eliminar el producto",
+    };
   }
 };
 
-export const handleSearchProducto = async (searchProducto, searchCategoria, priceRange) => {
-  try {
-    // Construir los parámetros de búsqueda
-    const params = new URLSearchParams();
+// Filtrar productos
+export const handleSearchProducto = (
+  productos,
+  searchProducto,
+  searchCategoria,
+  priceRange
+) => {
+  // Convertir los valores de búsqueda a minúsculas para hacer la búsqueda insensible a mayúsculas/minúsculas
+  const lowerCaseSearchProducto = searchProducto.toLowerCase();
+  const lowerCaseSearchCategoria = searchCategoria.toLowerCase();
 
-    if (searchProducto) {
-      params.append("nombre", searchProducto.toLowerCase()); // Convertir a minúsculas
-    }
-    if (searchCategoria) {
-      params.append("categoria", searchCategoria.toLowerCase()); // Convertir a minúsculas
-    }
-    if (priceRange && priceRange.length === 2) {
-      params.append("precioMin", priceRange[0]);
-      params.append("precioMax", priceRange[1]);
-    }
+  // Filtrar los productos
+  const filteredProductos = productos.filter((producto) => {
+    const matchesNombre = searchProducto
+      ? producto.nombre?.toLowerCase() === lowerCaseSearchProducto // Comparación exacta
+      : true; // Si no se especifica el nombre, coinciden todos
 
-    console.log("Buscando con parámetros:", params.toString());
+    const matchesCategoria = searchCategoria
+      ? producto.categoria?.toLowerCase().includes(lowerCaseSearchCategoria)
+      : true; // Si no se especifica la categoría, coinciden todos
 
-    // Realizar la solicitud GET con los parámetros
-    const response = await fetch(`http://localhost:80/api/productos?${params.toString()}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const matchesPrecio =
+      producto.precio >= priceRange[0] && producto.precio <= priceRange[1]; // Verificar si el precio está dentro del rango
 
-    if (!response.ok) {
-      throw new Error(`Error al buscar productos: ${response.statusText}`);
-    }
+    return matchesNombre && matchesCategoria && matchesPrecio;
+  });
 
-    // Devolver los resultados de la búsqueda
-    const data = await response.json();
-    return { success: true, data };
-  } catch (error) {
-    console.error("Error en handleSearchProducto:", error);
-    return { success: false, message: "Error al buscar productos" };
-  }
+  return filteredProductos;
 };

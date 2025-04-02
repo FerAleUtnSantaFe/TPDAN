@@ -1,24 +1,23 @@
 'use client';
 
-import * as React from 'react';
-import { useRouter } from 'next/navigation';
-import { DataGrid } from '@mui/x-data-grid';
-import { styled, alpha } from '@mui/material/styles';
-import NavBar from "../../Components/NavBar";
+import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { Container } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import InputBase from '@mui/material/InputBase';
-import SearchIcon from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
-import SettingsIcon from '@mui/icons-material/Settings';
-import DeleteIcon from '@mui/icons-material/Delete';
 import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import { DataGrid } from '@mui/x-data-grid';
 import Link from 'next/link';
-import { Container } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import * as React from 'react';
+import { Search, SearchIconWrapper, StyledInputBase } from '../../styles/styles';
+import NavBar from "../../Components/NavBar";
 
 export default function PedidosPage() {
     const paginationModel = { page: 0, pageSize: 5 };
@@ -154,35 +153,3 @@ export default function PedidosPage() {
     );
 }
 
-// Estilos para la barra de búsqueda
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.25) },
-    marginLeft: 0,
-    width: '100%',
-    minWidth: 200,
-    [theme.breakpoints.up('sm')]: { marginLeft: theme.spacing(1), width: 'auto' },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    width: '100%',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 1),
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        [theme.breakpoints.up('sm')]: { width: '12ch', '&:focus': { width: '20ch' } },
-    },
-}));
