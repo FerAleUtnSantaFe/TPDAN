@@ -69,8 +69,8 @@ const FormularioCliente = ({ modo }) => {
 
     // Validar números positivos
     if (['cuit', 'maximoDescubierto', 'maximoDeObras'].includes(name) && value < 0) {
-        setErrors({ ...errors, [name]: 'El valor debe ser un número positivo' });
-        return;
+      setErrors({ ...errors, [name]: 'El valor debe ser un número positivo' });
+      return;
     }
     // Limpiar el error del campo si se corrige
     if (errors[name]) {

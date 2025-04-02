@@ -12,6 +12,22 @@ export async function fetchProductos() {
   }
 }
 
+// Obtener producto por ID
+export async function getProductoById(id) {
+  try {
+    const response = await fetch(`http://localhost:80/api/productos/${id}`);
+    if (!response.ok) {
+      throw new Error(
+        `Error al obtener el producto con ID ${id}: ${response.statusText}`
+      );
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error en getProductoById:", error);
+    throw error;
+  }
+}
+
 // Crear producto
 export async function createProducto(producto) {
   try {
@@ -40,22 +56,6 @@ export async function createProducto(producto) {
     return await response.json();
   } catch (error) {
     console.error("Error en createProducto:", error);
-    throw error;
-  }
-}
-
-// Obtener producto por ID
-export async function getProductoById(id) {
-  try {
-    const response = await fetch(`http://localhost:80/api/productos/${id}`);
-    if (!response.ok) {
-      throw new Error(
-        `Error al obtener el producto con ID ${id}: ${response.statusText}`
-      );
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error en getProductoById:", error);
     throw error;
   }
 }
