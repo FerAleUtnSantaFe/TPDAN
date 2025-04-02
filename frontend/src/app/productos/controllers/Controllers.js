@@ -5,13 +5,21 @@ import { deleteProducto, editProducto } from "../APIs/ProductosAPI";
 export const handleEdit = async (
   id,
   nombre,
-  descripcion,
   precio,
   stockActual,
-  stockMinimo
+  stockMinimo,
+  descuentoPromocional,
+  descripcion,
 ) => {
   try {
-    const producto = { nombre, descripcion, precio, stockActual, stockMinimo };
+    const producto = {
+      nombre,
+      precio,
+      stockActual,
+      stockMinimo,
+      descuentoPromocional,
+      descripcion,
+    };
     const result = await editProducto(id, producto);
 
     return {

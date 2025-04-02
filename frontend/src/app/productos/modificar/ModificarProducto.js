@@ -7,6 +7,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  InputAdornment,
   TextField,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -19,10 +20,11 @@ export default function ModificarProductoModal({
   onProductoUpdated,
 }) {
   const [nombre, setNombre] = useState("");
-  const [descripcion, setDescripcion] = useState("");
   const [precio, setPrecio] = useState("");
   const [stockActual, setStockActual] = useState("");
   const [stockMinimo, setStockMinimo] = useState("");
+  const [descuentoPromocional, setDescuentoPromocional] = useState(0);
+  const [descripcion, setDescripcion] = useState("");
   const [errors, setErrors] = useState({}); // Estado para manejar errores
 
   // Cargar los datos del producto al abrir el modal
@@ -32,10 +34,11 @@ export default function ModificarProductoModal({
         try {
           const producto = await getProductoById(productoId);
           setNombre(producto.nombre);
-          setDescripcion(producto.descripcion);
           setPrecio(producto.precio);
           setStockActual(producto.stockActual);
           setStockMinimo(producto.stockMinimo);
+          setDescuentoPromocional(producto.descuentoPromocional);
+          setDescripcion(producto.descripcion);
         } catch (error) {
           console.error("Error al cargar el producto:", error);
         }
@@ -49,12 +52,14 @@ export default function ModificarProductoModal({
     if (!nombre.trim()) newErrors.nombre = "El nombre no puede estar vacío.";
     if (!descripcion.trim())
       newErrors.descripcion = "La descripción no puede estar vacía.";
-    if (!precio || precio <= 0)
-      newErrors.precio = "El precio debe ser mayor a 0.";
+    if (!precio || precio <= 0) newErrors.precio = "Valor de precio no válido.";
     if (!stockActual || stockActual < 0)
-      newErrors.stockActual = "El stock actual no puede ser negativo.";
+      newErrors.stockActual = "Valor de stock actual no válido.";
     if (!stockMinimo || stockMinimo < 0)
-      newErrors.stockMinimo = "El stock mínimo no puede ser negativo.";
+      newErrors.stockMinimo = "Valor de stock mínimo no válido.";
+    if (!descuentoPromocional || descuentoPromocional < 0)
+      newErrors.descuentoPromocional =
+        "Valor de descuento promocional no válido.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // Retorna true si no hay errores
   };
@@ -63,13 +68,16 @@ export default function ModificarProductoModal({
     if (!validateFields()) return; // Detiene la ejecución si hay errores
 
     try {
+
       const updatedProducto = {
         nombre,
-        descripcion,
         precio,
         stockActual,
         stockMinimo,
+        descuentoPromocional,
+        descripcion,
       };
+
       await editProducto(productoId, updatedProducto);
       onProductoUpdated(); // Notifica a la vista principal que el producto fue actualizado
       onClose(); // Cierra el modal
@@ -135,6 +143,24 @@ export default function ModificarProductoModal({
             onChange={(e) => setStockMinimo(e.target.value)}
             error={!!errors.stockMinimo}
             helperText={errors.stockMinimo}
+            required
+          />
+          <TextField
+            label="Descuento Promocional"
+            type="number"
+            value={descuentoPromocional}
+            onChange={(e) => {
+              const value = parseFloat(e.target.value);
+              if (value >= 0 && value <= 100) {
+                setDescuentoPromocional(value); // Actualiza el estado directamente
+              }
+            }}
+            error={!!errors.descuentoPromocional}
+            margin="normal"
+            InputProps={{
+              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+            }}
+            helperText="Ingrese un valor entre 0 y 100"
             required
           />
           <TextField
