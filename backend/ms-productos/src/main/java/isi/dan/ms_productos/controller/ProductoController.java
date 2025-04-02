@@ -1,6 +1,8 @@
 package isi.dan.ms_productos.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -100,6 +102,34 @@ public class ProductoController {
     public ResponseEntity<List<Producto>> saveProductos(@RequestBody List<Producto> productos) {
         List<Producto> savedProductos = productoService.saveAll(productos);
         return ResponseEntity.ok(savedProductos);
+    }
+
+    @PutMapping("/{id}/provision")
+    @LogExecutionTime
+    public ResponseEntity<Producto> provisionStock(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Object> request) throws ProductoNotFoundException {
+        Optional<Producto> productoOptional = productoService.getProductoById(id);
+
+        if (!productoOptional.isPresent()) {
+            throw new ProductoNotFoundException("Producto " + id + " no encontrado");
+        }
+
+        Producto producto = productoOptional.get();
+
+        // Obtener y sumar el stock
+        Integer stock = (Integer) request.get("stock");
+        if (stock != null) {
+            producto.setStockActual(producto.getStockActual() + stock);
+        }
+
+        // Actualizar el precio
+        BigDecimal precio = new BigDecimal(request.get("precio").toString());
+        producto.setPrecio(precio);
+
+        // Guardar los cambios
+
+        return ResponseEntity.ok(productoService.updateProducto(producto));
     }
 
 }

@@ -3,9 +3,7 @@ export async function fetchProductos() {
   try {
     const response = await fetch("http://localhost:80/api/productos");
     if (!response.ok) {
-      throw new Error(
-        `Error al obtener los productos: ${response.statusText}`
-      );
+      throw new Error(`Error al obtener los productos: ${response.statusText}`);
     }
     return await response.json();
   } catch (error) {
@@ -17,6 +15,12 @@ export async function fetchProductos() {
 // Crear producto
 export async function createProducto(producto) {
   try {
+    // Ajustar el precio si el descuento promocional es distinto de 0
+    if (producto.descuentoPromocional > 0) {
+      producto.precio =
+        producto.precio * (1 - producto.descuentoPromocional / 100);
+    }
+
     const response = await fetch("http://localhost:80/api/productos", {
       method: "POST",
       headers: {
@@ -28,7 +32,8 @@ export async function createProducto(producto) {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.message || `Error al crear el producto: ${response.statusText}`
+        errorData.message ||
+          `Error al crear el producto: ${response.statusText}`
       );
     }
 
@@ -55,7 +60,6 @@ export async function getProductoById(id) {
   }
 }
 
-
 // Editar producto
 export async function editProducto(id, producto) {
   const productoAModificar = await getProductoById(id);
@@ -63,6 +67,10 @@ export async function editProducto(id, producto) {
 
   try {
     // Incluye la categoría previa en el cuerpo de la solicitud
+    if (producto.descuentoPromocional > 0) {
+      producto.precio =
+        producto.precio * (1 - producto.descuentoPromocional / 100);
+    }
     const response = await fetch(`http://localhost:80/api/productos/${id}`, {
       method: "PUT",
       headers: {
@@ -77,7 +85,8 @@ export async function editProducto(id, producto) {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.message || `Error al editar el producto: ${response.statusText}`
+        errorData.message ||
+          `Error al editar el producto: ${response.statusText}`
       );
     }
 
@@ -101,7 +110,8 @@ export async function deleteProducto(id) {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        errorData.message || `Error al eliminar el producto: ${response.statusText}`
+        errorData.message ||
+          `Error al eliminar el producto: ${response.statusText}`
       );
     }
 

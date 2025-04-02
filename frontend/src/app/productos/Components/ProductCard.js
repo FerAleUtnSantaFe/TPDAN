@@ -1,6 +1,13 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { Box, Card, CardContent, IconButton, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 
 export default function ProductCard({ producto, handleEdit, handleDelete }) {
@@ -9,6 +16,11 @@ export default function ProductCard({ producto, handleEdit, handleDelete }) {
 
   // Estado para controlar si el mouse está sobre la tarjeta
   const [isHovered, setIsHovered] = useState(false);
+
+  // Calcular el precio anterior (sin descuento) y el precio actual
+  const precioAnterior =
+    producto.precio / (1 - producto.descuentoPromocional / 100);
+  const tieneDescuento = producto.descuentoPromocional > 0;
 
   return (
     <Tooltip
@@ -50,12 +62,39 @@ export default function ProductCard({ producto, handleEdit, handleDelete }) {
           }}
         />
         <CardContent>
-          <Typography variant="h6" component="div">
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              wordWrap: "break-word", // Permite que el texto haga wrap si es muy largo
+              fontSize: "1rem", // Ajusta el tamaño de la fuente si es necesario
+              maxWidth: "calc(100% - 120px)", // Evita que el texto solape la imagen (ajusta el ancho máximo)
+              whiteSpace: "normal", // Asegura que el texto haga wrap en lugar de desbordarse
+            }}
+          >
             {producto.nombre}
           </Typography>
-          <Typography variant="body1" color="text.primary">
-            Precio: ${producto.precio}
-          </Typography>
+          {tieneDescuento ? (
+            <>
+              {/* Precio anterior tachado */}
+              <Typography
+                variant="body1"
+                color="error"
+                sx={{ textDecoration: "line-through" }}
+              >
+                Precio anterior: ${precioAnterior.toFixed(2)}
+              </Typography>
+              {/* Precio actual */}
+              <Typography variant="body1" color="text.primary">
+                Precio actual: ${producto.precio.toFixed(2)}
+              </Typography>
+            </>
+          ) : (
+            // Precio sin descuento
+            <Typography variant="body1" color="text.primary">
+              Precio: ${producto.precio.toFixed(2)}
+            </Typography>
+          )}
           <Typography variant="body2" color="text.secondary">
             Stock Actual: {producto.stockActual}
           </Typography>
