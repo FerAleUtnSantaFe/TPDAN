@@ -21,9 +21,9 @@ const DataGridUsuarios = ({ rows, onDelete }) => {
     },
   ];
 
-  return <DataGrid 
-    rows={rows} 
-    columns={columns} 
+  return <DataGrid
+    rows={rows}
+    columns={columns}
     pageSize={5}
     pageSizeOptions={[5, 10, 20]}
     checkboxSelection
@@ -35,7 +35,7 @@ const DataGridUsuarios = ({ rows, onDelete }) => {
     }}
     sx={{
       width: '100%',
-    }}/>;
+    }} />;
 };
 
 export default DataGridUsuarios;

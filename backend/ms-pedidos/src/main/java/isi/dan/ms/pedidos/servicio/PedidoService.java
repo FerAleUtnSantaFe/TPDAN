@@ -34,7 +34,7 @@ public class PedidoService {
         return pedidoRepository.findById(id).orElse(null);
     }
     
-    public List<Pedido> getPedidos(Integer cliente) {
+    public List<Pedido> getPedidos(String cliente) {
         return pedidoRepository.findByCliente(cliente).orElse(null);
     }
 
@@ -42,7 +42,7 @@ public class PedidoService {
         return pedidoRepository.findByEstado(estado).orElse(null);
     }
 
-    public List<Pedido> getPedidos(Integer clienteId, Estado estado) {
+    public List<Pedido> getPedidos(String clienteId, Estado estado) {
         return pedidoRepository.findByCliente_IdAndEstado(clienteId, estado).orElse(null);
     }
 

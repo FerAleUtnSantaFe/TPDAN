@@ -60,9 +60,9 @@ public class PedidoRepositoryTest {
         pedido = new Pedido();
         cliente = new Cliente();
         pedido.setNumeroPedido(1);
-        cliente.setId(1);
+        cliente.setId("1A");
         obra = new Obra();
-        obra.setId(1);
+        obra.setId("1A");
         pedido.setObra(obra);
         estado = Estado.ACEPTADO;
         pedido.setCliente(cliente);

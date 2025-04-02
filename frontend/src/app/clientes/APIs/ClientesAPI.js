@@ -73,6 +73,7 @@ export async function updateCliente(idCli, cliente) {
 // Eliminar un cliente por ID
 export async function deleteCliente(idCli) {
     try {
+        console.log(idCli);
         const response = await fetch(`${BASE_URL}/${idCli}`, {
             method: 'DELETE'
         });
