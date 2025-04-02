@@ -21,10 +21,13 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { findClientes, deleteCliente } from './APIs/ClientesAPI';
 import { Container } from '@mui/material';
 
+/* 
+               HASTA AHORA ESTA EL CRUD ECHO, SOLO PARA DATOS CORRECTOS, FALTARIA MANEJO DE EXCEPCIONES DE BACKEND
+*/
+
 export default function ClientePage() {
     const paginationModel = { page: 0, pageSize: 5 };
     const [clientes, setClientes] = React.useState([]);
-    const [filteredRows, setFilteredRows] = React.useState([]);
     const [searchTerm, setSearchTerm] = React.useState('');
     const [snackbar, setSnackbar] = React.useState({ open: false, message: '', severity: 'success' });
     const router = useRouter();
@@ -34,17 +37,16 @@ export default function ClientePage() {
     }, []);
 
     async function cargarClientes() {
-        const data = await findClientes();
+        const data = await findClientes()
         const formattedData = data.map((cliente) => ({
             id: cliente.id,
-            cuil: cliente.cuil,
+            cuit: cliente.cuit,
             nombre: cliente.nombre,
-            correo: cliente.correo,
-            maximoDescuento: cliente.maximoDescuento,
-            obrasActivas: cliente.obrasActivas,
+            correoElectronico: cliente.correoElectronico,
+            maximoDescubierto: cliente.maximoDescubierto,
+            maximoDeObras: cliente.maximoDeObras,
         }));
         setClientes(formattedData);
-        setFilteredRows(formattedData);
     }
 
     const handleSearch = (event) => {
@@ -52,13 +54,13 @@ export default function ClientePage() {
         setSearchTerm(value);
         
         const filtered = clientes.filter(cliente =>
-            cliente.cuil.toLowerCase().includes(value) ||
+            cliente.cuit.toLowerCase().includes(value) ||
             cliente.nombre.toLowerCase().includes(value) ||
-            cliente.correo.toLowerCase().includes(value) ||
-            cliente.maximoDescuento.toString().includes(value) ||
-            cliente.obrasActivas.toString().includes(value)
+            cliente.correoElectronico.toLowerCase().includes(value) ||
+            cliente.maximoDescubierto.toString().includes(value) ||
+            cliente.maximoDeObras.toString().includes(value)
         );
-        setFilteredRows(filtered);
+        setClientes(filtered);
     };
 
     const handleEdit = (cliente) => {
@@ -105,13 +107,13 @@ export default function ClientePage() {
                 </Box>
 
                 <DataGrid
-                    clientes={filteredRows}
+                    rows={clientes}
                     columns={[
-                        { field: 'cuil', headerName: 'CUIL', flex: 1 },
+                        { field: 'cuit', headerName: 'CUIL', flex: 1 },
                         { field: 'nombre', headerName: 'Nombre', flex: 1 },
-                        { field: 'correo', headerName: 'Correo', flex: 1 },
-                        { field: 'obrasActivas', headerName: 'Obras Activas', flex: 1 },
-                        { field: 'descubierto', headerName: 'Descubierto', flex: 1 },
+                        { field: 'correoElectronico', headerName: 'Correo', flex: 1 },
+                        { field: 'maximoDeObras', headerName: 'Obras Activas', flex: 1 },
+                        { field: 'maximoDescubierto', headerName: 'Descubierto', flex: 1 },
                         {
                             field: 'opciones', headerName: 'Opciones', sortable: false, flex: 1,
                             renderCell: (params) => (
