@@ -9,7 +9,7 @@ import UsuarioModal from './UsuarioModal';
 import ObraModal from './ObraModal';
 import DataGridUsuarios from './DataGridUsuarios';
 import DataGridObras from './DataGridObras';
-import { createCliente, updateCliente, findbyIdCliente } from '../APIs/ClientesAPI';
+import { createCliente, updateCliente, findbyIdCliente } from '../../APIs/ClientesAPI';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const FormularioCliente = ({ modo }) => {
@@ -27,7 +27,6 @@ const FormularioCliente = ({ modo }) => {
 
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState({ open: false, message: '', severity: '' });
-  const [openUserModal, setOpenUserModal] = useState(false);
   const [openObraModal, setOpenObraModal] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -120,19 +119,6 @@ const FormularioCliente = ({ modo }) => {
     }
   };
 
-  const handleAddUser = (newUser) => {
-    setFormularioCliente({ ...formularioCliente, usuarios: [...formularioCliente.usuarios, { id: Date.now(), ...newUser }] });
-    setAlert({ open: true, message: 'Usuario agregado correctamente', severity: 'success' });
-  };
-
-  const handleDeleteUser = (id) => {
-    const confirmDelete = window.confirm(`¿Está seguro de que desea eliminar el usuario?`);
-    if (!confirmDelete) return;
-
-    setFormularioCliente({ ...formularioCliente, usuarios: formularioCliente.usuarios.filter(user => user.id !== id) });
-    setAlert({ open: true, message: 'Usuario eliminado correctamente', severity: 'success' });
-  };
-
   const handleAddObra = (newObra) => {
     setFormularioCliente({ ...formularioCliente, obras: [...formularioCliente.obras, { id: Date.now(), ...newObra }] });
     setAlert({ open: true, message: 'Obra agregada correctamente', severity: 'success' });
@@ -222,26 +208,9 @@ const FormularioCliente = ({ modo }) => {
               }}
             />
           )}
-          <Button
-            variant="contained"
-            color="success"
-            startIcon={<PersonAddIcon />}
-            onClick={() => setOpenUserModal(true)}
-            sx={{ marginTop: 2, marginBottom: 1 }}
-          >
-            Agregar Usuario
-          </Button>
+
           <DataGridUsuarios rows={formularioCliente.usuarios} onDelete={handleDeleteUser} />
 
-          <Button
-            variant="contained"
-            color="success"
-            startIcon={<DomainAddIcon />}
-            onClick={() => setOpenObraModal(true)}
-            sx={{ marginTop: 2, marginBottom: 1 }}
-          >
-            Agregar Obra
-          </Button>
           <DataGridObras rows={formularioCliente.obras} onDelete={handleDeleteObra} />
 
           <Button type="submit" variant="contained" color="primary" size="large" sx={{ marginTop: 2 }}>

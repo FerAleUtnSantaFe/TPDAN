@@ -8,11 +8,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
-import { deleteCliente, findClientes } from '../APIs/ClientesAPI';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { deleteCliente, findClientes } from '../../APIs/ClientesAPI';
 import { useRouter } from 'next/navigation';
 
-export default function DataGridCliente() {
-
+export default function DataGridCliente({ modo, onClienteSelect }) {
     const router = useRouter();
     const [searchTerm, setSearchTerm] = React.useState('');
     const [snackbar, setSnackbar] = React.useState({ open: false, message: '', severity: 'success' });
@@ -51,7 +51,7 @@ export default function DataGridCliente() {
     const handleDelete = async (cliente) => {
         const confirmDelete = window.confirm(`¿Está seguro de que desea eliminar el cliente ${cliente.nombre}?`);
         if (!confirmDelete) return;
- 
+
         try {
             const result = await deleteCliente(cliente.id);
             if (result) {
@@ -64,6 +64,33 @@ export default function DataGridCliente() {
             setSnackbar({ open: true, message: 'Error al eliminar el cliente', severity: 'error' });
         }
     };
+
+    // Configuración de las columnas
+    const columns = [
+        { field: 'cuit', headerName: 'CUIL', flex: 1 },
+        { field: 'nombre', headerName: 'Nombre', flex: 1 },
+        { field: 'correoElectronico', headerName: 'Correo', flex: 1 },
+        { field: 'maximoDeObras', headerName: 'Obras Activas', flex: 1 },
+        { field: 'maximoDescubierto', headerName: 'Descubierto', flex: 1 },
+        ...(modo !== 'pedido' ? [ // Si el modo no es "pedido", agrega la columna "opciones"
+            {
+                field: 'opciones',
+                headerName: 'Opciones',
+                sortable: false,
+                flex: 1,
+                renderCell: (params) => (
+                    <Box>
+                        <IconButton size="small" color="primary" onClick={() => router.push(`/clientes/modificar?id=${params.row.id}`)}>
+                            <SettingsIcon />
+                        </IconButton>
+                        <IconButton size="small" color="error" onClick={() => handleDelete(params.row)}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Box>
+                )
+            }
+        ] : [])
+    ];
 
     return (
         <Box>
@@ -80,35 +107,27 @@ export default function DataGridCliente() {
                             inputProps={{ 'aria-label': 'search' }}
                         />
                     </Search>
-                    <Button variant="contained" color="success" sx={{ ml: 'auto' }} startIcon={<AddCircleIcon />} onClick={() => router.push('/clientes/nuevo')}>
-                        Nuevo
+                    <Button
+                        variant="contained"
+                        color="success"
+                        sx={{ ml: 'auto' }}
+                        startIcon={modo !== 'pedido' ? <AddCircleIcon /> : <NavigateNextIcon/>}
+                        onClick={() => {
+                            if (modo === 'pedido') {
+                                onClienteSelect();
+                            } else {
+                                router.push('/clientes/nuevo');
+                            }
+                        }}
+                    >
+                        {modo === 'pedido' ? 'Siguiente' : 'Nuevo'}
                     </Button>
                 </Toolbar>
             </AppBar>
 
-
             <DataGrid
                 rows={clientes}
-                columns={[
-                    { field: 'cuit', headerName: 'CUIL', flex: 1 },
-                    { field: 'nombre', headerName: 'Nombre', flex: 1 },
-                    { field: 'correoElectronico', headerName: 'Correo', flex: 1 },
-                    { field: 'maximoDeObras', headerName: 'Obras Activas', flex: 1 },
-                    { field: 'maximoDescubierto', headerName: 'Descubierto', flex: 1 },
-                    {
-                        field: 'opciones', headerName: 'Opciones', sortable: false, flex: 1,
-                        renderCell: (params) => (
-                            <Box>
-                                <IconButton size="small" color="primary" onClick={() => router.push(`/clientes/modificar?id=${params.row.id}`)}>
-                                    <SettingsIcon />
-                                </IconButton>
-                                <IconButton size="small" color="error" onClick={() => handleDelete(params.row)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Box>
-                        )
-                    },
-                ]}
+                columns={columns}
                 initialState={{ pagination: { paginationModel: { page: 0, pageSize: 5 } } }}
                 pageSizeOptions={[5, 10]}
                 checkboxSelection
