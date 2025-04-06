@@ -7,35 +7,35 @@ import NavBar from "../../Components/NavBar";
 import ProgressBarPedido from '../Components/ProgressBarPedido';
 import DataGridCliente from '@/app/clientes/Components/DataGridCliente';
 import DataGridObras from '@/app/clientes/Components/DataGridObras';
+import { useState } from 'react';
 
 export default function PedidosPage() {
-    
-    const [currentStep, setCurrentStep] = React.useState(0); // Paso actual
-    const [selectedCliente, setSelectedCliente] = React.useState(null); // Cliente seleccionado
-    const [selectedObra, setSelectedObra] = React.useState(null); // Obra seleccionada
-    const [selectedProductos, setSelectedProductos] = React.useState([]); // Productos seleccionados
+
+    const [currentStep, setCurrentStep] = useState(0); // Paso actual
+    const [selectedCliente, setSelectedCliente] = useState({}); // Cliente seleccionado
+    const [selectedObra, setSelectedObra] = useState({}); // Obra seleccionada
+    const [selectedProductos, setSelectedProductos] = useState([]); // Productos seleccionados
 
     // Manejar la selección de un cliente
     const handleClienteSelect = (cliente) => {
+
+        console.log("en la pantalla de nuevo pedido");
+        console.log(cliente);
+
         setSelectedCliente(cliente); // Guardar el cliente seleccionado
         console.log(cliente)
-        setCurrentStep(1); // Avanzar al paso 1
+        if(cliente) setCurrentStep(1);
     };
 
     // Manejar la selección de una obra
     const handleObraSelect = (obra) => {
         setSelectedObra(obra); // Guardar la obra seleccionada
-        setCurrentStep(1); // Avanzar al paso 2
+        setCurrentStep(2); // Avanzar al paso 2
     };
 
     // Manejar la selección de productos
     const handleProductosSelect = (productos) => {
         setSelectedProductos(productos); // Guardar los productos seleccionados
-        console.log('Pedido completo:', {
-            cliente: selectedCliente,
-            obra: selectedObra,
-            productos: productos,
-        });
         // Aquí puedes enviar los datos al backend o realizar otra acción
     };
 
@@ -48,16 +48,17 @@ export default function PedidosPage() {
                 </Typography>
                 <ProgressBarPedido currentStep={currentStep} />
 
-                {/* Mostrar el DataGrid correspondiente según el paso actual */}
                 {currentStep === 0 && (
                     <DataGridCliente
                         modo="pedido"
                         onClienteSelect={handleClienteSelect} // Pasar la función para manejar la selección de cliente
+                        // Pasar la función para manejar la selección de cliente
                     />
                 )}
 
                 {currentStep === 1 && (
                     <DataGridObras
+                        obrasIniciales={selectedCliente ? selectedCliente.obras : []} // Pasar las obras del cliente seleccionado
                         modo="pedido"
                         onObraSelect={handleObraSelect} // Pasar la función para manejar la selección de obra
                     />

@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
-const ObraModal = ({ open, onClose, onAdd }) => {
-  const [newObra, setNewObra] = useState({ direccion: '', lat: '', lng: '', presupuesto: '', estado: '' });
+const ObraModal = ({ open, onClose, onAdd, onEdit, obraParametro}) => {
+  const [obra, setObra] = useState({ direccion: '', lat: '', lng: '', presupuesto: '', estado: '' });
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (obraParametro) {
+      setObra(obraParametro);
+    } else {
+      setObra({ direccion: '', lat: '', lng: '', presupuesto: '', estado: '' });
+    }
+    setErrors({});
+  }, [obraParametro, open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewObra({ ...newObra, [name]: value });
+    setObra({ ...obra, [name]: value });
 
-    // Limpiar el error del campo si se corrige
     if (errors[name]) {
       setErrors({ ...errors, [name]: false });
     }
@@ -17,27 +25,30 @@ const ObraModal = ({ open, onClose, onAdd }) => {
 
   const validateFields = () => {
     const newErrors = {};
-    if (!newObra.direccion) newErrors.direccion = true;
-    if (!newObra.lat) newErrors.lat = true;
-    if (!newObra.lng) newErrors.lng = true;
-    if (!newObra.presupuesto) newErrors.presupuesto = true;
-    if (!newObra.estado) newErrors.estado = true;
+    if (!obra.direccion) newErrors.direccion = true;
+    if (!obra.lat) newErrors.lat = true;
+    if (!obra.lng) newErrors.lng = true;
+    if (!obra.presupuesto) newErrors.presupuesto = true;
+    if (!obra.estado) newErrors.estado = true;
     return newErrors;
   };
 
-  const handleAdd = () => {
+  const handleSubmit = () => {
     const newErrors = validateFields();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
-    onAdd(newObra);
-    handleClose(); // Limpia los campos y cierra el modal
+    if (obraParametro) {
+      onEdit(obra);
+    } else {
+      onAdd(obra);
+    }
+    handleClose();
   };
 
   const handleClose = () => {
-    setNewObra({ direccion: '', lat: '', lng: '', presupuesto: '', estado: '' });
+    setObra({ direccion: '', lat: '', lng: '', presupuesto: '', estado: '' });
     setErrors({});
     onClose();
   };
@@ -52,7 +63,7 @@ const ObraModal = ({ open, onClose, onAdd }) => {
           label="Dirección"
           fullWidth
           name="direccion"
-          value={newObra.direccion}
+          value={obra.direccion}
           onChange={handleChange}
           margin="normal"
           error={!!errors.direccion}
@@ -63,7 +74,7 @@ const ObraModal = ({ open, onClose, onAdd }) => {
           fullWidth
           name="lat"
           type="number"
-          value={newObra.lat}
+          value={obra.lat}
           onChange={handleChange}
           margin="normal"
           error={!!errors.lat}
@@ -74,7 +85,7 @@ const ObraModal = ({ open, onClose, onAdd }) => {
           fullWidth
           name="lng"
           type="number"
-          value={newObra.lng}
+          value={obra.lng}
           onChange={handleChange}
           margin="normal"
           error={!!errors.lng}
@@ -85,7 +96,7 @@ const ObraModal = ({ open, onClose, onAdd }) => {
           fullWidth
           name="presupuesto"
           type="number"
-          value={newObra.presupuesto}
+          value={obra.presupuesto}
           onChange={handleChange}
           margin="normal"
           error={!!errors.presupuesto}
@@ -95,7 +106,7 @@ const ObraModal = ({ open, onClose, onAdd }) => {
           <InputLabel>Estado</InputLabel>
           <Select
             name="estado"
-            value={newObra.estado}
+            value={obra.estado}
             onChange={handleChange}
           >
             <MenuItem value="HABILITADA">HABILITADA</MenuItem>
@@ -109,8 +120,8 @@ const ObraModal = ({ open, onClose, onAdd }) => {
         <Button color="error" onClick={handleClose}>
           Cancelar
         </Button>
-        <Button color="primary" onClick={handleAdd}>
-          Aceptar
+        <Button color="primary" onClick={handleSubmit}>
+        {obraParametro ? 'Guardar' : 'Aceptar'}
         </Button>
       </DialogActions>
     </Dialog>

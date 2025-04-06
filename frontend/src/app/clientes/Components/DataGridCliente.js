@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { AppBar, Box, IconButton, Snackbar, Toolbar, Button } from '@mui/material';
@@ -5,63 +7,65 @@ import MuiAlert from '@mui/material/Alert';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { styled, alpha } from '@mui/material/styles';
-import InputBase from '@mui/material/InputBase';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { deleteCliente, findClientes } from '../../APIs/ClientesAPI';
 import { useRouter } from 'next/navigation';
+import { SearchIconWrapper, StyledInputBase, Search } from '@/app/styles/styles';
+import { useState, useEffect } from 'react';
+import { cargarClientes, eliminarCliente } from '../Controllers/DataGridClienteController';
 
 export default function DataGridCliente({ modo, onClienteSelect }) {
     const router = useRouter();
-    const [searchTerm, setSearchTerm] = React.useState('');
-    const [snackbar, setSnackbar] = React.useState({ open: false, message: '', severity: 'success' });
-    const [clientes, setClientes] = React.useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+    const [clientes, setClientes] = useState([]);
+    const [clientesOriginales, setClientesOriginales] = useState([]); // Estado para los clientes originales
+    const [clienteSeleccionado, setClienteSeleccionado] = useState({});
 
-    React.useEffect(() => {
-        cargarClientes();
+    useEffect(() => {
+        const fetchClientes = async () => {
+            try {
+                const data = await cargarClientes();
+                setClientes(data);
+                setClientesOriginales(data); // Guardar los clientes originales
+            } catch (error) {
+                console.error('Error al cargar los clientes:', error);
+            }
+        };
+        fetchClientes();
     }, []);
-
-    async function cargarClientes() {
-        const data = await findClientes();
-        const formattedData = data.map((cliente) => ({
-            id: cliente.id,
-            cuit: cliente.cuit,
-            nombre: cliente.nombre,
-            correoElectronico: cliente.correoElectronico,
-            maximoDescubierto: cliente.maximoDescubierto,
-            maximoDeObras: cliente.maximoDeObras,
-        }));
-        setClientes(formattedData);
-    }
 
     const handleSearch = (event) => {
         const value = event.target.value.toLowerCase();
         setSearchTerm(value);
-        const filtered = clientes.filter(cliente =>
-            cliente.cuit.toLowerCase().includes(searchTerm) ||
-            cliente.nombre.toLowerCase().includes(searchTerm) ||
-            cliente.correoElectronico.toLowerCase().includes(searchTerm) ||
-            cliente.maximoDescubierto.toString().includes(searchTerm) ||
-            cliente.maximoDeObras.toString().includes(searchTerm)
-        );
-        setClientes(filtered);
+
+        if (value === '') {
+            // Si el campo de búsqueda está vacío, restaurar los clientes originales
+            setClientes(clientesOriginales);
+        } else {
+            // Filtrar los clientes según el término de búsqueda
+            const filtered = clientesOriginales.filter(cliente =>
+                cliente.cuit.toLowerCase().includes(value) ||
+                cliente.nombre.toLowerCase().includes(value) ||
+                cliente.correoElectronico.toLowerCase().includes(value) ||
+                cliente.maximoDescubierto.toString().includes(value) ||
+                cliente.maximoDeObras.toString().includes(value)
+            );
+            setClientes(filtered);
+        }
     };
 
     const handleDelete = async (cliente) => {
-        const confirmDelete = window.confirm(`¿Está seguro de que desea eliminar el cliente ${cliente.nombre}?`);
-        if (!confirmDelete) return;
-
-        try {
-            const result = await deleteCliente(cliente.id);
+        if (window.confirm(`¿Está seguro de que desea eliminar el cliente ${cliente.nombre}?`)) {
+            const result = await eliminarCliente(cliente.id);
             if (result) {
                 setSnackbar({ open: true, message: 'Cliente eliminado con éxito', severity: 'success' });
-                await cargarClientes();
+                const updatedClientes = await cargarClientes();
+                setClientes(updatedClientes);
+                setClientesOriginales(updatedClientes); // Actualizar los clientes originales
             } else {
                 setSnackbar({ open: true, message: 'Error al eliminar el cliente en base de datos', severity: 'error' });
             }
-        } catch (error) {
-            setSnackbar({ open: true, message: 'Error al eliminar el cliente', severity: 'error' });
         }
     };
 
@@ -93,7 +97,7 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
     ];
 
     return (
-        <Box>
+        <Box marginTop={1}>
             <AppBar position="static">
                 <Toolbar>
                     <Search>
@@ -111,10 +115,16 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
                         variant="contained"
                         color="success"
                         sx={{ ml: 'auto' }}
-                        startIcon={modo !== 'pedido' ? <AddCircleIcon /> : <NavigateNextIcon/>}
+                        startIcon={modo !== 'pedido' ? <PersonAddIcon /> : <NavigateNextIcon />}
                         onClick={() => {
                             if (modo === 'pedido') {
-                                onClienteSelect();
+                                if (clienteSeleccionado !== '') {
+                                    console.log("en la pantalla datagrid cliente");
+                                    console.log(clienteSeleccionado);
+                                    onClienteSelect(clienteSeleccionado);
+                                } else {
+                                    setSnackbar({ open: true, message: 'Debe seleccionar un cliente para continuar', severity: 'warning' });
+                                }
                             } else {
                                 router.push('/clientes/nuevo');
                             }
@@ -132,6 +142,9 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
                 pageSizeOptions={[5, 10]}
                 checkboxSelection
                 disableMultipleRowSelection
+                onRowSelectionModelChange={(newSelection) => {
+                    setClienteSeleccionado(clientesOriginales.find(cliente => cliente.id === newSelection[0]) || {});
+                }}
                 localeText={{
                     noRowsLabel: 'No se encontraron resultados',
                     MuiTablePagination: { labelRowsPerPage: 'Clientes por página:' }
@@ -147,35 +160,3 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
         </Box>
     );
 }
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.25) },
-    marginLeft: 0,
-    width: '100%',
-    minWidth: 200,
-    [theme.breakpoints.up('sm')]: { marginLeft: theme.spacing(1), width: 'auto' },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    width: '100%',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 1),
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        [theme.breakpoints.up('sm')]: { width: '12ch', '&:focus': { width: '20ch' } },
-    },
-}));

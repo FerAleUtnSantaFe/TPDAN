@@ -2,11 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { TextField, Button, Container, Typography, Snackbar, Alert } from '@mui/material';
-import DomainAddIcon from '@mui/icons-material/DomainAdd';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import NavBar from '@/app/Components/NavBar';
-import UsuarioModal from './UsuarioModal';
-import ObraModal from './ObraModal';
 import DataGridUsuarios from './DataGridUsuarios';
 import DataGridObras from './DataGridObras';
 import { createCliente, updateCliente, findbyIdCliente } from '../../APIs/ClientesAPI';
@@ -27,7 +23,6 @@ const FormularioCliente = ({ modo }) => {
 
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState({ open: false, message: '', severity: '' });
-  const [openObraModal, setOpenObraModal] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -119,19 +114,6 @@ const FormularioCliente = ({ modo }) => {
     }
   };
 
-  const handleAddObra = (newObra) => {
-    setFormularioCliente({ ...formularioCliente, obras: [...formularioCliente.obras, { id: Date.now(), ...newObra }] });
-    setAlert({ open: true, message: 'Obra agregada correctamente', severity: 'success' });
-  };
-
-  const handleDeleteObra = (id) => {
-    const confirmDelete = window.confirm(`¿Está seguro de que desea eliminar la obra?`);
-    if (!confirmDelete) return;
-
-    setFormularioCliente({ ...formularioCliente, obras: formularioCliente.obras.filter(obra => obra.id !== id) });
-    setAlert({ open: true, message: 'Obra eliminada correctamente', severity: 'success' });
-  };
-
   return (
     <div>
       <NavBar />
@@ -209,18 +191,15 @@ const FormularioCliente = ({ modo }) => {
             />
           )}
 
-          <DataGridUsuarios rows={formularioCliente.usuarios} onDelete={handleDeleteUser} />
+          <DataGridUsuarios usuariosIniciales={formularioCliente.usuarios} />
 
-          <DataGridObras rows={formularioCliente.obras} onDelete={handleDeleteObra} />
+          <DataGridObras obrasIniciales={formularioCliente.obras} />
 
           <Button type="submit" variant="contained" color="primary" size="large" sx={{ marginTop: 2 }}>
             {modo === 'nuevo' ? 'Crear' : 'Guardar'}
           </Button>
         </form>
       </Container>
-
-      <UsuarioModal open={openUserModal} onClose={() => setOpenUserModal(false)} onAdd={handleAddUser} />
-      <ObraModal open={openObraModal} onClose={() => setOpenObraModal(false)} onAdd={handleAddObra} />
 
       <Snackbar open={alert.open} autoHideDuration={3000} onClose={() => setAlert({ ...alert, open: false })}>
         <Alert severity={alert.severity}>{alert.message}</Alert>
