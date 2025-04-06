@@ -1,5 +1,6 @@
 'use client';
 
+import ProductGrid from '@/app/productos/Components/ProductGrid';
 import { Container } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
@@ -48,7 +49,8 @@ export default function PedidosPage() {
                 </Typography>
                 <ProgressBarPedido currentStep={currentStep} />
 
-                {currentStep === 0 && (
+                {/* Mostrar el DataGrid correspondiente según el paso actual */}
+                {/* {currentStep === 0 && (
                     <DataGridCliente
                         modo="pedido"
                         onClienteSelect={handleClienteSelect} // Pasar la función para manejar la selección de cliente
@@ -62,12 +64,12 @@ export default function PedidosPage() {
                         modo="pedido"
                         onObraSelect={handleObraSelect} // Pasar la función para manejar la selección de obra
                     />
-                )}
+                )} */}
 
                 {currentStep === 2 && (
-                    <DataGridProductos
-                        modo="pedido"
-                        onProductosSelect={handleProductosSelect} // Pasar la función para manejar la selección de productos
+                    <ProductGrid
+                        isPedidoMode={true}
+                        // onProductosSelect={handleProductosSelect} // Pasar la función para manejar la selección de productos
                     />
                 )}
             </Container>
