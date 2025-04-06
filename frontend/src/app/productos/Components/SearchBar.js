@@ -19,6 +19,7 @@ export default function SearchBar({
   setProductos,
   productosSeleccionados,
   isPedidoMode,
+  onListaProductosSelect,
 }) {
   const [searchProducto, setSearchProducto] = useState("");
   const [searchCategoria, setSearchCategoria] = useState("");
@@ -53,7 +54,7 @@ export default function SearchBar({
   }
 
   const GenerarPedido = () => {
-    SeleccionarProductos(productosSeleccionados); // Llama a la función con los productos seleccionados
+    onListaProductosSelect(productosSeleccionados); // Llama a la función con los productos seleccionados
   };
 
   return (

@@ -45,7 +45,7 @@ function DataGridPedidos() {
     };
 
     const handleEdit = (pedido) => {
-        router.push(`/pedidos/modificar?id=${pedido.id}`);
+        // modal aaasheeeeeeeeeeeeeeeee de modificar el estado nomassssssssssss aaaaaaaaaaaaaaaaaaaashiiiiiiiiiiiii tomi sos alto feka
     };
 
     // CAMBIAR NOMBRES!!!!!!!!!!!!!!
@@ -104,9 +104,10 @@ function DataGridPedidos() {
                     <Button variant="contained" color="success" sx={{ ml: 'auto' }} startIcon={<AddCircleIcon />} onClick={() => router.push('/pedidos/nuevo')}> Nuevo </Button>
                 </Toolbar>
             </AppBar>
-            <DataGrid rows={pedidos} columns={columns} pageSize={5} />ç
+            <DataGrid rows={pedidos} columns={columns} pageSize={5} />
             <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
-                <MuiAlert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>                        {snackbar.message}
+                <MuiAlert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>                        
+                    {snackbar.message}
                 </MuiAlert>
             </Snackbar>
         </Box>    

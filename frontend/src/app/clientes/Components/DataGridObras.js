@@ -130,7 +130,7 @@ const DataGridObras = ({ obrasIniciales, modo, onObraSelect }) => {
             startIcon={modo !== 'pedido' ? <DomainAddIcon /> : <NavigateNextIcon />}
             onClick={() => {
               if (modo === 'pedido') {
-                onObraSelect();
+                onObraSelect(obraSeleccionada);
               } else {
                 openObraModal();
               }
@@ -147,6 +147,9 @@ const DataGridObras = ({ obrasIniciales, modo, onObraSelect }) => {
         pageSizeOptions={[5, 10, 20]}
         checkboxSelection
         disableMultipleRowSelection
+        onRowSelectionModelChange={(newSelection) => {
+          setObraSeleccionada(obrasOriginales.find(obra => obra.id === newSelection[0]) || {});
+      }}
         localeText={{
           noRowsLabel: 'No se encontraron resultados',
           MuiTablePagination: {

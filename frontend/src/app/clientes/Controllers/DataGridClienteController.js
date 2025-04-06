@@ -1,4 +1,3 @@
-
 import { findClientes, deleteCliente } from "@/app/APIs/ClientesAPI";
 
 export async function cargarClientes() {

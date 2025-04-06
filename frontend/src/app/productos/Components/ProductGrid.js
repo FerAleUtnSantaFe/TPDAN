@@ -6,7 +6,7 @@ import ModificarProductoModal from "@/app/productos/modificar/ModificarProducto"
 import { Box, Grid2 } from "@mui/material";
 import { useEffect, useState } from "react";
 
-export default function ProductGrid({ isPedidoMode }) {
+export default function ProductGrid({ isPedidoMode, onListaProductosSelect}) {
   const [productos, setProductos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProductoId, setSelectedProductoId] = useState(null);
@@ -19,7 +19,7 @@ export default function ProductGrid({ isPedidoMode }) {
     const updatedProductos = await fetchProductos();
     setProductos(updatedProductos);
   };
-
+  
   const handleEdit = (id) => {
     setSelectedProductoId(id);
     setIsModalOpen(true);
@@ -64,6 +64,7 @@ export default function ProductGrid({ isPedidoMode }) {
         setProductos={setProductos}
         productosSeleccionados={productosSeleccionados} 
         isPedidoMode={isPedidoMode}
+        onListaProductosSelect={onListaProductosSelect} 
       />
       <Grid2
         container

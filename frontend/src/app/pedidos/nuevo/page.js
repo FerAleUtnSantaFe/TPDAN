@@ -9,6 +9,8 @@ import ProgressBarPedido from '../Components/ProgressBarPedido';
 import DataGridCliente from '@/app/clientes/Components/DataGridCliente';
 import DataGridObras from '@/app/clientes/Components/DataGridObras';
 import { useState } from 'react';
+import FormularioPedido from '../Components/FormularioPedido';
+import { CargandoPedido } from '../Components/CargandoPedido';
 
 export default function PedidosPage() {
 
@@ -17,27 +19,26 @@ export default function PedidosPage() {
     const [selectedObra, setSelectedObra] = useState({}); // Obra seleccionada
     const [selectedProductos, setSelectedProductos] = useState([]); // Productos seleccionados
 
-    // Manejar la selección de un cliente
+
     const handleClienteSelect = (cliente) => {
-
-        console.log("en la pantalla de nuevo pedido");
-        console.log(cliente);
-
-        setSelectedCliente(cliente); // Guardar el cliente seleccionado
-        console.log(cliente)
-        if(cliente) setCurrentStep(1);
+        setSelectedCliente(cliente);
+        console.log("cliente seleccionado: ", cliente);
+        console.log("selected cliente: ", selectedCliente);
+        if (cliente) setCurrentStep(1);
     };
 
-    // Manejar la selección de una obra
     const handleObraSelect = (obra) => {
-        setSelectedObra(obra); // Guardar la obra seleccionada
-        setCurrentStep(2); // Avanzar al paso 2
+        setSelectedObra(obra);
+        console.log("obra seleccionada: ", obra);
+        console.log("selected obra: ", selectedObra);
+        setCurrentStep(2);
     };
 
-    // Manejar la selección de productos
-    const handleProductosSelect = (productos) => {
-        setSelectedProductos(productos); // Guardar los productos seleccionados
-        // Aquí puedes enviar los datos al backend o realizar otra acción
+    const handleProductosSelect = (productosSeleccionados) => {
+        setSelectedProductos(productosSeleccionados);
+        console.log("productos seleccionados: ", productosSeleccionados);
+        console.log("selected productos: ", selectedProductos);
+        setCurrentStep(3);
     };
 
     return (
@@ -49,12 +50,11 @@ export default function PedidosPage() {
                 </Typography>
                 <ProgressBarPedido currentStep={currentStep} />
 
-                {/* Mostrar el DataGrid correspondiente según el paso actual */}
-                {/* {currentStep === 0 && (
+                {currentStep === 0 && (
                     <DataGridCliente
                         modo="pedido"
                         onClienteSelect={handleClienteSelect} // Pasar la función para manejar la selección de cliente
-                        // Pasar la función para manejar la selección de cliente
+                    // Pasar la función para manejar la selección de cliente
                     />
                 )}
 
@@ -64,16 +64,32 @@ export default function PedidosPage() {
                         modo="pedido"
                         onObraSelect={handleObraSelect} // Pasar la función para manejar la selección de obra
                     />
-                )} */}
+                )}
 
                 {currentStep === 2 && (
                     <ProductGrid
                         isPedidoMode={true}
-                        // onProductosSelect={handleProductosSelect} // Pasar la función para manejar la selección de productos
+                        onListaProductosSelect={handleProductosSelect} // Pasar la función para manejar la selección de productos
+                    />
+                )}
+
+                {currentStep === 3 && (
+                    <CargandoPedido onEnd={() => {setCurrentStep(4)
+                        console.log("selected productos en paso 4: ", selectedProductos);
+                    }}
+                    />
+                    
+                )}
+
+                {currentStep === 4 && (
+                    <FormularioPedido
+                        cliente={selectedCliente} // Pasar el cliente seleccionado
+                        obra={selectedObra} // Pasar la obra seleccionada
+                        listaProductos={selectedProductos} // Pasar los productos seleccionados
                     />
                 )}
             </Container>
         </div>
     );
-}
 
+}

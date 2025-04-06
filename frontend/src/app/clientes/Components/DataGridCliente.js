@@ -119,8 +119,6 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
                         onClick={() => {
                             if (modo === 'pedido') {
                                 if (clienteSeleccionado !== '') {
-                                    console.log("en la pantalla datagrid cliente");
-                                    console.log(clienteSeleccionado);
                                     onClienteSelect(clienteSeleccionado);
                                 } else {
                                     setSnackbar({ open: true, message: 'Debe seleccionar un cliente para continuar', severity: 'warning' });
