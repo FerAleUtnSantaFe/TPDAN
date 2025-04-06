@@ -1,4 +1,6 @@
+import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import RemoveIcon from "@mui/icons-material/Remove";
 import SettingsIcon from "@mui/icons-material/Settings";
 import {
   Box,
@@ -10,17 +12,36 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 
-export default function ProductCard({ producto, handleEdit, handleDelete }) {
-  // Ruta dinámica para el ícono basado en la categoría
-  const iconPath = `/productos/icons/${producto.categoria.toLowerCase()}.png`;
+export default function ProductCard({
+  producto,
+  handleEdit,
+  handleDelete,
+  onCantidadChange, // Callback para notificar cambios en la cantidad
+  isPedidoMode, // Determina si está en modo carrito
+}) {
+  const [cantidad, setCantidad] = useState(0);
 
-  // Estado para controlar si el mouse está sobre la tarjeta
-  const [isHovered, setIsHovered] = useState(false);
+  // Manejar el incremento de la cantidad
+  const handleAdd = () => {
+    const nuevaCantidad = cantidad + 1;
+    setCantidad(nuevaCantidad);
+    if (onCantidadChange) onCantidadChange(producto, nuevaCantidad);
+  };
 
-  // Calcular el precio anterior (sin descuento) y el precio actual
-  const precioAnterior =
-    producto.precio / (1 - producto.descuentoPromocional / 100);
+  // Manejar el decremento de la cantidad
+  const handleRemove = () => {
+    if (cantidad > 0) {
+      const nuevaCantidad = cantidad - 1;
+      setCantidad(nuevaCantidad);
+      if (onCantidadChange) onCantidadChange(producto, nuevaCantidad);
+    }
+  };
+
   const tieneDescuento = producto.descuentoPromocional > 0;
+
+  const precioAnterior = tieneDescuento
+    ? producto.precio / (1 - producto.descuentoPromocional / 100)
+    : producto.precio;
 
   return (
     <Tooltip
@@ -36,7 +57,6 @@ export default function ProductCard({ producto, handleEdit, handleDelete }) {
       }
       placement="top"
       arrow
-      open={isHovered} // Controla si el tooltip está visible
     >
       <Card
         sx={{
@@ -44,13 +64,10 @@ export default function ProductCard({ producto, handleEdit, handleDelete }) {
           minWidth: 350,
           position: "relative",
         }}
-        onMouseEnter={() => setIsHovered(true)} // Mostrar tooltip al pasar el mouse
-        onMouseLeave={() => setIsHovered(false)} // Ocultar tooltip al salir el mouse
       >
-        {/* Ícono de categoría */}
         <Box
           component="img"
-          src={iconPath}
+          src={`/productos/icons/${producto.categoria.toLowerCase()}.png`}
           alt={producto.categoria}
           sx={{
             position: "absolute",
@@ -66,10 +83,10 @@ export default function ProductCard({ producto, handleEdit, handleDelete }) {
             variant="h6"
             component="div"
             sx={{
-              wordWrap: "break-word", // Permite que el texto haga wrap si es muy largo
-              fontSize: "1rem", // Ajusta el tamaño de la fuente si es necesario
-              maxWidth: "calc(100% - 120px)", // Evita que el texto solape la imagen (ajusta el ancho máximo)
-              whiteSpace: "normal", // Asegura que el texto haga wrap en lugar de desbordarse
+              wordWrap: "break-word",
+              fontSize: "1rem",
+              maxWidth: "calc(100% - 120px)",
+              whiteSpace: "normal",
             }}
           >
             {producto.nombre}
@@ -110,20 +127,44 @@ export default function ProductCard({ producto, handleEdit, handleDelete }) {
             padding: 1,
           }}
         >
-          <IconButton
-            size="small"
-            color="primary"
-            onClick={() => handleEdit(producto.id)}
-          >
-            <SettingsIcon />
-          </IconButton>
-          <IconButton
-            size="small"
-            color="error"
-            onClick={() => handleDelete(producto.id)}
-          >
-            <DeleteIcon />
-          </IconButton>
+          {isPedidoMode ? (
+            <>
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={handleRemove}
+                disabled={cantidad === 0}
+              >
+                <RemoveIcon />
+              </IconButton>
+              <Typography variant="body1">{cantidad}</Typography>
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={handleAdd}
+                disabled={cantidad === producto.stockActual}
+              >
+                <AddIcon />
+              </IconButton>
+            </>
+          ) : (
+            <>
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={() => handleEdit(producto.id)}
+              >
+                <SettingsIcon />
+              </IconButton>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => handleDelete(producto.id)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </>
+          )}
         </Box>
       </Card>
     </Tooltip>

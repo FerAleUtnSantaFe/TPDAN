@@ -1,6 +1,13 @@
+import { fetchProductos } from "@/app/APIs/ProductosAPI";
+import {
+  SearchProductos,
+  SeleccionarProductos,
+} from "@/app/productos/controllers/Controllers";
 import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import { AppBar, Box, Button, Slider, Toolbar } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   Search,
   SearchIconWrapper,
@@ -8,19 +15,50 @@ import {
 } from "../../styles/styles";
 
 export default function SearchBar({
-  searchProducto,
-  setSearchProducto,
-  searchCategoria,
-  setSearchCategoria,
-  priceRange,
-  setPriceRange,
-  handleSearch,
-  handleNew,
+  productos,
+  setProductos,
+  productosSeleccionados,
+  isPedidoMode,
 }) {
+  const [searchProducto, setSearchProducto] = useState("");
+  const [searchCategoria, setSearchCategoria] = useState("");
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+
+  const router = useRouter();
+
+  const handleNew = () => {
+    router.push("/productos/nuevo");
+  };
+
+  async function buscarProductos() {
+    if (
+      !searchProducto &&
+      !searchCategoria &&
+      priceRange[0] === 0 &&
+      priceRange[1] === 1000
+    ) {
+      const ReinicioProductos = await fetchProductos();
+      setProductos(ReinicioProductos); // Se reinician los campos de busqueda
+      return;
+    }
+
+    const productosFiltrados = SearchProductos(
+      productos,
+      searchProducto,
+      searchCategoria,
+      priceRange
+    );
+
+    setProductos(productosFiltrados);
+  }
+
+  const GenerarPedido = () => {
+    SeleccionarProductos(productosSeleccionados); // Llama a la función con los productos seleccionados
+  };
+
   return (
     <AppBar position="static" sx={{ borderRadius: 2 }}>
-      <Toolbar sx>
-        {/* Campo de búsqueda por producto */}
+      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Search sx={{ width: 200, gap: 1 }}>
           <SearchIconWrapper>
             <SearchIcon />
@@ -33,28 +71,19 @@ export default function SearchBar({
           />
         </Search>
 
-        {/* Campo de búsqueda por Categoría */}
         <Search sx={{ width: 200, gap: 1 }}>
           <SearchIconWrapper>
             <SearchIcon />
           </SearchIconWrapper>
           <StyledInputBase
-            placeholder="Categoria..."
+            placeholder="Categoría..."
             inputProps={{ "aria-label": "search" }}
             value={searchCategoria}
             onChange={(e) => setSearchCategoria(e.target.value)}
           />
         </Search>
 
-        {/* Slider para rango de precios */}
-        <Box
-          sx={{
-            flexGrow: 0,
-            minWidth: 200,
-            ml: 4,
-            display: { xs: "none", sm: "block" },
-          }}
-        >
+        <Box sx={{ flexGrow: 0, minWidth: 200, ml: 4 }}>
           <Slider
             value={priceRange}
             onChange={(e, newValue) => setPriceRange(newValue)}
@@ -71,28 +100,40 @@ export default function SearchBar({
           />
         </Box>
 
-        {/* Botón Buscar */}
         <Button
           variant="contained"
           size="large"
           color="info"
           sx={{ ml: "auto", padding: "0.75rem 1.5rem" }}
-          onClick={handleSearch}
+          onClick={buscarProductos}
         >
           Buscar
         </Button>
 
-        {/* Botón Nuevo */}
-        <Button
-          variant="contained"
-          color="success"
-          size="large"
-          sx={{ ml: "1rem", padding: "0.75rem 1.5rem" }}
-          startIcon={<AddIcon />}
-          onClick={handleNew}
-        >
-          Nuevo
-        </Button>
+        {isPedidoMode ? (
+          <Button
+            variant="contained"
+            color="success"
+            size="large"
+            sx={{ ml: "1rem", padding: "0.75rem 1.5rem" }}
+            onClick={GenerarPedido}
+          >
+            Generar Pedido
+          </Button>
+        ) : (
+          <>
+            <Button
+              variant="contained"
+              color="success"
+              size="large"
+              sx={{ ml: "1rem", padding: "0.75rem 1.5rem" }}
+              startIcon={<AddIcon />}
+              onClick={handleNew}
+            >
+              Nuevo
+            </Button>
+          </>
+        )}
       </Toolbar>
     </AppBar>
   );

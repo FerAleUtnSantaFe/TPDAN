@@ -119,7 +119,7 @@ export default function NuevoProductoForm({ handleSubmit }) {
           value={formData.descuentoPromocional}
           onChange={handleChange}
           margin="normal"
-          InputProps={{
+          SlotProps={{
             endAdornment: <InputAdornment position="end">%</InputAdornment>,
           }}
           helperText="Ingrese un valor entre 0 y 100"

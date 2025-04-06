@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation"; // Importa useRouter
+import { createProducto } from "../../APIs/ProductosAPI";
 import NavBar from "../../Components/NavBar";
-import { createProducto } from "../APIs/ProductosAPI";
 import NuevoProductoForm from "../Components/NuevoProductoForm";
 
 export default function NuevoProducto() {

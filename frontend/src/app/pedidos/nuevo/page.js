@@ -1,16 +1,16 @@
 'use client';
 
+import ProductGrid from '@/app/productos/Components/ProductGrid';
 import { Container } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import NavBar from "../../Components/NavBar";
 import ProgressBarPedido from '../Components/ProgressBarPedido';
-import DataGridCliente from '@/app/clientes/Components/DataGridCliente';
-import DataGridObras from '@/app/clientes/Components/DataGridObras';
+
 
 export default function PedidosPage() {
     
-    const [currentStep, setCurrentStep] = React.useState(0); // Paso actual
+    const [currentStep, setCurrentStep] = React.useState(2); // Paso actual
     const [selectedCliente, setSelectedCliente] = React.useState(null); // Cliente seleccionado
     const [selectedObra, setSelectedObra] = React.useState(null); // Obra seleccionada
     const [selectedProductos, setSelectedProductos] = React.useState([]); // Productos seleccionados
@@ -49,7 +49,7 @@ export default function PedidosPage() {
                 <ProgressBarPedido currentStep={currentStep} />
 
                 {/* Mostrar el DataGrid correspondiente según el paso actual */}
-                {currentStep === 0 && (
+                {/* {currentStep === 0 && (
                     <DataGridCliente
                         modo="pedido"
                         onClienteSelect={handleClienteSelect} // Pasar la función para manejar la selección de cliente
@@ -61,12 +61,12 @@ export default function PedidosPage() {
                         modo="pedido"
                         onObraSelect={handleObraSelect} // Pasar la función para manejar la selección de obra
                     />
-                )}
+                )} */}
 
                 {currentStep === 2 && (
-                    <DataGridProductos
-                        modo="pedido"
-                        onProductosSelect={handleProductosSelect} // Pasar la función para manejar la selección de productos
+                    <ProductGrid
+                        isPedidoMode={true}
+                        // onProductosSelect={handleProductosSelect} // Pasar la función para manejar la selección de productos
                     />
                 )}
             </Container>

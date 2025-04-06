@@ -1,4 +1,4 @@
-import { deleteProducto, editProducto } from "../APIs/ProductosAPI";
+import { deleteProducto, editProducto } from "../../APIs/ProductosAPI";
 
 // Editar producto
 
@@ -9,7 +9,7 @@ export const handleEdit = async (
   stockActual,
   stockMinimo,
   descuentoPromocional,
-  descripcion,
+  descripcion
 ) => {
   try {
     const producto = {
@@ -64,7 +64,7 @@ export const handleDelete = async (id) => {
 };
 
 // Filtrar productos
-export const handleSearchProducto = (
+export const SearchProductos = (
   productos,
   searchProducto,
   searchCategoria,
@@ -75,7 +75,7 @@ export const handleSearchProducto = (
   const lowerCaseSearchCategoria = searchCategoria.toLowerCase();
 
   // Filtrar los productos
-  const filteredProductos = productos.filter((producto) => {
+  const productosFiltrados = productos.filter((producto) => {
     const matchesNombre = searchProducto
       ? producto.nombre?.toLowerCase() === lowerCaseSearchProducto // Comparación exacta
       : true; // Si no se especifica el nombre, coinciden todos
@@ -90,5 +90,14 @@ export const handleSearchProducto = (
     return matchesNombre && matchesCategoria && matchesPrecio;
   });
 
-  return filteredProductos;
+  return productosFiltrados;
+};
+
+export const SeleccionarProductos = (productosSeleccionados) => {
+  if (!productosSeleccionados || productosSeleccionados.length === 0) {
+    console.log("No hay productos seleccionados.");
+    return;
+  }
+
+  console.log("Productos seleccionados:", productosSeleccionados);
 };

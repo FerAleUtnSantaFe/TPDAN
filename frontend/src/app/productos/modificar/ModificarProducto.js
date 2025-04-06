@@ -1,5 +1,6 @@
 "use client";
 
+import { editProducto, getProductoById } from "@/app/APIs/ProductosAPI";
 import {
   Box,
   Button,
@@ -11,13 +12,11 @@ import {
   TextField,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { editProducto, getProductoById } from "../APIs/ProductosAPI";
 
 export default function ModificarProductoModal({
   open,
   onClose,
   productoId,
-  onProductoUpdated,
 }) {
   const [nombre, setNombre] = useState("");
   const [precio, setPrecio] = useState("");
@@ -47,7 +46,7 @@ export default function ModificarProductoModal({
     }
   }, [open, productoId]);
 
-  const validateFields = () => {
+  const validarCampos = () => {
     const newErrors = {};
     if (!nombre.trim()) newErrors.nombre = "El nombre no puede estar vacío.";
     if (!descripcion.trim())
@@ -64,12 +63,12 @@ export default function ModificarProductoModal({
     return Object.keys(newErrors).length === 0; // Retorna true si no hay errores
   };
 
-  const handleSave = async () => {
-    if (!validateFields()) return; // Detiene la ejecución si hay errores
+  const guardarProducto = async () => {
+    if (!validarCampos()) return; // Detiene la ejecución si hay errores
 
     try {
 
-      const updatedProducto = {
+      const productoActualizado = {
         nombre,
         precio,
         stockActual,
@@ -78,8 +77,7 @@ export default function ModificarProductoModal({
         descripcion,
       };
 
-      await editProducto(productoId, updatedProducto);
-      onProductoUpdated(); // Notifica a la vista principal que el producto fue actualizado
+      await editProducto(productoId, productoActualizado);
       onClose(); // Cierra el modal
     } catch (error) {
       console.error("Error al guardar los cambios:", error);
@@ -87,7 +85,7 @@ export default function ModificarProductoModal({
     }
   };
 
-  const handleDescripcionChange = (e) => {
+  const validacionDescripcion = (e) => {
     const value = e.target.value;
     if (value.length <= 170) {
       setDescripcion(value);
@@ -157,7 +155,7 @@ export default function ModificarProductoModal({
             }}
             error={!!errors.descuentoPromocional}
             margin="normal"
-            InputProps={{
+            slotProps={{
               endAdornment: <InputAdornment position="end">%</InputAdornment>,
             }}
             helperText="Ingrese un valor entre 0 y 100"
@@ -167,7 +165,7 @@ export default function ModificarProductoModal({
             label="Descripción"
             variant="outlined"
             value={descripcion}
-            onChange={handleDescripcionChange}
+            onChange={validacionDescripcion}
             error={!!errors.descripcion}
             helperText={
               errors.descripcion || `${descripcion.length}/170 caracteres`
@@ -182,7 +180,7 @@ export default function ModificarProductoModal({
         <Button onClick={onClose} color="secondary">
           Cancelar
         </Button>
-        <Button onClick={handleSave} variant="contained" color="primary">
+        <Button onClick={guardarProducto} variant="contained" color="primary">
           Guardar Cambios
         </Button>
       </DialogActions>
