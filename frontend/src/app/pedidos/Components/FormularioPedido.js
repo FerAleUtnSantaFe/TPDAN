@@ -3,27 +3,38 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Snackbar, Alert, List, ListItem, ListItemText } from '@mui/material';
 import { createPedido } from '@/app/APIs/PedidosAPI';
+import { useRouter } from 'next/navigation';
 
 
 const FormularioPedido = ({ cliente, obra, listaProductos }) => {
+    const router = useRouter();
     const [alert, setAlert] = useState({ open: false, message: '', severity: '' });
     const [pedido, setPedido] = useState({
-        fecha: new Date().toLocaleDateString(),
+        fecha: new Date().toISOString(),
         numeroPedido: Math.floor(Math.random() * 1000000), // Genera un número de pedido aleatorio
         usuario: 'Usuario Actual', // Cambiar por el usuario actual
         observaciones: 'Sin observaciones',
         total: listaProductos.reduce((total, producto) => total + producto.precio * producto.cantidad, 0), // Calcula el total
+        estadosPedido: [],
+        estado: 'ACEPTADO',
         obra: obra,
         cliente: cliente,
         listaProductos: listaProductos,
-        estadosPedido: '',
-        estado: '',
     });
 
 
     const handleFinalizar = async () => {
         try {
-            result = await createPedido(pedido); // Llama a la API para crear el pedido
+            const pedidoData = {
+                ...pedido,
+                cliente: cliente.id.toString(), // Asegúrate de que el ID del cliente sea una cadena
+                obra: obra.id.toString(), // Asegúrate de que el ID de la obra sea una cadena
+                listaProductos: listaProductos.map(producto => ({ id: producto.id.toString() , cantidad: producto.cantidad, precio: producto.precio })), // Asegúrate de que la lista de productos tenga el formato correcto
+            };
+
+            console.log('Datos y formato del pedido:'); // Verifica los datos del pedido antes de enviarlos
+            console.log(pedidoData); // Verifica los datos del pedido antes de enviarlos
+            const result = await createPedido(pedidoData); // Llama a la API para crear el pedido
             if (result) {
                 setAlert({ open: true, message: 'Pedido creado correctamente', severity: 'success' });
                 setTimeout(() => {

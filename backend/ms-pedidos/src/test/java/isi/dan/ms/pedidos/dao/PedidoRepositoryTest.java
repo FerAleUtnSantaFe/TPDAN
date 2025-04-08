@@ -21,9 +21,7 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import isi.dan.ms.pedidos.modelo.Cliente;
 import isi.dan.ms.pedidos.modelo.Estado;
-import isi.dan.ms.pedidos.modelo.Obra;
 import isi.dan.ms.pedidos.modelo.Pedido;
 
 import java.util.List;
@@ -46,8 +44,6 @@ public class PedidoRepositoryTest {
     
     private static final Integer CANTIDAD_PEDIDOS = 5;
     private static Pedido pedido;
-    private static Cliente cliente;
-    private static Obra obra;
     private static Estado estado;
 
     @DynamicPropertySource
@@ -58,14 +54,10 @@ public class PedidoRepositoryTest {
     @BeforeAll
     static void inicializar() {
         pedido = new Pedido();
-        cliente = new Cliente();
         pedido.setNumeroPedido(1);
-        cliente.setId("1A");
-        obra = new Obra();
-        obra.setId("1A");
-        pedido.setObra(obra);
+        pedido.setObra("1");
         estado = Estado.ACEPTADO;
-        pedido.setCliente(cliente);
+        pedido.setCliente("1");
         pedido.setEstado(estado);
         pedido.setId("1A");
     }

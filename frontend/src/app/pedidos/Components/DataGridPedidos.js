@@ -24,10 +24,10 @@ function DataGridPedidos() {
         const data = await findPedidos();
         const formattedData = data.map((pedido) => ({
             id: pedido.id,
-            nro_pedido: pedido.nro_pedido,
+            numeroPedido: pedido.numeroPedido,
             fecha: pedido.fecha,
-            cuit: pedido.cuit,
-            id_obra: pedido.id_obra,
+            cliente: pedido.cliente,
+            obra: pedido.obra,
             estado: pedido.estado,
             total: pedido.total,
         }));
@@ -38,23 +38,22 @@ function DataGridPedidos() {
         const value = event.target.value.toLowerCase();
         setSearchTerm(value);
         const filtered = pedidos.filter(pedido =>
-            pedido.cuit.toLowerCase().includes(searchTerm) ||
+            pedido.cliente.toLowerCase().includes(searchTerm) ||
             pedido.estado.toLowerCase().includes(searchTerm)
         );
         setClientes(filtered);
     };
 
     const handleEdit = (pedido) => {
-        // modal aaasheeeeeeeeeeeeeeeee de modificar el estado nomassssssssssss aaaaaaaaaaaaaaaaaaaashiiiiiiiiiiiii tomi sos alto feka
+        console.log("pedido a editar: ", pedido);
     };
 
-    // CAMBIAR NOMBRES!!!!!!!!!!!!!!
     const columns = [
         { field: 'id', headerName: 'ID', flex: 0.5 },
-        { field: 'nro_pedido', headerName: 'Nro Pedido', flex: 1 },
+        { field: 'numeroPedido', headerName: 'Nro Pedido', flex: 1 },
         { field: 'fecha', headerName: 'Fecha', flex: 1 },
-        { field: 'cuit', headerName: 'CUIT', flex: 1 },
-        { field: 'id_obra', headerName: 'ID Obra', flex: 1 },
+        { field: 'cliente', headerName: 'ID cliente', flex: 1 },
+        { field: 'obra', headerName: 'ID Obra', flex: 1 },
         { field: 'estado', headerName: 'Estado', flex: 1 },
         { field: 'total', headerName: 'Total', flex: 1 },
         {
@@ -96,9 +95,12 @@ function DataGridPedidos() {
                             placeholder="Buscar por ESTADO"
                             displayEmpty>
                             <MenuItem value="">Todos</MenuItem>
-                            <MenuItem value="Habilitado">Habilitado</MenuItem>
-                            <MenuItem value="Pendiente">Pendiente</MenuItem>
-                            <MenuItem value="Finalizado">Finalizado</MenuItem>
+                            <MenuItem value="ACEPTADO">ACEPTADO</MenuItem>
+                            <MenuItem value="RECHAZADO">RECHAZADO</MenuItem>
+                            <MenuItem value="CANCELADO">CANCELADO</MenuItem>
+                            <MenuItem value="EN_PREPARACION">EN_PREPARACION</MenuItem>
+                            <MenuItem value="ENTREGADO">ENTREGADO</MenuItem>
+                            <MenuItem value="RECIBIDO">RECIBIDO</MenuItem>
                         </StyledSelect>
                     </Search>
                     <Button variant="contained" color="success" sx={{ ml: 'auto' }} startIcon={<AddCircleIcon />} onClick={() => router.push('/pedidos/nuevo')}> Nuevo </Button>
@@ -106,11 +108,11 @@ function DataGridPedidos() {
             </AppBar>
             <DataGrid rows={pedidos} columns={columns} pageSize={5} />
             <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
-                <MuiAlert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>                        
+                <MuiAlert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
                     {snackbar.message}
                 </MuiAlert>
             </Snackbar>
-        </Box>    
+        </Box>
     );
 }
 
@@ -147,7 +149,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const StyledSelect = styled(Select)(({ theme }) => ({
     color: 'inherit',
-    width: '100%',    
+    width: '100%',
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.05),
     '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.15) },

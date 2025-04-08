@@ -43,7 +43,7 @@ public class PedidoService {
     }
 
     public List<Pedido> getPedidos(String clienteId, Estado estado) {
-        return pedidoRepository.findByCliente_IdAndEstado(clienteId, estado).orElse(null);
+        return pedidoRepository.findByClienteAndEstado(clienteId, estado).orElse(null);
     }
 
     public void deletePedido(String id) {
