@@ -10,13 +10,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 const FormularioCliente = ({ modo }) => {
   const [formularioCliente, setFormularioCliente] = useState({
-    id: '',
-    cuit: '',
+    id: null,
+    cuit: 0,
     correoElectronico: '',
     nombre: '',
-    maximoDescubierto: '',
-    maximoDeObras: '',
-    obrasActivas: '',
+    maximoDescubierto: 0,
+    maximoDeObras: 0,
+    obrasActivas: 0,
     obras: [],
     usuarios: []
   });
@@ -94,6 +94,7 @@ const FormularioCliente = ({ modo }) => {
     try {
       let result;
       if (modo === 'nuevo') {
+        console.log('cliente datos = ', formularioCliente);
         result = await createCliente(formularioCliente); // Llama a la API para crear el cliente
       } else if (modo === 'modificar') {
         const id = searchParams.get('id'); // Obtiene el ID del cliente desde los parámetros de la URL

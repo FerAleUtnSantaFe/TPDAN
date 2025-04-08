@@ -19,14 +19,15 @@ public class Pedido {
     private String usuario;
     private String observaciones;
     private BigDecimal total;
-    private Obra obra;
-    private Cliente cliente;
+    private String obra;
+    private String cliente;
+
+    // aca tengo si o si q hacer un producto, pq necesito saber cantidades y precio por c/u SIOSI
 
     @Field("Lista Productos")
     private ArrayList<Producto> listaProductos = new ArrayList<>();
     @Field("Lista Estados")
     private ArrayList<HistorialEstado> estadosPedido = new ArrayList<>();
-    // cambiar, es medio crotera
     private Estado estado = Estado.EN_PREPARACION;
 
     public void agregarEstado(Estado estado) {
