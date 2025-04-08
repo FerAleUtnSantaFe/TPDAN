@@ -1,18 +1,28 @@
 import { fetchProductos } from "@/app/APIs/ProductosAPI";
-import {
-  SearchProductos,
-  SeleccionarProductos,
-} from "@/app/productos/controllers/Controllers";
-import AddIcon from "@mui/icons-material/Add";
-import SearchIcon from "@mui/icons-material/Search";
-import { AppBar, Box, Button, Slider, Toolbar } from "@mui/material";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { SearchProductos } from "@/app/productos/controllers/Controllers";
 import {
   Search,
   SearchIconWrapper,
   StyledInputBase,
-} from "../../styles/styles";
+} from "@/app/styles/styles";
+import AddIcon from "@mui/icons-material/Add";
+import CheckIcon from "@mui/icons-material/Check";
+import SearchIcon from "@mui/icons-material/Search";
+import {
+  AppBar,
+  Box,
+  Button,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Select,
+  Slider,
+  Toolbar,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SearchBar({
   productos,
@@ -20,12 +30,18 @@ export default function SearchBar({
   productosSeleccionados,
   isPedidoMode,
   onListaProductosSelect,
+  orden,
+  setOrden,
 }) {
   const [searchProducto, setSearchProducto] = useState("");
   const [searchCategoria, setSearchCategoria] = useState("");
   const [priceRange, setPriceRange] = useState([0, 1000]);
 
   const router = useRouter();
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const handleNew = () => {
     router.push("/productos/nuevo");
@@ -38,8 +54,8 @@ export default function SearchBar({
       priceRange[0] === 0 &&
       priceRange[1] === 1000
     ) {
-      const ReinicioProductos = await fetchProductos();
-      setProductos(ReinicioProductos); // Se reinician los campos de busqueda
+      const reinicio = await fetchProductos();
+      setProductos(reinicio);
       return;
     }
 
@@ -54,13 +70,42 @@ export default function SearchBar({
   }
 
   const GenerarPedido = () => {
-    onListaProductosSelect(productosSeleccionados); // Llama a la función con los productos seleccionados
+    onListaProductosSelect(productosSeleccionados);
   };
 
   return (
-    <AppBar position="static" sx={{ borderRadius: 2 }}>
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Search sx={{ width: 200, gap: 1 }}>
+    <AppBar
+      position="static"
+      sx={{
+        borderRadius: 2,
+        maxWidth: "1200px",
+        margin: "auto",
+        px: 0, // quitar padding interno del AppBar
+        py: 0.5,
+      }}
+    >
+      <Toolbar
+        sx={(theme) => ({
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 0.5,
+          pl: 1.5, // padding izquierda global real
+          pr: 1.5, // padding derecha global real
+          [theme.breakpoints.up("md")]: {
+            gap: 1, // más separado en pantallas más grandes
+            flexWrap: "nowrap",
+          },
+        })}
+      >
+        <Search
+          sx={{
+            width: isSmallScreen ? 140 : 200,
+            height: 40,
+            px: 1,
+          }}
+        >
           <SearchIconWrapper>
             <SearchIcon />
           </SearchIconWrapper>
@@ -72,7 +117,13 @@ export default function SearchBar({
           />
         </Search>
 
-        <Search sx={{ width: 200, gap: 1 }}>
+        <Search
+          sx={{
+            width: isSmallScreen ? 140 : 200,
+            height: 40,
+            px: 1,
+          }}
+        >
           <SearchIconWrapper>
             <SearchIcon />
           </SearchIconWrapper>
@@ -84,57 +135,114 @@ export default function SearchBar({
           />
         </Search>
 
-        <Box sx={{ flexGrow: 0, minWidth: 200, ml: 4 }}>
-          <Slider
-            value={priceRange}
-            onChange={(e, newValue) => setPriceRange(newValue)}
-            valueLabelDisplay="auto"
-            min={0}
-            max={1000}
+        {!isMediumScreen && (
+          <Box sx={{ minWidth: 200, px: 1 }}>
+            <Slider
+              value={priceRange}
+              onChange={(e, newValue) => setPriceRange(newValue)}
+              valueLabelDisplay="auto"
+              min={0}
+              max={1000}
+              sx={{
+                backgroundColor: "#lightgrey",
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "#grey",
+                },
+              }}
+            />
+          </Box>
+        )}
+
+        <Box
+          sx={{
+            minWidth: isSmallScreen ? 120 : 140,
+            height: 40,
+            px: 0.5, // menos separación
+          }}
+        >
+          <Select
+            value={orden}
+            onChange={(e) => setOrden(e.target.value)}
+            renderValue={() => "Ordenar por"}
+            variant="outlined"
+            size="small"
             sx={{
-              backgroundColor: "#lightgrey", // Color de fondo personalizado
-              color: "#ffffff", // Color del texto
-              "&:hover": {
-                backgroundColor: "#grey", // Color de fondo al pasar el mouse
+              height: "100%",
+              borderRadius: 2,
+              backgroundColor: "white",
+              boxShadow: 1,
+              "& .MuiSelect-select": {
+                display: "flex",
+                alignItems: "center",
               },
             }}
-          />
+          >
+            <MenuItem value="nombre">
+              <ListItemText primary="Nombre" />
+              {orden === "nombre" && (
+                <ListItemIcon sx={{ justifyContent: "flex-end", minWidth: 0 }}>
+                  <CheckIcon fontSize="small" />
+                </ListItemIcon>
+              )}
+            </MenuItem>
+            <MenuItem value="precioAsc">
+              <ListItemText primary="Precio: Menor a Mayor" />
+              {orden === "precioAsc" && (
+                <ListItemIcon sx={{ justifyContent: "flex-end", minWidth: 0 }}>
+                  <CheckIcon fontSize="small" />
+                </ListItemIcon>
+              )}
+            </MenuItem>
+            <MenuItem value="precioDesc">
+              <ListItemText primary="Precio: Mayor a Menor" />
+              {orden === "precioDesc" && (
+                <ListItemIcon sx={{ justifyContent: "flex-end", minWidth: 0 }}>
+                  <CheckIcon fontSize="small" />
+                </ListItemIcon>
+              )}
+            </MenuItem>
+          </Select>
         </Box>
 
-        <Button
-          variant="contained"
-          size="large"
-          color="info"
-          sx={{ ml: "auto", padding: "0.75rem 1.5rem" }}
-          onClick={buscarProductos}
+        <Box
+          sx={{
+            minWidth: isSmallScreen ? 80 : 120,
+            height: 40,
+            px: 0.5, // menos separación
+          }}
         >
-          Buscar
-        </Button>
-
-        {isPedidoMode ? (
           <Button
             variant="contained"
-            color="success"
-            size="large"
-            sx={{ ml: "1rem", padding: "0.75rem 1.5rem" }}
-            onClick={GenerarPedido}
+            size="small"
+            color="info"
+            fullWidth
+            onClick={buscarProductos}
+            sx={{ height: "100%", gap: 1 }}
           >
-            Generar Pedido
+            Buscar
           </Button>
-        ) : (
-          <>
-            <Button
-              variant="contained"
-              color="success"
-              size="large"
-              sx={{ ml: "1rem", padding: "0.75rem 1.5rem" }}
-              startIcon={<AddIcon />}
-              onClick={handleNew}
-            >
-              Nuevo
-            </Button>
-          </>
-        )}
+        </Box>
+
+        <Box
+          sx={{
+            minWidth: isSmallScreen ? 100 : 130,
+            height: 40,
+            px: 0.5, // menos separación
+          }}
+        >
+          <Button
+            variant="contained"
+            size="small"
+            color="success"
+            fullWidth
+            onClick={isPedidoMode ? GenerarPedido : handleNew}
+            startIcon={!isPedidoMode && <AddIcon />}
+            sx={{ height: "100%", gap: 1 }}
+          >
+            {isPedidoMode ? "Generar Pedido" : "Nuevo"}
+          </Button>
+        </Box>
       </Toolbar>
     </AppBar>
   );
