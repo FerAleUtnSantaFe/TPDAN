@@ -1,4 +1,5 @@
 package isi.dan.ms.pedidos.controller;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,25 +16,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.qos.logback.classic.Logger;
 import isi.dan.ms.pedidos.exception.PedidoNotFoundException;
 import isi.dan.ms.pedidos.modelo.Estado;
 import isi.dan.ms.pedidos.modelo.Pedido;
+import isi.dan.ms.pedidos.rabbit.PedidoPublisher;
 import isi.dan.ms.pedidos.servicio.PedidoService;
 
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/pedidos")
 public class PedidoController {
-    
+
     @Autowired
     private PedidoService pedidoService;
 
+    @Autowired
+    private PedidoPublisher pedidoPublisher;
+
     // EJEMPLO DE RUTA /api/pedidos/?clienteId=5&estado=EN_PROCESO
     @GetMapping
-    public List<Pedido> getAllPedidos( 
-        @RequestParam(required = false) String clienteId,
-        @RequestParam(required = false) Estado estado) {
+    public List<Pedido> getAllPedidos(
+            @RequestParam(required = false) String clienteId,
+            @RequestParam(required = false) Estado estado) {
 
         if (clienteId != null && estado != null) {
             return pedidoService.getPedidos(clienteId, estado);
@@ -60,16 +64,18 @@ public class PedidoController {
 
     @PostMapping
     public Pedido createPedido(@RequestBody @Validated Pedido pedido) {
-        return pedidoService.savePedido(pedido);
+        Pedido nuevoPedido = pedidoService.savePedido(pedido);
+        pedidoPublisher.enviarPedido(nuevoPedido); // mensaje a rabbitMQ
+        return nuevoPedido;
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Pedido> updateEstadoPedido(@PathVariable final String id, @RequestBody Estado estado) throws PedidoNotFoundException {
+    public ResponseEntity<Pedido> updateEstadoPedido(@PathVariable final String id, @RequestBody Estado estado)
+            throws PedidoNotFoundException {
         if (pedidoService.getPedido(id) == null) {
-            throw new PedidoNotFoundException("Pedido "+id+" no encontrado");
+            throw new PedidoNotFoundException("Pedido " + id + " no encontrado");
         }
         return ResponseEntity.ok(pedidoService.updateEstado(id, estado));
     }
 
 }
-

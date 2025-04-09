@@ -5,15 +5,12 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import isi.dan.ms_productos.conf.RabbitMQConfig;
 import isi.dan.ms_productos.dao.ProductoRepository;
 import isi.dan.ms_productos.exception.ProductoNotFoundException;
 import isi.dan.ms_productos.modelo.Categoria;
-import isi.dan.ms_productos.modelo.OrderMessage;
 import isi.dan.ms_productos.modelo.Producto;
 
 @Service
@@ -22,23 +19,23 @@ public class ProductoService {
     private ProductoRepository productoRepository;
     Logger log = LoggerFactory.getLogger(ProductoService.class);
 
-    @RabbitListener(queues = RabbitMQConfig.STOCK_UPDATE_QUEUE)
-    public void handleStockUpdate(OrderMessage orderMessage) {
-        log.info("Recibido {}", orderMessage);
-        orderMessage.getOrderItems().forEach(orderItem -> {
-            Optional<Producto> productoOptional = productoRepository.findById(orderItem.getProductId());
-            if (productoOptional.isPresent()) {
-                Producto producto = productoOptional.get();
-                // producto.setStockActual(producto.getStockActual() - orderItem.getQuantity());
-                // // posiblemente necesite el caso de que no haya suficiente stock, aunque
-                // posiblemente se maneje en frontend
-                producto.setStockActual(1);
-                productoRepository.save(producto);
-            } else {
-                log.warn("Producto no encontrado con id: {}", orderItem.getProductId());
-            }
-        });
-    }
+    // @RabbitListener(queues = RabbitMQConfig.STOCK_UPDATE_QUEUE)
+    // public void handleStockUpdate(OrderMessage orderMessage) {
+    //     log.info("Recibido {}", orderMessage);
+    //     orderMessage.getOrderItems().forEach(orderItem -> {
+    //         Optional<Producto> productoOptional = productoRepository.findById(orderItem.getProductId());
+    //         if (productoOptional.isPresent()) {
+    //             Producto producto = productoOptional.get();
+    //             // producto.setStockActual(producto.getStockActual() - orderItem.getQuantity());
+    //             // // posiblemente necesite el caso de que no haya suficiente stock, aunque
+    //             // posiblemente se maneje en frontend
+    //             producto.setStockActual(1);
+    //             productoRepository.save(producto);
+    //         } else {
+    //             log.warn("Producto no encontrado con id: {}", orderItem.getProductId());
+    //         }
+    //     });
+    
 
     public Producto saveProducto(Producto producto) {
         return productoRepository.save(producto);

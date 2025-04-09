@@ -16,7 +16,7 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue queue() {
-        return new Queue(STOCK_UPDATE_QUEUE, false);
+        return new Queue(STOCK_UPDATE_QUEUE, true);
     }
 
     @Bean

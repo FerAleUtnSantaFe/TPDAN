@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Snackbar, Alert, List, ListItem, ListItemText } from '@mui/material';
 import { createPedido } from '@/app/APIs/PedidosAPI';
+import { Alert, Button, Container, List, ListItem, ListItemText, Snackbar, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 
 const FormularioPedido = ({ cliente, obra, listaProductos }) => {
@@ -110,7 +110,7 @@ const FormularioPedido = ({ cliente, obra, listaProductos }) => {
                         <ListItem key={index}>
                             <ListItemText
                                 primary={`${producto.nombre} - Cantidad: ${producto.cantidad}`}
-                                secondary={`Precio: $${producto.precio}`}
+                                secondary={`Precio unitario: $${producto.precio}, Total: $${(producto.precio * producto.cantidad).toFixed(2)}`}
                             />
                         </ListItem>
                     ))}
