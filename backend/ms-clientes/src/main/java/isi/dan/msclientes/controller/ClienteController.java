@@ -1,3 +1,4 @@
+
 package isi.dan.msclientes.controller;
 
 import java.util.List;
@@ -6,6 +7,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,37 +29,41 @@ import isi.dan.msclientes.servicios.ClienteService;
 @RequestMapping("/api/clientes")
 public class ClienteController {
 
-    Logger log = LoggerFactory.getLogger(ClienteController.class);
+    private static final Logger log = LoggerFactory.getLogger(ClienteController.class);
 
     @Autowired
     private ClienteService clienteService;
-
-/* 
+ 
     @Value("${dan.clientes.instancia}")
     private String instancia;
 
-    @GetMapping("/echo")
+/*     @GetMapping("/echo")
     @LogExecutionTime
     public String getEcho() {
         log.debug("Recibiendo un echo ----- {}",instancia);
         return Instant.now()+" - "+instancia;
-    }
-*/  
+    } */
+ 
     @PostMapping
     @LogExecutionTime
     public Cliente create(@RequestBody @Validated Cliente cliente) {
+        log.info("Creando cliente: {} en instancia {}", cliente, instancia);
         return clienteService.save(cliente);
     }
 
     @GetMapping
     @LogExecutionTime
     public List<Cliente> getAll() {
-        return clienteService.findAll();
+        log.info("Obteniendo todos los clientes");
+        List<Cliente> clientes = clienteService.findAll();
+        log.debug("Clientes encontrados: {} en instancia {}", clientes.size(), instancia);
+        return clientes;
     }
 
     @GetMapping("/{id}")
     @LogExecutionTime
     public ResponseEntity<Cliente> getById(@PathVariable Integer id)  throws ClienteNotFoundException {
+        log.info("Buscando cliente con ID: {} en instancia {}", id, instancia);
         Optional<Cliente> cliente = clienteService.findById(id);
         return ResponseEntity.ok(cliente.orElseThrow(()-> new ClienteNotFoundException("Cliente "+id+" no encontrado")));
     }
@@ -65,8 +71,10 @@ public class ClienteController {
     @PutMapping("/{id}")
     @LogExecutionTime
     public ResponseEntity<Cliente> update(@PathVariable final Integer id, @RequestBody Cliente cliente) throws ClienteNotFoundException {
+        log.info("Actualizando cliente con ID: {} en instancia {}", id, instancia);
         if (!clienteService.findById(id).isPresent()) {
-            throw new ClienteNotFoundException("Cliente "+id+" no encontrado");
+            log.warn("Cliente con ID {} no encontrado en instancia {}", id, instancia);
+            throw new ClienteNotFoundException("Cliente " + id + " no encontrado");
         }
         cliente.setId(id);
         return ResponseEntity.ok(clienteService.update(cliente));
@@ -75,8 +83,10 @@ public class ClienteController {
     @DeleteMapping("/{id}")
     @LogExecutionTime
     public ResponseEntity<Void> delete(@PathVariable Integer id) throws ClienteNotFoundException {
+        log.info("Eliminando cliente con ID: {} en instancia {}", id, instancia);
         if (!clienteService.findById(id).isPresent()) {
-            throw new ClienteNotFoundException("Cliente "+id+" no encontrado para borrar");
+            log.warn("Cliente con ID {} no encontrado en instancia {}", id, instancia);
+            throw new ClienteNotFoundException("Cliente " + id + " no encontrado para borrar");
         }
         clienteService.deleteById(id);
         return ResponseEntity.noContent().build();

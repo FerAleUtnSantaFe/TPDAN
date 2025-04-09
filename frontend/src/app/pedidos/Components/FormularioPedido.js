@@ -22,7 +22,6 @@ const FormularioPedido = ({ cliente, obra, listaProductos }) => {
         listaProductos: listaProductos,
     });
 
-
     const handleFinalizar = async () => {
         try {
             const pedidoData = {
@@ -32,8 +31,6 @@ const FormularioPedido = ({ cliente, obra, listaProductos }) => {
                 listaProductos: listaProductos.map(producto => ({ id: producto.id.toString() , cantidad: producto.cantidad, precio: producto.precio })), // Asegúrate de que la lista de productos tenga el formato correcto
             };
 
-            console.log('Datos y formato del pedido:'); // Verifica los datos del pedido antes de enviarlos
-            console.log(pedidoData); // Verifica los datos del pedido antes de enviarlos
             const result = await createPedido(pedidoData); // Llama a la API para crear el pedido
             if (result) {
                 setAlert({ open: true, message: 'Pedido creado correctamente', severity: 'success' });

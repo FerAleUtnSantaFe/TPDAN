@@ -38,6 +38,7 @@
   
     <root level="INFO">
       <appender-ref ref="STDOUT" />
+      <appender-ref ref="GELF" />
     </root>
   
     <logger name="isi.dan.msclientes" additivity="false">

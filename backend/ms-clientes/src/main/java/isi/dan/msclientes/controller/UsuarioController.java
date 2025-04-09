@@ -15,7 +15,7 @@ import isi.dan.msclientes.servicios.UsuarioService;
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
-    
+
     @Autowired
     private UsuarioService usuarioService;
 

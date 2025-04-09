@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Service
 public class ClienteService {
-    
+
     @Autowired
     private ClienteRepository clienteRepository;
 
@@ -27,10 +27,26 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
-    public Cliente update(Cliente cliente) {
+    public Cliente update(Cliente clienteActualizado) {
+
+        Cliente cliente = clienteRepository.findById(clienteActualizado.getId())
+        .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+
+        // Sincronizar la lista de usuarios con la nueva lista recibida
+        cliente.actualizarUsuarios(clienteActualizado.getUsuarios());
+
+        // Ahora puedes actualizar las demás propiedades del cliente
+        cliente.setNombre(clienteActualizado.getNombre());
+        cliente.setCorreoElectronico(clienteActualizado.getCorreoElectronico());
+        cliente.setCuit(clienteActualizado.getCuit());
+        cliente.setMaximoDescubierto(clienteActualizado.getMaximoDescubierto());
+        cliente.setMaximoDeObras(clienteActualizado.getMaximoDeObras());
+        cliente.setObrasActivas(clienteActualizado.getObrasActivas());
+        cliente.setObras(clienteActualizado.getObras());
+
         return clienteRepository.save(cliente);
     }
-    
+
     public void deleteById(Integer id) {
         clienteRepository.deleteById(id);
     }
