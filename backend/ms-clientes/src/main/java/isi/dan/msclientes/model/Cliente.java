@@ -3,7 +3,6 @@ package isi.dan.msclientes.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.OneToMany;
@@ -69,4 +68,19 @@ public class Cliente {
         joinColumns = @JoinColumn(name = "cliente_id"),
         inverseJoinColumns = @JoinColumn(name = "usuario_id"))
     private List<Usuario> usuarios = new ArrayList<>();
+
+    // Método para sincronizar los usuarios cuando se actualiza el cliente
+    public void actualizarUsuarios(List<Usuario> nuevosUsuarios) {
+        // Eliminar usuarios que ya no están en la lista recibida
+        this.usuarios.removeIf(usuario -> !nuevosUsuarios.contains(usuario));
+
+        // Añadir nuevos usuarios que no están en la lista actual
+        for (Usuario nuevoUsuario : nuevosUsuarios) {
+            if (!this.usuarios.contains(nuevoUsuario)) {
+                this.usuarios.add(nuevoUsuario);
+            }
+        }
+    }
+
+    
 }

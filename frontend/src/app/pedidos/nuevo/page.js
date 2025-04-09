@@ -22,22 +22,16 @@ export default function PedidosPage() {
 
     const handleClienteSelect = (cliente) => {
         setSelectedCliente(cliente);
-        console.log("cliente seleccionado: ", cliente);
-        console.log("selected cliente: ", selectedCliente);
         if (cliente) setCurrentStep(1);
     };
 
     const handleObraSelect = (obra) => {
         setSelectedObra(obra);
-        console.log("obra seleccionada: ", obra);
-        console.log("selected obra: ", selectedObra);
         setCurrentStep(2);
     };
 
     const handleProductosSelect = (productosSeleccionados) => {
         setSelectedProductos(productosSeleccionados);
-        console.log("productos seleccionados: ", productosSeleccionados);
-        console.log("selected productos: ", selectedProductos);
         setCurrentStep(3);
     };
 
