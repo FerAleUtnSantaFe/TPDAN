@@ -6,20 +6,32 @@ import ModificarProductoModal from "@/app/productos/modificar/ModificarProducto"
 import { Box, Grid2 } from "@mui/material";
 import { useEffect, useState } from "react";
 
-export default function ProductGrid({ isPedidoMode, onListaProductosSelect}) {
+export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
   const [productos, setProductos] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProductoId, setSelectedProductoId] = useState(null);
-  const [productosSeleccionados, setProductosSeleccionados] = useState([]); // Estado para productos seleccionados
+  const [productosSeleccionados, setProductosSeleccionados] = useState([]);
+  const [orden, setOrden] = useState("nombre");
+
+  const ordenarProductos = (lista) => {
+    const sorted = [...lista];
+    if (orden === "nombre") {
+      sorted.sort((a, b) => a.nombre.localeCompare(b.nombre));
+    } else if (orden === "precioAsc") {
+      sorted.sort((a, b) => a.precio - b.precio);
+    } else if (orden === "precioDesc") {
+      sorted.sort((a, b) => b.precio - a.precio);
+    }
+    return sorted;
+  };
 
   const handleModalClose = async () => {
     setIsModalOpen(false);
     setSelectedProductoId(null);
-
     const updatedProductos = await fetchProductos();
-    setProductos(updatedProductos);
+    setProductos(ordenarProductos(updatedProductos));
   };
-  
+
   const handleEdit = (id) => {
     setSelectedProductoId(id);
     setIsModalOpen(true);
@@ -28,17 +40,17 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect}) {
   useEffect(() => {
     async function fetchData() {
       const data = await fetchProductos();
-      setProductos(data);
+      setProductos(ordenarProductos(data));
     }
     fetchData();
-  }, []);
+  }, [orden]);
 
   const handleDeleteProducto = async (id) => {
     const result = await handleDelete(id);
     alert(result.message);
     if (result.success) {
       const updatedProductos = await fetchProductos();
-      setProductos(updatedProductos);
+      setProductos(ordenarProductos(updatedProductos));
     }
   };
 
@@ -46,12 +58,10 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect}) {
     setProductosSeleccionados((prev) => {
       const index = prev.findIndex((p) => p.id === producto.id);
       if (index !== -1) {
-        // Si el producto ya está en la lista, actualiza la cantidad
         const updated = [...prev];
         updated[index].cantidad = cantidad;
-        return updated.filter((p) => p.cantidad > 0); // Elimina productos con cantidad 0
+        return updated.filter((p) => p.cantidad > 0);
       } else {
-        // Si el producto no está en la lista, agrégalo
         return [...prev, { ...producto, cantidad }];
       }
     });
@@ -61,10 +71,14 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect}) {
     <Box sx={{ maxWidth: 1200, margin: "0 auto" }}>
       <SearchBar
         productos={productos}
-        setProductos={setProductos}
-        productosSeleccionados={productosSeleccionados} 
+        setProductos={(newProductos) =>
+          setProductos(ordenarProductos(newProductos))
+        }
+        productosSeleccionados={productosSeleccionados}
         isPedidoMode={isPedidoMode}
-        onListaProductosSelect={onListaProductosSelect} 
+        onListaProductosSelect={onListaProductosSelect}
+        orden={orden}
+        setOrden={setOrden}
       />
       <Grid2
         container
@@ -86,7 +100,7 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect}) {
               handleEdit={handleEdit}
               handleDelete={handleDeleteProducto}
               onCantidadChange={handleCantidadChange}
-              isPedidoMode={isPedidoMode} // Cambia esto según el modo que necesites
+              isPedidoMode={isPedidoMode}
             />
           </Grid2>
         ))}

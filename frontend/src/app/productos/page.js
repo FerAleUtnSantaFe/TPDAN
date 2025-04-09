@@ -23,7 +23,7 @@ export default function ProductosTarjetas() {
         >
           Gestión de Producto
         </Typography>
-        <ProductGrid isPedidoMode={true} />
+        <ProductGrid isPedidoMode={false} />
       </Container>
     </div>
   );
