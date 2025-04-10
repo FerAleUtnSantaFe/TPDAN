@@ -10,22 +10,38 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String STOCK_UPDATE_QUEUE = "stock-update-queue";
-    public static final String EXCHANGE = "stock-update-exchange";
-    public static final String ROUTING_KEY = "stock.update";
-
     @Bean
-    public Queue queue() {
-        return new Queue(STOCK_UPDATE_QUEUE, true);
+    public TopicExchange pedidoExchange() {
+        return new TopicExchange("pedido.exchange");
     }
 
     @Bean
-    public TopicExchange exchange() {
-        return new TopicExchange(EXCHANGE);
+    public Queue pedidoConfirmadoQueue() {
+        return new Queue("pedido.confirmado.productos", true);
     }
 
     @Bean
-    public Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+    public Queue stockDescontadoQueue() {
+        return new Queue("pedido.stock-descontado", true);
+    }
+
+    @Bean
+    public Queue pedidoFallidoQueue() {
+        return new Queue("pedido.confirmado-fallido", true);
+    }
+
+    @Bean
+    public Binding bindingPedidoConfirmado(Queue pedidoConfirmadoQueue, TopicExchange pedidoExchange) {
+        return BindingBuilder.bind(pedidoConfirmadoQueue).to(pedidoExchange).with("pedido.confirmado");
+    }
+
+    @Bean
+    public Binding bindingPedidoFallido(Queue pedidoFallidoQueue, TopicExchange pedidoExchange) {
+        return BindingBuilder.bind(pedidoFallidoQueue).to(pedidoExchange).with("pedido.confirmado-fallido");
+    }
+
+    @Bean
+    public Binding bindingStockDescontado(Queue stockDescontadoQueue, TopicExchange pedidoExchange) {
+        return BindingBuilder.bind(stockDescontadoQueue).to(pedidoExchange).with("pedido.stock-descontado");
     }
 }

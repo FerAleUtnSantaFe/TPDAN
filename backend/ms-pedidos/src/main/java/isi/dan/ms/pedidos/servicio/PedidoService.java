@@ -11,9 +11,10 @@ import org.springframework.stereotype.Service;
 import isi.dan.ms.pedidos.dao.PedidoRepository;
 import isi.dan.ms.pedidos.modelo.Estado;
 import isi.dan.ms.pedidos.modelo.Pedido;
+
 @Service
 public class PedidoService {
-    
+
     @Autowired
     private PedidoRepository pedidoRepository;
 
@@ -22,10 +23,6 @@ public class PedidoService {
 
     Logger log = LoggerFactory.getLogger(PedidoService.class);
 
-    public Pedido savePedido(Pedido pedido){
-        return pedidoRepository.save(pedido);
-    }
-
     public List<Pedido> getAllPedidos() {
         return pedidoRepository.findAll();
     }
@@ -33,8 +30,8 @@ public class PedidoService {
     public Pedido getPedido(String id) {
         return pedidoRepository.findById(id).orElse(null);
     }
-    
-    public List<Pedido> getPedidos(String cliente) {
+
+    public List<Pedido> getPedidos(Integer cliente) {
         return pedidoRepository.findByCliente(cliente).orElse(null);
     }
 
@@ -42,16 +39,18 @@ public class PedidoService {
         return pedidoRepository.findByEstado(estado).orElse(null);
     }
 
-    public List<Pedido> getPedidos(String clienteId, Estado estado) {
+    public List<Pedido> getPedidos(Integer clienteId, Estado estado) {
         return pedidoRepository.findByClienteAndEstado(clienteId, estado).orElse(null);
     }
 
-    public void deletePedido(String id) {
-        pedidoRepository.deleteById(id);
+    public Pedido savePedido(Pedido pedido) {
+        Pedido pedidoNuevo = pedidoRepository.save(pedido);
+        log.info("EN MS-PEDIDOS CREADO PEDIDO : {}", pedido);
+        return pedidoNuevo;
     }
 
-    public Pedido updateEstado(String id, Estado estado){
-        Pedido pedido = pedidoRepository.findById(id).get();        
+    public Pedido updateEstado(String id, Estado estado) {
+        Pedido pedido = pedidoRepository.findById(id).get();
         pedido.agregarEstado(estado);
         return pedidoRepository.save(pedido);
     }

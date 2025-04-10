@@ -1,5 +1,4 @@
 package isi.dan.ms.pedidos.modelo;
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 
@@ -18,9 +17,9 @@ public class Pedido {
     private Integer numeroPedido;
     private String usuario;
     private String observaciones;
-    private BigDecimal total;
-    private String obra;
-    private String cliente;
+    private Double total;
+    private Integer obra;
+    private Integer cliente;
 
     // aca tengo si o si q hacer un producto, pq necesito saber cantidades y precio por c/u SIOSI
 
@@ -28,7 +27,7 @@ public class Pedido {
     private ArrayList<Producto> listaProductos = new ArrayList<>();
     @Field("Lista Estados")
     private ArrayList<HistorialEstado> estadosPedido = new ArrayList<>();
-    private Estado estado = Estado.EN_PREPARACION;
+    private Estado estado = Estado.PENDIENTE;
 
     public void agregarEstado(Estado estado) {
         HistorialEstado nuevo = new HistorialEstado();

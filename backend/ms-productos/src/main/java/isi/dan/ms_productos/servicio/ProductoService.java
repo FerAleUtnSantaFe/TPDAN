@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,23 +20,8 @@ public class ProductoService {
     private ProductoRepository productoRepository;
     Logger log = LoggerFactory.getLogger(ProductoService.class);
 
-    // @RabbitListener(queues = RabbitMQConfig.STOCK_UPDATE_QUEUE)
-    // public void handleStockUpdate(OrderMessage orderMessage) {
-    //     log.info("Recibido {}", orderMessage);
-    //     orderMessage.getOrderItems().forEach(orderItem -> {
-    //         Optional<Producto> productoOptional = productoRepository.findById(orderItem.getProductId());
-    //         if (productoOptional.isPresent()) {
-    //             Producto producto = productoOptional.get();
-    //             // producto.setStockActual(producto.getStockActual() - orderItem.getQuantity());
-    //             // // posiblemente necesite el caso de que no haya suficiente stock, aunque
-    //             // posiblemente se maneje en frontend
-    //             producto.setStockActual(1);
-    //             productoRepository.save(producto);
-    //         } else {
-    //             log.warn("Producto no encontrado con id: {}", orderItem.getProductId());
-    //         }
-    //     });
-    
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     public Producto saveProducto(Producto producto) {
         return productoRepository.save(producto);
@@ -74,4 +60,5 @@ public class ProductoService {
     public List<Producto> saveAll(List<Producto> productos) {
         return productoRepository.saveAll(productos);
     }
+
 }

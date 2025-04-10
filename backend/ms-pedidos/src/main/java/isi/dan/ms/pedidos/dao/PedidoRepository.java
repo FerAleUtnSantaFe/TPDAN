@@ -10,10 +10,8 @@ import isi.dan.ms.pedidos.modelo.Pedido;
 
 public interface PedidoRepository extends MongoRepository<Pedido, String> {
 
-    Optional<List<Pedido>> findByCliente(String cliente);
-
+    Optional<List<Pedido>> findByCliente(Integer cliente);
     Optional<List<Pedido>> findByEstado(Estado estado);
-
-    Optional<List<Pedido>> findByClienteAndEstado(String cliente, Estado estado);
+    Optional<List<Pedido>> findByClienteAndEstado(Integer cliente, Estado estado);
 }
 

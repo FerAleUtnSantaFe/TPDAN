@@ -16,7 +16,7 @@ const FormularioPedido = ({ cliente, obra, listaProductos }) => {
         observaciones: 'Sin observaciones',
         total: listaProductos.reduce((total, producto) => total + producto.precio * producto.cantidad, 0), // Calcula el total
         estadosPedido: [],
-        estado: 'ACEPTADO',
+        estado: 'PENDIENTE',
         obra: obra,
         cliente: cliente,
         listaProductos: listaProductos,
@@ -26,9 +26,9 @@ const FormularioPedido = ({ cliente, obra, listaProductos }) => {
         try {
             const pedidoData = {
                 ...pedido,
-                cliente: cliente.id.toString(), // Asegúrate de que el ID del cliente sea una cadena
-                obra: obra.id.toString(), // Asegúrate de que el ID de la obra sea una cadena
-                listaProductos: listaProductos.map(producto => ({ id: producto.id.toString() , cantidad: producto.cantidad, precio: producto.precio })), // Asegúrate de que la lista de productos tenga el formato correcto
+                cliente: cliente.id,
+                obra: obra.id, 
+                listaProductos: listaProductos.map(producto => ({ id: producto.id , cantidad: producto.cantidad, precio: producto.precio })), // Asegúrate de que la lista de productos tenga el formato correcto
             };
 
             const result = await createPedido(pedidoData); // Llama a la API para crear el pedido

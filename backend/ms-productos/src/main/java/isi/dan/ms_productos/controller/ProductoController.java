@@ -106,9 +106,8 @@ public class ProductoController {
 
     @PutMapping("/{id}/provision")
     @LogExecutionTime
-    public ResponseEntity<Producto> provisionStock(
-            @PathVariable Integer id,
-            @RequestBody Map<String, Object> request) throws ProductoNotFoundException {
+    public ResponseEntity<Producto> provisionStock(@PathVariable Integer id, @RequestBody Map<String, Object> request)
+            throws ProductoNotFoundException {
         Optional<Producto> productoOptional = productoService.getProductoById(id);
 
         if (!productoOptional.isPresent()) {
@@ -130,6 +129,50 @@ public class ProductoController {
         // Guardar los cambios
 
         return ResponseEntity.ok(productoService.updateProducto(producto));
+    }
+
+    @PutMapping("/actualizar-stock")
+    @LogExecutionTime
+    public ResponseEntity<Boolean> actualizarStock(@RequestBody List<Map<String, Object>> productos) {
+        log.info("Actualizando stock para los productos: {}", productos);
+
+        try {
+            // Verificar si todos los productos tienen suficiente stock
+            for (Map<String, Object> productoData : productos) {
+                Integer productoId = (Integer) productoData.get("id");
+                Integer cantidad = (Integer) productoData.get("cantidad");
+
+                Optional<Producto> productoOptional = productoService.getProductoById(productoId);
+                if (!productoOptional.isPresent()) {
+                    log.warn("Producto con ID {} no encontrado", productoId);
+                    return ResponseEntity.ok(false); // Producto no encontrado
+                }
+
+                Producto producto = productoOptional.get();
+                if (producto.getStockActual() < cantidad) {
+                    log.warn("Stock insuficiente para el producto con ID {}. Stock actual: {}, requerido: {}",
+                            productoId, producto.getStockActual(), cantidad);
+                    return ResponseEntity.ok(false); // Stock insuficiente
+                }
+            }
+
+            // Si todos los productos tienen suficiente stock, actualizarlos
+            for (Map<String, Object> productoData : productos) {
+                Integer productoId = (Integer) productoData.get("id");
+                Integer cantidad = (Integer) productoData.get("cantidad");
+
+                Producto producto = productoService.getProductoById(productoId).get();
+                producto.setStockActual(producto.getStockActual() - cantidad);
+                productoService.updateProducto(producto);
+            }
+
+            log.info("Stock actualizado correctamente para todos los productos");
+            return ResponseEntity.ok(true); // Stock actualizado correctamente
+
+        } catch (Exception e) {
+            log.error("Error al actualizar stock: {}", e.getMessage());
+            return ResponseEntity.ok(false); // Error al actualizar stock
+        }
     }
 
 }

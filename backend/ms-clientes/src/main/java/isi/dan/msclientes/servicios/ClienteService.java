@@ -1,10 +1,14 @@
 package isi.dan.msclientes.servicios;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import isi.dan.msclientes.dao.ClienteRepository;
 import isi.dan.msclientes.model.Cliente;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +18,7 @@ public class ClienteService {
 
     @Autowired
     private ClienteRepository clienteRepository;
+    private static final Logger log = LoggerFactory.getLogger(ClienteService.class);
 
     public List<Cliente> findAll() {
         return clienteRepository.findAll();
@@ -30,7 +35,7 @@ public class ClienteService {
     public Cliente update(Cliente clienteActualizado) {
 
         Cliente cliente = clienteRepository.findById(clienteActualizado.getId())
-        .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
         // Sincronizar la lista de usuarios con la nueva lista recibida
         cliente.actualizarUsuarios(clienteActualizado.getUsuarios());
@@ -49,5 +54,16 @@ public class ClienteService {
 
     public void deleteById(Integer id) {
         clienteRepository.deleteById(id);
+    }
+
+    public boolean checkSaldoCliente(Cliente clienteActual, Double saldoTotal) {
+        Cliente cliente = clienteRepository.findById(clienteActual.getId())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+
+        if (cliente.getMaximoDescubierto() >= saldoTotal) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

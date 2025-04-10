@@ -3,7 +3,7 @@ docker network create backend-net
 cd ms-docker
 docker network create backend-net frontend-net
 docker-compose -f docker-compose-rabbit.yml up -d --build
-#docker-compose -f docker-compose-graylog.yml up -d --build
+docker-compose -f docker-compose-graylog.yml up -d --build
 #docker-compose -f docker-compose-zipin.yml up -d --build
 #docker-compose -f docker-compose-perf.yml up -d --build
 cd ..

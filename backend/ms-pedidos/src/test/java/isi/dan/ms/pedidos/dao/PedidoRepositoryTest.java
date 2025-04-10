@@ -55,9 +55,9 @@ public class PedidoRepositoryTest {
     static void inicializar() {
         pedido = new Pedido();
         pedido.setNumeroPedido(1);
-        pedido.setObra("1");
+        pedido.setObra(1);
         estado = Estado.ACEPTADO;
-        pedido.setCliente("1");
+        pedido.setCliente(1);
         pedido.setEstado(estado);
         pedido.setId("1A");
     }
