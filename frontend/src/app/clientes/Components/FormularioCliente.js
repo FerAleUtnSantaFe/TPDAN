@@ -16,11 +16,11 @@ const FormularioCliente = ({ modo }) => {
     nombre: '',
     maximoDescubierto: 0,
     maximoDeObras: 0,
-    obrasActivas: 0,
-    obras: [],
-    usuarios: []
+    obrasActivas: 0
   });
 
+  const [obras, setObras] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState({ open: false, message: '', severity: '' });
   const router = useRouter();
@@ -40,10 +40,10 @@ const FormularioCliente = ({ modo }) => {
                 correoElectronico: cliente.correoElectronico,
                 maximoDescubierto: cliente.maximoDescubierto,
                 maximoDeObras: cliente.maximoDeObras,
-                obrasActivas: cliente.obrasActivas,
-                obras: cliente.obras || [],
-                usuarios: cliente.usuarios || []
+                obrasActivas: cliente.obrasActivas
               });
+              setObras(cliente.obras || []);
+              setUsuarios(cliente.usuarios || []);
             } else {
               setAlert({ open: true, message: 'Cliente no encontrado', severity: 'error' });
             }
@@ -93,12 +93,12 @@ const FormularioCliente = ({ modo }) => {
 
     try {
       let result;
+
       if (modo === 'nuevo') {
-        console.log('cliente datos = ', formularioCliente);
-        result = await createCliente(formularioCliente); // Llama a la API para crear el cliente
+        result = await createCliente(formularioCliente, obras, usuarios); // Llama a la API para crear el cliente
       } else if (modo === 'modificar') {
         const id = searchParams.get('id'); // Obtiene el ID del cliente desde los parámetros de la URL
-        result = await updateCliente(id, formularioCliente); // Llama a la API para actualizar el cliente
+        result = await updateCliente(id, formularioCliente, obras, usuarios); // Llama a la API para actualizar el cliente
       }
 
       if (result) {
@@ -192,9 +192,9 @@ const FormularioCliente = ({ modo }) => {
             />
           )}
 
-          <DataGridUsuarios usuariosIniciales={formularioCliente.usuarios} />
+          <DataGridUsuarios usuariosIniciales={usuarios} setUsuariosIniciales={setUsuarios} />
 
-          <DataGridObras obrasIniciales={formularioCliente.obras} />
+          <DataGridObras obrasIniciales={obras} setObrasIniciales={setObras} />
 
           <Button type="submit" variant="contained" color="primary" size="large" sx={{ marginTop: 2 }}>
             {modo === 'nuevo' ? 'Crear' : 'Guardar'}

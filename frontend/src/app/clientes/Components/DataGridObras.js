@@ -12,18 +12,18 @@ import ObraModal from './ObraModal';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 
-const DataGridObras = ({ obrasIniciales, modo, onObraSelect }) => {
+const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }) => {
 
   const [obras, setObras] = useState([]);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [obraModalOpen, setObraModalOpen] = useState(false);
   const [obraSeleccionada, setObraSeleccionada] = useState({});
-  const [obrasOriginales, setObrasOriginales] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (obrasIniciales && Array.isArray(obrasIniciales)) {
-      const formattedData = obrasIniciales.map((obra) => ({
+      const formattedData = obrasIniciales.map((obra, index) => ({
+        tempId: obra.id || Date.now()-index,
         id: obra.id,
         direccion: obra.direccion,
         lat: obra.lat,
@@ -32,7 +32,6 @@ const DataGridObras = ({ obrasIniciales, modo, onObraSelect }) => {
         estado: obra.estado
       }));
       setObras(formattedData);
-      setObrasOriginales(formattedData); // Guardar las obras originales
     }
   }, [obrasIniciales]);
 
@@ -42,9 +41,9 @@ const DataGridObras = ({ obrasIniciales, modo, onObraSelect }) => {
 
     if (value === '') {
       // Si el campo de búsqueda está vacío, restaurar los clientes originales
-      setObras(obrasOriginales);
+      setObras(obrasIniciales);
     } else {
-      const filtered = obrasOriginales.filter(obra =>
+      const filtered = obrasIniciales.filter(obra =>
         obra.direccion.toLowerCase().includes(value) ||
         obra.lat.toString().includes(value) ||
         obra.lng.toString().includes(value) ||
@@ -66,22 +65,33 @@ const DataGridObras = ({ obrasIniciales, modo, onObraSelect }) => {
   };
 
   const handleAdd = (nuevaObra) => {
-    setObras(obras => [...obras, { id: Date.now(), ...nuevaObra }]);
+    const newObra = { tempId: Date.now(), id: null, ...nuevaObra };
+    const updatedObras = [...obras, newObra];
+
+    setObras(updatedObras);
+    setObrasIniciales(updatedObras);
     setSnackbar({ open: true, message: 'Obra agregada correctamente', severity: 'success' });
     closeObraModal();
   };
 
   const handleEdit = (obraEditada) => {
-    setObras(obras => obras.map(obra => obra.id === obraSeleccionada.id ? { ...obraSeleccionada, ...obraEditada } : obra));
+    const updatedObras = obras.map((obra) =>
+      obra.tempId === obraSeleccionada.tempId // Comparar usando el ID temporal
+        ? { ...obraSeleccionada, ...obraEditada }
+        : obra
+    );
+    setObras(updatedObras);
+    setObrasIniciales(updatedObras); // Actualizar también las obras iniciales
     setSnackbar({ open: true, message: 'Obra editada correctamente', severity: 'success' });
     closeObraModal();
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (tempId) => {
     const confirmDelete = window.confirm('¿Está seguro de que desea eliminar esta obra?');
     if (!confirmDelete) return;
-    setObras(obras => obras.filter(obra => obra.id !== id));
-    setObrasOriginales(obras => obras.filter(obra => obra.id !== id));
+    const updatedObras = obras.filter((obra) => obra.tempId !== tempId); // Filtrar por ID temporal
+    setObras(updatedObras);
+    setObrasIniciales(updatedObras); // Actualizar también las obras iniciales
     setSnackbar({ open: true, message: 'Obra eliminada correctamente', severity: 'success' });
   };
 
@@ -100,7 +110,7 @@ const DataGridObras = ({ obrasIniciales, modo, onObraSelect }) => {
           <IconButton size="small" color="primary" onClick={() => openObraModal(params.row)}>
             <SettingsIcon />
           </IconButton>
-          <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+          <IconButton size="small" color="error" onClick={() => handleDelete(params.row.tempId)}>
             <DeleteIcon />
           </IconButton>
         </Box>
@@ -145,11 +155,12 @@ const DataGridObras = ({ obrasIniciales, modo, onObraSelect }) => {
         columns={columns}
         pageSize={5}
         pageSizeOptions={[5, 10, 20]}
+        getRowId={(row) => row.tempId}
         checkboxSelection
         disableMultipleRowSelection
         onRowSelectionModelChange={(newSelection) => {
-          setObraSeleccionada(obrasOriginales.find(obra => obra.id === newSelection[0]) || {});
-      }}
+          setObraSeleccionada(obrasIniciales.find(obra => obra.id === newSelection[0]) || {});
+        }}
         localeText={{
           noRowsLabel: 'No se encontraron resultados',
           MuiTablePagination: {

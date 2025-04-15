@@ -16,7 +16,7 @@ const FormularioPedido = ({ cliente, obra, listaProductos }) => {
         observaciones: 'Sin observaciones',
         total: listaProductos.reduce((total, producto) => total + producto.precio * producto.cantidad, 0), // Calcula el total
         estadosPedido: [],
-        estado: 'PENDIENTE',
+        estado: 'RECIBIDO',
         obra: obra,
         cliente: cliente,
         listaProductos: listaProductos,

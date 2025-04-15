@@ -10,38 +10,21 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
+    public static final String QUEUE_NAME = "cola_actualizar-stock";
+    public static final String EXCHANGE_NAME = "exchange_actualizar-stock";
+
     @Bean
-    public TopicExchange pedidoExchange() {
-        return new TopicExchange("pedido.exchange");
+    public Queue queue() {
+        return new Queue(QUEUE_NAME, true); // Cola durable
     }
 
     @Bean
-    public Queue pedidoConfirmadoQueue() {
-        return new Queue("pedido.confirmado.productos", true);
+    public TopicExchange exchange() {
+        return new TopicExchange(EXCHANGE_NAME);
     }
 
     @Bean
-    public Queue stockDescontadoQueue() {
-        return new Queue("pedido.stock-descontado", true);
-    }
-
-    @Bean
-    public Queue pedidoFallidoQueue() {
-        return new Queue("pedido.confirmado-fallido", true);
-    }
-
-    @Bean
-    public Binding bindingPedidoConfirmado(Queue pedidoConfirmadoQueue, TopicExchange pedidoExchange) {
-        return BindingBuilder.bind(pedidoConfirmadoQueue).to(pedidoExchange).with("pedido.confirmado");
-    }
-
-    @Bean
-    public Binding bindingPedidoFallido(Queue pedidoFallidoQueue, TopicExchange pedidoExchange) {
-        return BindingBuilder.bind(pedidoFallidoQueue).to(pedidoExchange).with("pedido.confirmado-fallido");
-    }
-
-    @Bean
-    public Binding bindingStockDescontado(Queue stockDescontadoQueue, TopicExchange pedidoExchange) {
-        return BindingBuilder.bind(stockDescontadoQueue).to(pedidoExchange).with("pedido.stock-descontado");
+    public Binding binding(Queue queue, TopicExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(QUEUE_NAME);
     }
 }

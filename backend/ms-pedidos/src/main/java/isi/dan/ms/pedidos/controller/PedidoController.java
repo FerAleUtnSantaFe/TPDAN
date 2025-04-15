@@ -1,9 +1,12 @@
 package isi.dan.ms.pedidos.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -22,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 import isi.dan.ms.pedidos.exception.PedidoNotFoundException;
 import isi.dan.ms.pedidos.modelo.Estado;
+import isi.dan.ms.pedidos.modelo.EstadoDTO;
 import isi.dan.ms.pedidos.modelo.Pedido;
 import isi.dan.ms.pedidos.servicio.PedidoService;
 
@@ -35,10 +39,13 @@ public class PedidoController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     private static final String URL_MS_CLIENTES = "http://ms-gateway-svc:8080/api/clientes/";
     private static final String URL_MS_PRODUCTOS = "http://ms-gateway-svc:8080/api/productos/actualizar-stock";
     private static final Logger log = LoggerFactory.getLogger(PedidoController.class);
-
 
     // EJEMPLO DE RUTA /api/pedidos/?clienteId=5&estado=EN_PROCESO
     @GetMapping
@@ -71,7 +78,7 @@ public class PedidoController {
             pedidoNuevo.setEstado(Estado.RECHAZADO);
             return pedidoService.savePedido(pedidoNuevo);
         }
-    
+
         // Actualizar stock con ms-productos
         boolean stockSuficiente = actualizarStockConProductos(pedidoNuevo);
         if (stockSuficiente) {
@@ -79,8 +86,48 @@ public class PedidoController {
         } else {
             pedidoNuevo.setEstado(Estado.ACEPTADO);
         }
-    
+
         return pedidoService.savePedido(pedidoNuevo);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Pedido> updatePedido(@PathVariable final String id, @RequestBody EstadoDTO nuevoEstado)
+            throws PedidoNotFoundException {
+        Pedido pedido = pedidoService.getPedido(id);
+        if (pedido == null) {
+            throw new PedidoNotFoundException("Pedido " + id + " no encontrado");
+        }
+
+        Estado estadoActual = pedido.getEstado();
+        log.info("Nuevo estado recibido: {}", nuevoEstado.getEstado());
+        log.info("Estado actual del pedido: {}", estadoActual);
+        // Si pasa de EN_PREPARACION a CANCELADO, enviar mensaje a RabbitMQ
+        if (estadoActual == Estado.EN_PREPARACION && "CANCELADO".equals(nuevoEstado.getEstado())) {
+            log.info("Creando mensaje RABBIT para pedidoId {}", id);
+            List<Map<String, Object>> productosParaActualizar = pedido.getListaProductos().stream()
+                    .map(producto -> {
+                        Map<String, Object> productoMap = new HashMap<>();
+                        productoMap.put("id", producto.getId());
+                        productoMap.put("cantidad", producto.getCantidad());
+                        return productoMap;
+                    })
+                    .toList();
+
+            rabbitTemplate.convertAndSend("cola_actualizar-stock", productosParaActualizar);
+            log.info("Mensaje enviado a cola_actualizar-stock para pedidoId {}: {}", id, productosParaActualizar);
+        }
+
+        // Actualizar el estado del pedido
+        if ("ENTREGADO".equals(nuevoEstado.getEstado())) {
+            pedido.setEstado(Estado.ENTREGADO);
+        } else if ("CANCELADO".equals(nuevoEstado.getEstado())) {
+            pedido.setEstado(Estado.CANCELADO);
+        } else {
+            return ResponseEntity.badRequest().body(null); // Si el estado no es válido, devolver 400
+        }
+        Pedido pedidoActualizado = pedidoService.savePedido(pedido);
+
+        return ResponseEntity.ok(pedidoActualizado);
     }
 
     private boolean verificarSaldoConCliente(Integer clienteId, Double totalPedido) {
@@ -107,28 +154,21 @@ public class PedidoController {
                 .sum();
     }
 
+    
     private boolean actualizarStockConProductos(Pedido pedido) {
         try {
             ResponseEntity<Boolean> response = restTemplate.exchange(
-                URL_MS_PRODUCTOS, // URL del endpoint
-                HttpMethod.PUT,   // Método HTTP
-                new HttpEntity<>(pedido.getListaProductos()), // Cuerpo de la solicitud
-                Boolean.class     // Tipo de respuesta esperada
-        );
+                    URL_MS_PRODUCTOS, // URL del endpoint
+                    HttpMethod.PUT, // Método HTTP
+                    new HttpEntity<>(pedido.getListaProductos()), // Cuerpo de la solicitud
+                    Boolean.class // Tipo de respuesta esperada
+            );
             return response.getBody() != null && response.getBody();
         } catch (Exception e) {
-            log.error("Error al actualizar stock con ms-productos para pedidoId {}: {}", pedido.getId(), e.getMessage());
+            log.error("Error al actualizar stock con ms-productos para pedidoId {}: {}", pedido.getId(),
+                    e.getMessage());
             return false; // Si hay un error, asumimos que no hay stock suficiente
         }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Pedido> updateEstadoPedido(@PathVariable final String id, @RequestBody Estado estado)
-            throws PedidoNotFoundException {
-        if (pedidoService.getPedido(id) == null) {
-            throw new PedidoNotFoundException("Pedido " + id + " no encontrado");
-        }
-        return ResponseEntity.ok(pedidoService.updateEstado(id, estado));
     }
 
 }

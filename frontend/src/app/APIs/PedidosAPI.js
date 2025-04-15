@@ -49,26 +49,26 @@ export async function createPedido(pedido) {
 }
 
 // Actualizar un pedido existente
-export async function updatePedido(idPedido, pedido) {
+export async function updatePedido(idPedido, estado) {
     try {
-        const response = await fetch(`${BASE_URL}/${idPedido}`, {
+        const response = await fetch(`${BASE_URL}/${idPedido}`, { // Asegúrate de que la URL coincida con el endpoint del backend
             method: 'PUT',
             headers: {
-            'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(pedido)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error al actualizar el pedido con ID ${idPedido}: ${response.statusText}`);
-      }
-  
-      return await response.json();
+            body: JSON.stringify({ estado }) // Enviar solo el estado como JSON
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al actualizar el pedido con ID ${idPedido}: ${response.statusText}`);
+        }
+
+        return await response.json(); // Retorna la respuesta del backend
     } catch (error) {
-      console.error('Error en updatePedido:', error);
-      throw error;
+        console.error('Error en updatePedido:', error);
+        throw error;
     }
-  }
+}
 
 // Eliminar un pedido por ID
 export async function deletePedido(idPedido) {

@@ -1,57 +1,62 @@
 import { Typography, Container, Box } from "@mui/material";
-import LocalShippingIcon from '@mui/icons-material/LocalShipping'; // Ícono de camioncito
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { useEffect } from "react";
 
 export const CargandoPedido = ({ onEnd }) => {
     useEffect(() => {
         const timer = setTimeout(() => {
-            onEnd(); // Avanza automáticamente al siguiente paso después de 3 segundos
-        }, 3000);
-        return () => clearTimeout(timer); // Limpia el temporizador al desmontar el componente
+            onEnd();
+        }, 4000);
+        return () => clearTimeout(timer);
     }, [onEnd]);
 
     return (
-        <Container sx={{ textAlign: 'center', marginTop: 5, position: 'relative', height: '200px' }}>
-            {/* Camioncito */}
-            <Box sx={{ position: 'absolute', bottom: 50, left: '10%', animation: 'drive 3s linear infinite' }}>
-                <LocalShippingIcon sx={{ fontSize: 100, color: 'primary.main' }} />
+        <Container sx={{ textAlign: 'center', marginTop: 5, height: '300px', position: 'relative', overflow: 'hidden' }}>
+            {/* Camión */}
+            <Box
+                sx={{
+                    position: 'absolute',
+                    bottom: 80,
+                    left: 0,
+                    animation: 'drive 4s linear forwards',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                }}
+            >
+                <LocalShippingIcon sx={{ fontSize: 80, color: 'primary.main' }} />
             </Box>
 
             {/* Cajitas que caen */}
+            {[...Array(3)].map((_, i) => (
+                <Box
+                    key={i}
+                    sx={{
+                        position: 'absolute',
+                        bottom: 140,
+                        left: `${20 + i * 10}%`,
+                        animation: `fall${i} 4s ease-in-out forwards`,
+                        animationDelay: `${i * 0.5}s`,
+                        backgroundColor: 'saddlebrown',
+                        width: `${30 + i * 5}px`,
+                        height: `${30 + i * 5}px`,
+                        borderRadius: '4px',
+                        opacity: 0,
+                    }}
+                />
+            ))}
+
+            {/* Contenedor donde caen los paquetes */}
             <Box
                 sx={{
                     position: 'absolute',
-                    bottom: 100,
-                    left: '15%',
-                    animation: 'fall 1.5s linear infinite',
-                    backgroundColor: 'brown',
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '4px',
-                }}
-            />
-            <Box
-                sx={{
-                    position: 'absolute',
-                    bottom: 100,
-                    left: '25%',
-                    animation: 'fall 2s linear infinite',
-                    backgroundColor: 'brown',
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '4px',
-                }}
-            />
-            <Box
-                sx={{
-                    position: 'absolute',
-                    bottom: 100,
-                    left: '35%',
-                    animation: 'fall 2.5s linear infinite',
-                    backgroundColor: 'brown',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '4px',
+                    bottom: 40,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '80%',
+                    height: '20px',
+                    backgroundColor: '#ccc',
+                    borderRadius: '10px',
                 }}
             />
 
@@ -65,12 +70,25 @@ export const CargandoPedido = ({ onEnd }) => {
                 {`
                     @keyframes drive {
                         0% { transform: translateX(-100%); }
-                        100% { transform: translateX(100%); }
+                        100% { transform: translateX(110%); }
                     }
 
-                    @keyframes fall {
-                        0% { transform: translateY(0); opacity: 1; }
-                        100% { transform: translateY(100px); opacity: 0; }
+                    @keyframes fall0 {
+                        0% { transform: translateY(0); opacity: 0; }
+                        30% { opacity: 1; }
+                        100% { transform: translateY(80px); opacity: 1; }
+                    }
+
+                    @keyframes fall1 {
+                        0% { transform: translateY(0); opacity: 0; }
+                        40% { opacity: 1; }
+                        100% { transform: translateY(80px); opacity: 1; }
+                    }
+
+                    @keyframes fall2 {
+                        0% { transform: translateY(0); opacity: 0; }
+                        50% { opacity: 1; }
+                        100% { transform: translateY(80px); opacity: 1; }
                     }
                 `}
             </style>

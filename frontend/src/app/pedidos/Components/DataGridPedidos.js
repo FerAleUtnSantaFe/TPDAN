@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import InputBase from '@mui/material/InputBase';
-import { findPedidos } from '@/app/APIs/PedidosAPI';
+import { findPedidos, updatePedido } from '@/app/APIs/PedidosAPI';
 
 function DataGridPedidos() {
 
@@ -44,8 +44,35 @@ function DataGridPedidos() {
         setClientes(filtered);
     };
 
-    const handleEdit = (pedido) => {
-        console.log("pedido a editar: ", pedido);
+    const handleEdit = async (pedido) => {
+        const opcionesEstado =
+            pedido.estado === 'ACEPTADO'
+                ? ['CANCELADO']
+                : pedido.estado === 'EN_PREPARACION'
+                ? ['ENTREGADO', 'CANCELADO']
+                : [];
+    
+        const nuevoEstado = prompt(
+            `El estado actual es ${pedido.estado}. Opciones disponibles: ${opcionesEstado.join(', ')}`
+        );
+    
+        if (!opcionesEstado.includes(nuevoEstado)) {
+            alert('Estado no permitido.');
+            return;
+        }
+    
+        try {
+            // Llamar a la API para actualizar el estado
+            const updatedPedido = await updatePedido(pedido.id, { estado: nuevoEstado });
+            alert(`Estado actualizado a ${updatedPedido.estado}`);
+            // Actualizar el estado en el frontend
+            setPedidos((prevPedidos) =>
+                prevPedidos.map((p) => (p.id === pedido.id ? { ...p, estado: nuevoEstado } : p))
+            );
+        } catch (error) {
+            console.error('Error al actualizar el pedido:', error);
+            alert('No se pudo actualizar el estado del pedido.');
+        }
     };
 
     const columns = [
@@ -59,11 +86,13 @@ function DataGridPedidos() {
         {
             field: 'editar', headerName: 'Editar', sortable: false, flex: 1,
             renderCell: (params) => (
-                <Box>
-                    <IconButton size="small" color="primary" onClick={() => handleEdit(params.row)}>
-                        <EditIcon />
-                    </IconButton>
-                </Box>
+                (params.row.estado === 'ACEPTADO' || params.row.estado === 'EN_PREPARACION') && (
+                    <Box>
+                        <IconButton size="small" color="primary" onClick={() => handleEdit(params.row)}>
+                            <EditIcon />
+                        </IconButton>
+                    </Box>
+                )
             )
         },
     ];

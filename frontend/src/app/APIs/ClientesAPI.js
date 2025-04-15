@@ -29,14 +29,25 @@ export async function findbyIdCliente(idCli) {
 }
 
 // Crear un nuevo cliente
-export async function createCliente(cliente) {
+export async function createCliente(cliente, obras, usuarios) {
+    const obrasLimpias = obras.map(({ tempId, ...obra }) => obra); // Eliminar tempId de cada obra
+    const usuariosLimpios = usuarios.map(({ tempId, ...usuario }) => usuario); // Eliminar tempId de cada usuario
+
+    const clienteCompleto = {
+        ...cliente,
+        obras: obrasLimpias,
+        usuarios: usuariosLimpios
+    };
+
+    console.log("cliente completo: ", clienteCompleto)
     try {
         const response = await fetch(`${BASE_URL}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(cliente)
+            body: JSON.stringify(clienteCompleto)
+
         });
         if (!response.ok) {
             throw new Error(`Error al crear el cliente: ${response.statusText}`);
@@ -49,14 +60,25 @@ export async function createCliente(cliente) {
 }
 
 // Actualizar un cliente existente
-export async function updateCliente(idCli, cliente) {
+export async function updateCliente(idCli, cliente, obras, usuarios) {
+
+    const obrasLimpias = obras.map(({ tempId, ...obra }) => obra); // Eliminar tempId de cada obra
+    const usuariosLimpios = usuarios.map(({ tempId, ...usuario }) => usuario); // Eliminar tempId de cada usuario
+
+    const clienteCompleto = {
+        ...cliente,
+        obras: obrasLimpias,
+        usuarios: usuariosLimpios
+    };
+    
+    console.log("cliente completo: ", clienteCompleto)
     try {
         const response = await fetch(`${BASE_URL}/${idCli}`, {
             method: 'PUT',
             headers: {
             'Content-Type': 'application/json',
             },
-            body: JSON.stringify(cliente)
+            body: JSON.stringify(clienteCompleto)
       });
       
       if (!response.ok) {

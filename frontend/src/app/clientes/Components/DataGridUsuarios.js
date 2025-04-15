@@ -10,18 +10,18 @@ import { SearchIconWrapper, StyledInputBase, Search } from '@/app/styles/styles'
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import UsuarioModal from './UsuarioModal';
 
-const DataGridUsuarios = ({ usuariosIniciales }) => {
+const DataGridUsuarios = ({ usuariosIniciales, setUsuariosIniciales }) => {
 
   const [usuarios, setUsuarios] = useState([]);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [usuariosModalOpen, setUsuariosModalOpen] = useState(false);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState({});
-  const [usuariosOriginales, setUsuariosOriginales] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (usuariosIniciales && Array.isArray(usuariosIniciales)) {
-      const formattedData = usuariosIniciales.map((usuario) => ({
+      const formattedData = usuariosIniciales.map((usuario, index) => ({
+        tempId: usuario.id || Date.now()-index,
         id: usuario.id,
         dni: usuario.dni,
         nombre: usuario.nombre,
@@ -29,7 +29,6 @@ const DataGridUsuarios = ({ usuariosIniciales }) => {
         correoElectronico: usuario.correoElectronico
       }));
       setUsuarios(formattedData);
-      setUsuariosOriginales(formattedData);
     }
   }, [usuariosIniciales]);
 
@@ -38,9 +37,9 @@ const DataGridUsuarios = ({ usuariosIniciales }) => {
     setSearchTerm(value);
     if (value === '') {
       // Si el campo de búsqueda está vacío, restaurar los clientes originales
-      setUsuarios(usuariosOriginales);
+      setUsuarios(usuariosIniciales);
     } else {
-      const filtered = usuariosOriginales.filter(usuario =>
+      const filtered = usuariosIniciales.filter(usuario =>
         usuario.dni.toLowerCase().includes(value) ||
         usuario.nombre.toLowerCase().includes(value) ||
         usuario.correoElectronico.toLowerCase().includes(value)
@@ -60,25 +59,36 @@ const DataGridUsuarios = ({ usuariosIniciales }) => {
   };
 
   const handleAdd = (newUser) => {
-    setUsuarios(usuarios => [...usuarios, { id: Date.now(), ...newUser }]);
+ 
+    const newUsuario = { tempId: Date.now(), id: null, ...newUser };
+    console.log(newUsuario);
+    const updatedUsuarios = [...usuarios, newUsuario];
+    setUsuarios(updatedUsuarios);
+    setUsuariosIniciales(updatedUsuarios);
     setSnackbar({ open: true, message: 'Usuario agregado correctamente', severity: 'success' });
     closeUsuarioModal();
   };
 
   const handleEdit = (newUser) => {
-    setUsuarios(usuarios => usuarios.map(usuario => usuario.id === usuarioSeleccionado.id ? { ...usuarioSeleccionado, ...newUser } : usuario));
+    const updatedUsuarios = usuarios.map((usuario) =>
+      usuario.tempId === usuarioSeleccionado.tempId // Comparar usando el ID temporal
+        ? { ...usuarioSeleccionado, ...newUser }
+        : usuario
+    )
+    setUsuarios(updatedUsuarios);
+    setUsuariosIniciales(updatedUsuarios);
     setSnackbar({ open: true, message: 'Usuario editado correctamente', severity: 'success' });
     closeUsuarioModal();
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = (tempId) => {
     const confirmDelete = window.confirm(`¿Está seguro de que desea eliminar el usuario?`);
     if (!confirmDelete) return;
-    setUsuarios((usuarios) => usuarios.filter((usuario) => usuario.id !== id));
-    setUsuariosOriginales((usuarios) => usuarios.filter((usuario) => usuario.id !== id));
+    const updatedUsuarios = usuarios.filter((usuario) => usuario.tempId !== tempId);
+    setUsuarios(updatedUsuarios);
+    setUsuariosIniciales(updatedUsuarios);
     setSnackbar({ open: true, message: 'Usuario eliminado correctamente', severity: 'success' });
   };
-
 
   const columns = [
     { field: 'dni', headerName: 'DNI', flex: 1 },
@@ -94,7 +104,7 @@ const DataGridUsuarios = ({ usuariosIniciales }) => {
           <IconButton size="small" color="primary" onClick={() => openUsuarioModal(params.row)}>
             <SettingsIcon />
           </IconButton>
-          <IconButton size="small" color="error" onClick={() => handleDelete(params.row.id)}>
+          <IconButton size="small" color="error" onClick={() => handleDelete(params.row.tempId)}>
             <DeleteIcon />
           </IconButton>
         </Box>
@@ -131,6 +141,7 @@ const DataGridUsuarios = ({ usuariosIniciales }) => {
       <DataGrid
         rows={usuarios}
         columns={columns}
+        getRowId={(row) => row.tempId} // Usar tempId como identificador único
         pageSize={5}
         pageSizeOptions={[5, 10, 20]}
         disableMultipleRowSelection

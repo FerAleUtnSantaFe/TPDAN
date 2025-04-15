@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -172,6 +173,30 @@ public class ProductoController {
         } catch (Exception e) {
             log.error("Error al actualizar stock: {}", e.getMessage());
             return ResponseEntity.ok(false); // Error al actualizar stock
+        }
+    }
+
+    @RabbitListener(queues = "cola_actualizar-stock")
+    public void actualizarStockRabbit(List<Map<String, Object>> productos) {
+        log.info("Mensaje recibido para actualizar stock: {}", productos);
+
+        for (Map<String, Object> productoData : productos) {
+            try {
+                Integer productoId = (Integer) productoData.get("id");
+                Integer cantidad = (Integer) productoData.get("cantidad");
+
+                Producto producto = productoService.getProductoById(productoId)
+                        .orElseThrow(() -> new RuntimeException("Producto con ID " + productoId + " no encontrado"));
+
+                // Incrementar el stock del producto
+                producto.setStockActual(producto.getStockActual() + cantidad);
+                productoService.updateProducto(producto);
+
+                log.info("Stock actualizado para el producto con ID {}: nuevo stock {}", productoId,
+                        producto.getStockActual());
+            } catch (Exception e) {
+                log.error("Error al actualizar stock para producto: {}", productoData, e);
+            }
         }
     }
 

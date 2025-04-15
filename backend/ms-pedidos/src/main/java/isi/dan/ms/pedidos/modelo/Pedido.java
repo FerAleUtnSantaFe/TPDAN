@@ -27,7 +27,7 @@ public class Pedido {
     private ArrayList<Producto> listaProductos = new ArrayList<>();
     @Field("Lista Estados")
     private ArrayList<HistorialEstado> estadosPedido = new ArrayList<>();
-    private Estado estado = Estado.PENDIENTE;
+    private Estado estado = Estado.RECIBIDO;
 
     public void agregarEstado(Estado estado) {
         HistorialEstado nuevo = new HistorialEstado();
