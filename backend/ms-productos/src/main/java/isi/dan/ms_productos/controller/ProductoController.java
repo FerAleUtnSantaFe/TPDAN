@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -59,13 +60,18 @@ public class ProductoController {
     // Get by Categoria
     @GetMapping("/categoria/{categoria}")
     @LogExecutionTime
-    public List<Producto> getProductosByCategoria(@PathVariable String categoria) throws ProductoNotFoundException {
+    public ResponseEntity<List<Producto>> getProductosByCategoria(@PathVariable String categoria)
+            throws ProductoNotFoundException {
+        Categoria cat;
         try {
-            Categoria cat = Categoria.valueOf(categoria.toUpperCase());
-            return productoService.getProductosByCategoria(cat);
+            cat = Categoria.valueOf(categoria.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new ProductoNotFoundException(categoria);
         }
+
+        List<Producto> productos = productoService.getProductosByCategoria(cat);
+
+        return ResponseEntity.ok(productos);
     }
 
     @DeleteMapping("/{id}")
@@ -93,7 +99,7 @@ public class ProductoController {
     public ResponseEntity<Producto> updateProducto(@PathVariable final Integer id, @RequestBody Producto producto)
             throws ProductoNotFoundException {
         if (!productoService.getProductoById(id).isPresent()) {
-            throw new ProductoNotFoundException("Producto " + id + " no encontrado");
+            throw new ProductoNotFoundException(id);
         }
         producto.setId(id);
         return ResponseEntity.ok(productoService.updateProducto(producto));
@@ -112,7 +118,7 @@ public class ProductoController {
         Optional<Producto> productoOptional = productoService.getProductoById(id);
 
         if (!productoOptional.isPresent()) {
-            throw new ProductoNotFoundException("Producto " + id + " no encontrado");
+            throw new ProductoNotFoundException(id);
         }
 
         Producto producto = productoOptional.get();
@@ -146,7 +152,7 @@ public class ProductoController {
                 Optional<Producto> productoOptional = productoService.getProductoById(productoId);
                 if (!productoOptional.isPresent()) {
                     log.warn("Producto con ID {} no encontrado", productoId);
-                    return ResponseEntity.ok(false); // Producto no encontrado
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
                 }
 
                 Producto producto = productoOptional.get();
@@ -178,26 +184,28 @@ public class ProductoController {
 
     @RabbitListener(queues = "cola_actualizar-stock")
     public void actualizarStockRabbit(List<Map<String, Object>> productos) {
-        log.info("Mensaje recibido para actualizar stock: {}", productos);
+    log.info("Mensaje recibido para actualizar stock: {}", productos);
 
-        for (Map<String, Object> productoData : productos) {
-            try {
-                Integer productoId = (Integer) productoData.get("id");
-                Integer cantidad = (Integer) productoData.get("cantidad");
+    for (Map<String, Object> productoData : productos) {
+    try {
+    Integer productoId = (Integer) productoData.get("id");
+    Integer cantidad = (Integer) productoData.get("cantidad");
 
-                Producto producto = productoService.getProductoById(productoId)
-                        .orElseThrow(() -> new RuntimeException("Producto con ID " + productoId + " no encontrado"));
+    Producto producto = productoService.getProductoById(productoId)
+    .orElseThrow(() -> new RuntimeException("Producto con ID " + productoId + "
+    no encontrado"));
 
-                // Incrementar el stock del producto
-                producto.setStockActual(producto.getStockActual() + cantidad);
-                productoService.updateProducto(producto);
+    // Incrementar el stock del producto
+    producto.setStockActual(producto.getStockActual() + cantidad);
+    productoService.updateProducto(producto);
 
-                log.info("Stock actualizado para el producto con ID {}: nuevo stock {}", productoId,
-                        producto.getStockActual());
-            } catch (Exception e) {
-                log.error("Error al actualizar stock para producto: {}", productoData, e);
-            }
-        }
+    log.info("Stock actualizado para el producto con ID {}: nuevo stock {}",
+    productoId,
+    producto.getStockActual());
+    } catch (Exception e) {
+    log.error("Error al actualizar stock para producto: {}", productoData, e);
+    }
+    }
     }
 
 }

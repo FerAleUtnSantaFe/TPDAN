@@ -1,11 +1,11 @@
 package isi.dan.msclientes.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import isi.dan.msclientes.model.Cliente;
-import isi.dan.msclientes.model.Obra;
-import isi.dan.msclientes.model.Usuario;
-import isi.dan.msclientes.servicios.ClienteService;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,12 +16,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Optional;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import isi.dan.msclientes.model.Cliente;
+import isi.dan.msclientes.model.Obra;
+import isi.dan.msclientes.model.Usuario;
+import isi.dan.msclientes.servicios.ClienteService;
 
 @WebMvcTest(ClienteController.class)
 public class ClienteControllerTest {
@@ -42,7 +42,7 @@ public class ClienteControllerTest {
         cliente.setMaximoDescubierto(150000.00);
         cliente.setMaximoDeObras(10);
         cliente.setObrasActivas(0);
-        
+
         Obra obra = new Obra();
         obra.setDireccion("Direccion Test Obra");
         obra.setPresupuesto(BigDecimal.valueOf(100));
@@ -126,4 +126,3 @@ public class ClienteControllerTest {
         }
     }
 }
-
