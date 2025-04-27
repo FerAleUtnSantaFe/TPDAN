@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 import isi.dan.msclientes.aop.LogExecutionTime;
 import isi.dan.msclientes.exception.ClienteNotFoundException;
 import isi.dan.msclientes.model.Cliente;
+import isi.dan.msclientes.model.Estado;
+import isi.dan.msclientes.model.Obra;
 import isi.dan.msclientes.servicios.ClienteService;
 
 @CrossOrigin(origins = "*")
@@ -87,6 +89,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}/{monto}")
+    @LogExecutionTime
     public ResponseEntity<Boolean> verificarSaldo(@PathVariable Integer id, @PathVariable Double monto) {
         log.info("Verificando saldo para cliente con ID: {} y monto: {}", id, monto);
 
@@ -108,4 +111,41 @@ public class ClienteController {
         }
     }
 
+    @PutMapping("/{clienteId}/{obraId}/")
+    @LogExecutionTime
+    public ResponseEntity<Void> actualizarEstadoObra(
+            @PathVariable Integer clienteId,
+            @PathVariable Integer obraId,
+            @RequestBody Estado nuevoEstado) {
+        log.info("Actualizando estado de la obra con ID: {} para el cliente con ID: {} a estado: {}", obraId, clienteId,
+                nuevoEstado);
+
+        Optional<Cliente> clienteOpt = clienteService.findById(clienteId);
+        if (!clienteOpt.isPresent()) {
+            log.warn("Cliente con ID {} no encontrado", clienteId);
+            return ResponseEntity.notFound().build();
+        }
+
+        Cliente cliente = clienteOpt.get();
+
+        Optional<Obra> obraOpt = cliente.getObras().stream()
+                .filter(obra -> obra.getId().equals(obraId))
+                .findFirst();
+
+        if (!obraOpt.isPresent()) {
+            log.warn("Obra con ID {} no encontrada para el cliente con ID {}", obraId, clienteId);
+            return ResponseEntity.notFound().build();
+        }
+
+        Obra obra = obraOpt.get();
+
+        try {
+            clienteService.actualizarEstadoObra(cliente, obra, nuevoEstado);
+            log.info("Estado de la obra con ID {} actualizado correctamente a {}", obraId, nuevoEstado);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            log.error("Error al actualizar el estado de la obra: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

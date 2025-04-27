@@ -32,29 +32,29 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name="NOMBRE")
+    @Column(name = "NOMBRE")
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
-    @Column(name="CORREO_ELECTRONICO")
+    @Column(name = "CORREO_ELECTRONICO")
     @Email(message = "Email debe ser valido")
     @NotBlank(message = "Email es obligatorio")
     private String correoElectronico;
 
-    @Column(name="CUIT")
+    @Column(name = "CUIT")
     @NotBlank(message = "CUIT es obligatorio")
     private String cuit;
 
-    @Column(name="MAX_DESCUBIERTO")
+    @Column(name = "MAX_DESCUBIERTO")
     @Min(value = 10000, message = "El descubierto maximo debe ser al menos 10000")
     private Double maximoDescubierto;
 
-    @Column(name="MAX_OBRAS")
+    @Column(name = "MAX_OBRAS")
     @NotNull(message = "El maximo de obras es obligatorio")
     @Min(value = 0, message = "Error debe ser positivo")
     private Integer maximoDeObras;
 
-    @Column(name="OBRAS_ACTIVAS")
+    @Column(name = "OBRAS_ACTIVAS")
     @NotNull(message = "El numero de obras activas es obligatorio")
     @Min(value = 0, message = "Error debe ser positivo")
     private Integer obrasActivas;
@@ -65,10 +65,7 @@ public class Cliente {
     private List<Obra> obras = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-        name = "cliente_usuario",
-        joinColumns = @JoinColumn(name = "cliente_id"),
-        inverseJoinColumns = @JoinColumn(name = "usuario_id"))
+    @JoinTable(name = "cliente_usuario", joinColumns = @JoinColumn(name = "cliente_id"), inverseJoinColumns = @JoinColumn(name = "usuario_id"))
     private List<Usuario> usuarios = new ArrayList<>();
 
     // Método para sincronizar los usuarios cuando se actualiza el cliente
@@ -84,5 +81,17 @@ public class Cliente {
         }
     }
 
-    
+    // Método para sincronizar los usuarios cuando se actualiza el cliente
+    public void actualizarObras(List<Obra> nuevasObras) {
+        // Eliminar usuarios que ya no están en la lista recibida
+        this.obras.removeIf(obra -> !nuevasObras.contains(obra));
+
+        // Añadir nuevos usuarios que no están en la lista actual
+        for (Obra nuevaObra : nuevasObras) {
+            if (!this.obras.contains(nuevaObra)) {
+                this.obras.add(nuevaObra);
+            }
+        }
+    }
+
 }

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { updateEstadoObra } from '@/app/APIs/ClientesAPI';
 
-const ObraModal = ({ open, onClose, onAdd, onEdit, obraParametro}) => {
+const ObraModal = ({ open, onClose, onAdd, onEdit, obraParametro, modo }) => {
   const [obra, setObra] = useState({ direccion: '', lat: '', lng: '', presupuesto: '', estado: '' });
   const [errors, setErrors] = useState({});
 
@@ -9,7 +10,7 @@ const ObraModal = ({ open, onClose, onAdd, onEdit, obraParametro}) => {
     if (obraParametro) {
       setObra(obraParametro);
     } else {
-      setObra({ direccion: '', lat: '', lng: '', presupuesto: '', estado: '' });
+      setObra({ direccion: '', lat: '', lng: '', presupuesto: '', estado: 'PENDIENTE' });
     }
     setErrors({});
   }, [obraParametro, open]);
@@ -25,11 +26,12 @@ const ObraModal = ({ open, onClose, onAdd, onEdit, obraParametro}) => {
 
   const validateFields = () => {
     const newErrors = {};
+
     if (!obra.direccion) newErrors.direccion = true;
     if (!obra.lat) newErrors.lat = true;
     if (!obra.lng) newErrors.lng = true;
     if (!obra.presupuesto) newErrors.presupuesto = true;
-    if (!obra.estado) newErrors.estado = true;
+    if (modo !== 'nuevo' && !obra.estado) newErrors.estado = true;
     return newErrors;
   };
 
@@ -39,7 +41,9 @@ const ObraModal = ({ open, onClose, onAdd, onEdit, obraParametro}) => {
       setErrors(newErrors);
       return;
     }
-    if (obraParametro) {
+
+    if (modo === 'modificar') {
+      updateEstadoObra(obraParametro.idCli, obraParametro.id, { estado: obra.estado });
       onEdit(obra);
     } else {
       onAdd(obra);
@@ -48,15 +52,56 @@ const ObraModal = ({ open, onClose, onAdd, onEdit, obraParametro}) => {
   };
 
   const handleClose = () => {
-    setObra({ direccion: '', lat: '', lng: '', presupuesto: '', estado: '' });
     setErrors({});
     onClose();
   };
 
+  const renderEstadoOptions = () => {
+    if (modo === 'nuevo') {
+      // Si el modo es "nuevo", no se permite modificar el estado
+      return (
+        <MenuItem value="PENDIENTE" disabled>
+          PENDIENTE
+        </MenuItem>
+      );
+    }
+    else if (modo === 'modificar') {
+      console.log('obraParametro', obraParametro);
+      if (obra.estado === 'FINALIZADA') {
+        // Si el estado es "FINALIZADA", no se permite modificar
+        return (
+          <MenuItem value="FINALIZADA" disabled>
+            FINALIZADA
+          </MenuItem>
+        );
+      } else if (obra.estado === 'PENDIENTE') {
+        // Si el estado es "PENDIENTE", mostrar opciones "HABILITADA" y "FINALIZADA"
+        return (
+          <>
+            <MenuItem value="PENDIENTE" disabled>PENDIENTE</MenuItem>
+            <MenuItem value="HABILITADA">HABILITADA</MenuItem>
+            <MenuItem value="FINALIZADA">FINALIZADA</MenuItem>
+          </>
+        );
+      } else if (obra.estado === 'HABILITADA') {
+        // Si el estado es "HABILITADA", mostrar opciones "PENDIENTE" y "FINALIZADA"
+        return (
+          <>
+            <MenuItem value="HABILITADA" disabled>
+              HABILITADA
+            </MenuItem>
+            <MenuItem value="PENDIENTE">PENDIENTE</MenuItem>
+            <MenuItem value="FINALIZADA">FINALIZADA</MenuItem>
+          </>
+        );
+      }
+    }
+  }
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle variant="h3" color="primary" gutterBottom sx={{ margin: 1, textAlign: 'center' }}>
-        Agregar Obra
+        {modo === 'nuevo' ? 'Agregar Obra' : 'Modificar Obra'}
       </DialogTitle>
       <DialogContent>
         <TextField
@@ -102,26 +147,22 @@ const ObraModal = ({ open, onClose, onAdd, onEdit, obraParametro}) => {
           error={!!errors.presupuesto}
           helperText={errors.presupuesto ? 'Este campo es obligatorio' : ''}
         />
-        <FormControl fullWidth margin="normal" error={!!errors.estado}>
-          <InputLabel>Estado</InputLabel>
-          <Select
-            name="estado"
-            value={obra.estado}
-            onChange={handleChange}
-          >
-            <MenuItem value="HABILITADA">HABILITADA</MenuItem>
-            <MenuItem value="PENDIENTE">PENDIENTE</MenuItem>
-            <MenuItem value="FINALIZADA">FINALIZADA</MenuItem>
-          </Select>
-          {errors.estado && <p style={{ color: 'red', fontSize: '0.8rem' }}>Este campo es obligatorio</p>}
-        </FormControl>
+        {modo !== 'nuevo' && (
+          <FormControl fullWidth margin="normal" error={!!errors.estado}>
+            <InputLabel>Estado</InputLabel>
+            <Select name="estado" value={obra.estado} onChange={handleChange}>
+              {renderEstadoOptions()}
+            </Select>
+            {errors.estado && <p style={{ color: 'red', fontSize: '0.8rem' }}>Este campo es obligatorio</p>}
+          </FormControl>
+        )}
       </DialogContent>
       <DialogActions>
         <Button color="error" onClick={handleClose}>
           Cancelar
         </Button>
         <Button color="primary" onClick={handleSubmit}>
-        {obraParametro ? 'Guardar' : 'Aceptar'}
+          {obraParametro ? 'Guardar' : 'Aceptar'}
         </Button>
       </DialogActions>
     </Dialog>

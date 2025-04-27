@@ -108,3 +108,22 @@ export async function deleteCliente(idCli) {
         throw error;
     }
 }
+
+export async function updateEstadoObra(idCli, idObra, estado) {
+    try {
+        const response = await fetch(`${BASE_URL}/${idCli}/${idObra}`, {
+                method: 'PUT',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(estado)
+          });
+        if (!response.ok) {
+            throw new Error(`Error al actualizar el estado de la obra: ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error en updateEstadoObra:', error);
+        throw error;
+    }
+}

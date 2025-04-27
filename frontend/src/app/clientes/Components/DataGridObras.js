@@ -19,6 +19,7 @@ const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }
   const [obraModalOpen, setObraModalOpen] = useState(false);
   const [obraSeleccionada, setObraSeleccionada] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [modoModal, setModoModal] = useState('nuevo');
 
   useEffect(() => {
     if (obrasIniciales && Array.isArray(obrasIniciales)) {
@@ -54,13 +55,14 @@ const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }
     }
   };
 
-  const openObraModal = (obra = null) => {
-    setObraSeleccionada(obra);
+  const openObraModal = (obra) => {
+    
+    setModoModal('modificar');
     setObraModalOpen(true);
   };
 
   const closeObraModal = () => {
-    setObraSeleccionada(null);
+    setObraSeleccionada({});
     setObraModalOpen(false);
   };
 
@@ -107,7 +109,7 @@ const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }
       sortable: false,
       renderCell: (params) => (
         <Box>
-          <IconButton size="small" color="primary" onClick={() => openObraModal(params.row)}>
+          <IconButton size="small" color="primary" onClick={() => { openObraModal(params.row)}}>
             <SettingsIcon />
           </IconButton>
           <IconButton size="small" color="error" onClick={() => handleDelete(params.row.tempId)}>
@@ -142,7 +144,8 @@ const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }
               if (modo === 'pedido') {
                 onObraSelect(obraSeleccionada);
               } else {
-                openObraModal();
+                setModoModal('nuevo');
+                setObraModalOpen(true);
               }
             }}
           >
@@ -175,6 +178,7 @@ const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }
         onAdd={handleAdd}
         onEdit={handleEdit}
         obraParametro={obraSeleccionada}
+        modo={modoModal}
       />
       <Snackbar
         open={snackbar.open}
