@@ -1,211 +1,185 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { TextField, Button, Container, Typography, Snackbar, Alert } from '@mui/material';
+import React from 'react';
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+} from '@mui/material';
 import NavBar from '@/app/Components/NavBar';
 import DataGridUsuarios from './DataGridUsuarios';
 import DataGridObras from './DataGridObras';
-import { createCliente, updateCliente, findbyIdCliente } from '../../APIs/ClientesAPI';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useFormularioCliente } from '../Hooks/useFormularioCliente';
+import SnackbarComponent from '@/app/Components/SnackBarComponent';
+import { useClienteContext } from '../Hooks/ClienteContext';
 
+/*
+ * FormularioCliente Component
+ * Handles the creation and modification of a client.
+ * @param {string} modo - Determines if the form is in "nuevo" (new) or "modificar" (edit) mode.
+ */
 const FormularioCliente = ({ modo }) => {
-  const [formularioCliente, setFormularioCliente] = useState({
-    id: null,
-    cuit: 0,
-    correoElectronico: '',
-    nombre: '',
-    maximoDescubierto: 0,
-    maximoDeObras: 0,
-    obrasActivas: 0
-  });
-
-  const [obras, setObras] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
-  const [errors, setErrors] = useState({});
-  const [alert, setAlert] = useState({ open: false, message: '', severity: '' });
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (modo === 'modificar') {
-      const fetchCliente = async () => {
-        const id = searchParams.get('id'); // Obtiene el ID de la URL
-        if (id) {
-          try {
-            const cliente = await findbyIdCliente(id); // Llama a la API con el ID
-            if (cliente) {
-              setFormularioCliente({
-                cuit: cliente.cuit,
-                nombre: cliente.nombre,
-                correoElectronico: cliente.correoElectronico,
-                maximoDescubierto: cliente.maximoDescubierto,
-                maximoDeObras: cliente.maximoDeObras,
-                obrasActivas: cliente.obrasActivas
-              });
-              setObras(cliente.obras || []);
-              setUsuarios(cliente.usuarios || []);
-            } else {
-              setAlert({ open: true, message: 'Cliente no encontrado', severity: 'error' });
-            }
-          } catch (error) {
-            console.error('Error al obtener el cliente:', error);
-            setAlert({ open: true, message: 'Error al cargar el cliente', severity: 'error' });
-          }
-        }
-      };
-      fetchCliente();
-    }
-  }, [modo, searchParams]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormularioCliente({ ...formularioCliente, [name]: value });
-
-    // Validar números positivos
-    if (['cuit', 'maximoDescubierto', 'maximoDeObras'].includes(name) && value < 0) {
-      setErrors({ ...errors, [name]: 'El valor debe ser un número positivo' });
-      return;
-    }
-    // Limpiar el error del campo si se corrige
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: false });
-    }
-  };
-
-  const validateFields = () => {
-    const newErrors = {};
-    if (!formularioCliente.cuit) newErrors.cuit = 'Este campo es obligatorio';
-    if (!formularioCliente.correoElectronico) newErrors.correoElectronico = 'Este campo es obligatorio';
-    if (!formularioCliente.nombre) newErrors.nombre = 'Este campo es obligatorio';
-    if (!formularioCliente.maximoDescubierto) newErrors.maximoDescubierto = 'Este campo es obligatorio';
-    if (!formularioCliente.maximoDeObras) newErrors.maximoDeObras = 'Este campo es obligatorio';
-    return newErrors;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const newErrors = validateFields();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    try {
-      let result;
-
-      if (modo === 'nuevo') {
-        result = await createCliente(formularioCliente, obras, usuarios); // Llama a la API para crear el cliente
-      } else if (modo === 'modificar') {
-        const id = searchParams.get('id'); // Obtiene el ID del cliente desde los parámetros de la URL
-        result = await updateCliente(id, formularioCliente, obras, usuarios); // Llama a la API para actualizar el cliente
-      }
-
-      if (result) {
-        setAlert({ open: true, message: `Cliente ${modo === 'nuevo' ? 'creado' : 'actualizado'} correctamente`, severity: 'success' });
-        setTimeout(() => {
-          router.push('/clientes'); // Redirige a la lista de clientes
-        }, 3000);
-      } else {
-        setAlert({ open: true, message: `Error al ${modo === 'nuevo' ? 'crear' : 'actualizar'} el cliente`, severity: 'error' });
-      }
-    } catch (error) {
-      console.error(`Error al ${modo === 'nuevo' ? 'crear' : 'actualizar'} el cliente:`, error);
-      setAlert({ open: true, message: `Error al ${modo === 'nuevo' ? 'crear' : 'actualizar'} el cliente`, severity: 'error' });
-    }
-  };
+  const { clienteSeleccionado } = useClienteContext(); // Access ClienteContext
+  const {
+    errors,
+    alert,
+    handleChange,
+    handleSubmit,
+    closeSnackbar,
+  } = useFormularioCliente(modo);
 
   return (
-    <div>
+    <>
+      {/* Navigation Bar */}
       <NavBar />
-      <Container>
-        <Typography variant="h3" gutterBottom color="primary" sx={{ margin: 1, textAlign: 'center' }}>
-          {modo === 'nuevo' ? 'Gestión de clientes: Nuevo Cliente' : 'Gestión de clientes: Modificar Cliente'}
+
+      {/* Main Container */}
+      <Container maxWidth="md" sx={{ marginTop: 4 }}>
+        {/* Title */}
+        <Typography
+          variant="h4"
+          gutterBottom
+          color="primary"
+          align="center"
+        >
+          {modo === 'nuevo'
+            ? 'Gestión de Clientes: Nuevo Cliente'
+            : 'Gestión de Clientes: Modificar Cliente'}
         </Typography>
+
+        {/* Form */}
         <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="CUIT"
-            name="cuit"
-            value={formularioCliente.cuit}
-            onChange={handleChange}
-            margin="normal"
-            error={!!errors.cuit}
-            helperText={errors.cuit}
-            slotProps={{
-              readOnly: modo === 'modificar', // Solo lectura si es modificar
-            }}
-          />
-          <TextField
-            fullWidth
-            label="Correo"
-            name="correoElectronico"
-            type="email"
-            value={formularioCliente.correoElectronico}
-            onChange={handleChange}
-            margin="normal"
-            error={!!errors.correoElectronico}
-            helperText={errors.correoElectronico}
-          />
-          <TextField
-            fullWidth
-            label="Nombre"
-            name="nombre"
-            value={formularioCliente.nombre}
-            onChange={handleChange}
-            margin="normal"
-            error={!!errors.nombre}
-            helperText={errors.nombre}
-          />
-          <TextField
-            fullWidth
-            label="Máximo Descubierto"
-            name="maximoDescubierto"
-            type="number"
-            value={formularioCliente.maximoDescubierto}
-            onChange={handleChange}
-            margin="normal"
-            error={!!errors.maximoDescubierto}
-            helperText={errors.maximoDescubierto}
-          />
-          <TextField
-            fullWidth
-            label="Máxima Cantidad de Obras"
-            name="maximoDeObras"
-            type="number"
-            value={formularioCliente.maximoDeObras}
-            onChange={handleChange}
-            margin="normal"
-            error={!!errors.maximoDeObras}
-            helperText={errors.maximoDeObras}
-          />
-          {modo === 'modificar' && (
-            <TextField
-              fullWidth
-              label="Obras Activas"
-              name="obrasActivas"
-              value={formularioCliente.obrasActivas}
-              margin="normal"
-              slotProps={{
-                readOnly: true, // Solo lectura
-              }}
-            />
-          )}
+          {/* Client Details Section */}
+          <Card sx={{ marginBottom: 4 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Detalles del Cliente
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="CUIT"
+                    name="cuit"
+                    value={clienteSeleccionado.cuit}
+                    onChange={handleChange}
+                    error={!!errors.cuit}
+                    helperText={errors.cuit}
+                    InputProps={{
+                      readOnly: modo === 'modificar', // Read-only in edit mode
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Correo Electrónico"
+                    name="correoElectronico"
+                    type="email"
+                    value={clienteSeleccionado.correoElectronico}
+                    onChange={handleChange}
+                    error={!!errors.correoElectronico}
+                    helperText={errors.correoElectronico}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Nombre"
+                    name="nombre"
+                    value={clienteSeleccionado.nombre}
+                    onChange={handleChange}
+                    error={!!errors.nombre}
+                    helperText={errors.nombre}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Máximo Descubierto"
+                    name="maximoDescubierto"
+                    type="number"
+                    value={clienteSeleccionado.maximoDescubierto}
+                    onChange={handleChange}
+                    error={!!errors.maximoDescubierto}
+                    helperText={errors.maximoDescubierto}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Máxima Cantidad de Obras"
+                    name="maximoDeObras"
+                    type="number"
+                    value={clienteSeleccionado.maximoDeObras}
+                    onChange={handleChange}
+                    error={!!errors.maximoDeObras}
+                    helperText={errors.maximoDeObras}
+                  />
+                </Grid>
+                {modo === 'modificar' && (
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Obras Activas"
+                      name="obrasActivas"
+                      value={clienteSeleccionado.obrasActivas}
+                      InputProps={{
+                        readOnly: true, // Read-only
+                      }}
+                    />
+                  </Grid>
+                )}
+              </Grid>
+            </CardContent>
+          </Card>
 
-          <DataGridUsuarios usuariosIniciales={usuarios} setUsuariosIniciales={setUsuarios} />
+          {/* Users Section */}
+          <Card sx={{ marginBottom: 4 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Usuarios
+              </Typography>
+              <DataGridUsuarios />
+            </CardContent>
+          </Card>
 
-          <DataGridObras obrasIniciales={obras} setObrasIniciales={setObras} />
+          {/* Obras Section */}
+          <Card sx={{ marginBottom: 4 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Obras
+              </Typography>
+              <DataGridObras />
+            </CardContent>
+          </Card>
 
-          <Button type="submit" variant="contained" color="primary" size="large" sx={{ marginTop: 2 }}>
-            {modo === 'nuevo' ? 'Crear' : 'Guardar'}
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            size="large"
+            fullWidth
+            sx={{ marginTop: 2 }}
+          >
+            {modo === 'nuevo' ? 'Crear Cliente' : 'Guardar Cambios'}
           </Button>
         </form>
       </Container>
 
-      <Snackbar open={alert.open} autoHideDuration={3000} onClose={() => setAlert({ ...alert, open: false })}>
-        <Alert severity={alert.severity}>{alert.message}</Alert>
-      </Snackbar>
-    </div>
+      {/* Snackbar for Notifications */}
+      <SnackbarComponent
+        open={alert.open}
+        message={alert.message}
+        severity={alert.severity}
+        onClose={closeSnackbar}
+      />
+    </>
   );
 };
 

@@ -59,7 +59,7 @@ public class Cliente {
     @Min(value = 0, message = "Error debe ser positivo")
     private Integer obrasActivas;
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     @ToString.Exclude
     private List<Obra> obras = new ArrayList<>();
@@ -81,14 +81,14 @@ public class Cliente {
         }
     }
 
-    // Método para sincronizar los usuarios cuando se actualiza el cliente
     public void actualizarObras(List<Obra> nuevasObras) {
-        // Eliminar usuarios que ya no están en la lista recibida
+        // Remove obras that are no longer in the list
         this.obras.removeIf(obra -> !nuevasObras.contains(obra));
-
-        // Añadir nuevos usuarios que no están en la lista actual
+    
+        // Add new obras that are not in the current list
         for (Obra nuevaObra : nuevasObras) {
             if (!this.obras.contains(nuevaObra)) {
+                nuevaObra.setCliente(this); // Ensure the obra is associated with this cliente
                 this.obras.add(nuevaObra);
             }
         }

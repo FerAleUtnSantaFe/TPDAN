@@ -45,8 +45,7 @@ public class ClienteService {
         cliente.setCuit(clienteActualizado.getCuit());
         cliente.setMaximoDescubierto(clienteActualizado.getMaximoDescubierto());
         cliente.setMaximoDeObras(clienteActualizado.getMaximoDeObras());
-        cliente.setObrasActivas(clienteActualizado.getObrasActivas());
-        cliente.setObras(clienteActualizado.getObras());        
+        cliente.setObrasActivas(clienteActualizado.getObrasActivas());    
 
         return clienteRepository.save(cliente);
     }
@@ -76,6 +75,7 @@ public class ClienteService {
     
             case PENDIENTE:
                 obra.setEstado(Estado.PENDIENTE);
+                cliente.setObrasActivas(cliente.getObrasActivas() - 1);
                 // No se habilitan nuevas obras automáticamente
                 break;
     

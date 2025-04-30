@@ -1,94 +1,29 @@
-import * as React from 'react';
+import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { AppBar, Box, IconButton, Snackbar, Toolbar, Button } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
+import { AppBar, Box, IconButton, Toolbar, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useState, useEffect } from 'react';
-import { SearchIconWrapper, StyledInputBase, Search } from '@/app/styles/styles';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import UsuarioModal from './UsuarioModal';
+import { useUsuarios } from '../Hooks/useUsuarios';
+import { SearchIconWrapper, StyledInputBase, Search } from '@/app/styles/styles';
+import SnackbarComponent from '@/app/Components/SnackBarComponent';
 
-const DataGridUsuarios = ({ usuariosIniciales, setUsuariosIniciales }) => {
-
-  const [usuarios, setUsuarios] = useState([]);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  const [usuariosModalOpen, setUsuariosModalOpen] = useState(false);
-  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    if (usuariosIniciales && Array.isArray(usuariosIniciales)) {
-      const formattedData = usuariosIniciales.map((usuario, index) => ({
-        tempId: usuario.id || Date.now()-index,
-        id: usuario.id,
-        dni: usuario.dni,
-        nombre: usuario.nombre,
-        apellido: usuario.apellido,
-        correoElectronico: usuario.correoElectronico
-      }));
-      setUsuarios(formattedData);
-    }
-  }, [usuariosIniciales]);
-
-  const handleSearch = (event) => {
-    const value = event.target.value.toLowerCase();
-    setSearchTerm(value);
-    if (value === '') {
-      // Si el campo de búsqueda está vacío, restaurar los clientes originales
-      setUsuarios(usuariosIniciales);
-    } else {
-      const filtered = usuariosIniciales.filter(usuario =>
-        usuario.dni.toLowerCase().includes(value) ||
-        usuario.nombre.toLowerCase().includes(value) ||
-        usuario.correoElectronico.toLowerCase().includes(value)
-      );
-      setUsuarios(filtered);
-    }
-  };
-
-  const openUsuarioModal = (usuario = null) => {
-    setUsuarioSeleccionado(usuario);
-    setUsuariosModalOpen(true);
-  };
-
-  const closeUsuarioModal = () => {
-    setUsuarioSeleccionado(null);
-    setUsuariosModalOpen(false);
-  };
-
-  const handleAdd = (newUser) => {
- 
-    const newUsuario = { tempId: Date.now(), id: null, ...newUser };
-    console.log(newUsuario);
-    const updatedUsuarios = [...usuarios, newUsuario];
-    setUsuarios(updatedUsuarios);
-    setUsuariosIniciales(updatedUsuarios);
-    setSnackbar({ open: true, message: 'Usuario agregado correctamente', severity: 'success' });
-    closeUsuarioModal();
-  };
-
-  const handleEdit = (newUser) => {
-    const updatedUsuarios = usuarios.map((usuario) =>
-      usuario.tempId === usuarioSeleccionado.tempId // Comparar usando el ID temporal
-        ? { ...usuarioSeleccionado, ...newUser }
-        : usuario
-    )
-    setUsuarios(updatedUsuarios);
-    setUsuariosIniciales(updatedUsuarios);
-    setSnackbar({ open: true, message: 'Usuario editado correctamente', severity: 'success' });
-    closeUsuarioModal();
-  }
-
-  const handleDelete = (tempId) => {
-    const confirmDelete = window.confirm(`¿Está seguro de que desea eliminar el usuario?`);
-    if (!confirmDelete) return;
-    const updatedUsuarios = usuarios.filter((usuario) => usuario.tempId !== tempId);
-    setUsuarios(updatedUsuarios);
-    setUsuariosIniciales(updatedUsuarios);
-    setSnackbar({ open: true, message: 'Usuario eliminado correctamente', severity: 'success' });
-  };
+const DataGridUsuarios = () => {
+  const {
+    usuarios,
+    snackbar,
+    usuariosModalOpen,
+    usuarioSeleccionado,
+    handleSearch,
+    openUsuarioModal,
+    closeUsuarioModal,
+    handleAdd,
+    handleEdit,
+    handleDelete,
+    closeSnackbar,
+  } = useUsuarios();
 
   const columns = [
     { field: 'dni', headerName: 'DNI', flex: 1 },
@@ -108,7 +43,7 @@ const DataGridUsuarios = ({ usuariosIniciales, setUsuariosIniciales }) => {
             <DeleteIcon />
           </IconButton>
         </Box>
-      )
+      ),
     },
   ];
 
@@ -121,9 +56,8 @@ const DataGridUsuarios = ({ usuariosIniciales, setUsuariosIniciales }) => {
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder="Buscar usuario…"
-              value={searchTerm}
-              onChange={handleSearch}
+              placeholder="Buscar usuario..."
+              onChange={(e) => handleSearch(e.target.value)}
               inputProps={{ 'aria-label': 'search' }}
             />
           </Search>
@@ -141,19 +75,13 @@ const DataGridUsuarios = ({ usuariosIniciales, setUsuariosIniciales }) => {
       <DataGrid
         rows={usuarios}
         columns={columns}
-        getRowId={(row) => row.tempId} // Usar tempId como identificador único
+        getRowId={(row) => row.tempId}
         pageSize={5}
         pageSizeOptions={[5, 10, 20]}
         disableMultipleRowSelection
-        localeText={{
-          noRowsLabel: 'No se encontraron resultados',
-          MuiTablePagination: {
-            labelRowsPerPage: 'Obras por página:',
-          },
-        }}
-        sx={{
-          width: '100%',
-        }} />
+        localeText={{ noRowsLabel: 'No se encontraron resultados' }}
+        sx={{ width: '100%' }}
+      />
       <UsuarioModal
         open={usuariosModalOpen}
         onClose={closeUsuarioModal}
@@ -161,16 +89,15 @@ const DataGridUsuarios = ({ usuariosIniciales, setUsuariosIniciales }) => {
         onEdit={handleEdit}
         usuarioParametro={usuarioSeleccionado}
       />
-
-      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
-        <MuiAlert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </MuiAlert>
-      </Snackbar>
-
+      {/* Snackbar for Notifications */}
+      <SnackbarComponent
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={closeSnackbar}
+      />
     </Box>
   );
-
 };
 
 export default DataGridUsuarios;

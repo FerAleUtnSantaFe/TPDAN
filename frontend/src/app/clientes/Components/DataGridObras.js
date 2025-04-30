@@ -1,129 +1,99 @@
-import * as React from 'react';
+import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { AppBar, Box, IconButton, Snackbar, Toolbar, Button } from '@mui/material';
-import MuiAlert from '@mui/material/Alert';
+import {
+  AppBar,
+  Box,
+  IconButton,
+  Toolbar,
+  Button,
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DomainAddIcon from '@mui/icons-material/DomainAdd';
-import { useState, useEffect } from 'react';
-import { SearchIconWrapper, StyledInputBase, Search } from '@/app/styles/styles';
-import ObraModal from './ObraModal';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import ObraModal from './ObraModal';
+import { useObras } from '../Hooks/useObras';
+import { SearchIconWrapper, StyledInputBase, Search } from '@/app/styles/styles';
+import SnackbarComponent from '@/app/Components/SnackBarComponent';
+import EstadoChip from './EstadoChip';
 
+/**
+ * DataGridObras Component
+ * Displays a list of "obras" (projects) in a professional, interactive data grid.
+ * Allows users to search, add, edit, and delete obras.
+ *
+ * @param {string} modo - Determines the mode of the component ("pedido" or default).
+ * @param {function} onObraSelect - Callback function to handle obra selection (used in "pedido" mode).
+ */
+const DataGridObras = ({ modo, onObraSelect}) => {
+  // Custom hook to manage the state and logic for obras
+  const {
+    obras,
+    snackbar,
+    obraModalOpen,
+    obraSeleccionada,
+    searchTerm,
+    modoModal,
+    handleSearch,
+    openObraModal,
+    closeObraModal,
+    handleAdd,
+    handleEdit,
+    handleDelete,
+    closeSnackbar,
+    seleccionarObra,
+  } = useObras();
 
-const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }) => {
-
-  const [obras, setObras] = useState([]);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  const [obraModalOpen, setObraModalOpen] = useState(false);
-  const [obraSeleccionada, setObraSeleccionada] = useState({});
-  const [searchTerm, setSearchTerm] = useState('');
-  const [modoModal, setModoModal] = useState('nuevo');
-
-  useEffect(() => {
-    if (obrasIniciales && Array.isArray(obrasIniciales)) {
-      const formattedData = obrasIniciales.map((obra, index) => ({
-        tempId: obra.id || Date.now()-index,
-        id: obra.id,
-        direccion: obra.direccion,
-        lat: obra.lat,
-        lng: obra.lng,
-        presupuesto: obra.presupuesto,
-        estado: obra.estado
-      }));
-      setObras(formattedData);
-    }
-  }, [obrasIniciales]);
-
-  const handleSearch = (event) => {
-    const value = event.target.value.toLowerCase();
-    setSearchTerm(value);
-
-    if (value === '') {
-      // Si el campo de búsqueda está vacío, restaurar los clientes originales
-      setObras(obrasIniciales);
-    } else {
-      const filtered = obrasIniciales.filter(obra =>
-        obra.direccion.toLowerCase().includes(value) ||
-        obra.lat.toString().includes(value) ||
-        obra.lng.toString().includes(value) ||
-        obra.presupuesto.toString().includes(value) ||
-        obra.estado.toLowerCase().includes(value)
-      );
-      setObras(filtered);
-    }
-  };
-
-  const openObraModal = (obra) => {
-    
-    setModoModal('modificar');
-    setObraModalOpen(true);
-  };
-
-  const closeObraModal = () => {
-    setObraSeleccionada({});
-    setObraModalOpen(false);
-  };
-
-  const handleAdd = (nuevaObra) => {
-    const newObra = { tempId: Date.now(), id: null, ...nuevaObra };
-    const updatedObras = [...obras, newObra];
-
-    setObras(updatedObras);
-    setObrasIniciales(updatedObras);
-    setSnackbar({ open: true, message: 'Obra agregada correctamente', severity: 'success' });
-    closeObraModal();
-  };
-
-  const handleEdit = (obraEditada) => {
-    const updatedObras = obras.map((obra) =>
-      obra.tempId === obraSeleccionada.tempId // Comparar usando el ID temporal
-        ? { ...obraSeleccionada, ...obraEditada }
-        : obra
-    );
-    setObras(updatedObras);
-    setObrasIniciales(updatedObras); // Actualizar también las obras iniciales
-    setSnackbar({ open: true, message: 'Obra editada correctamente', severity: 'success' });
-    closeObraModal();
-  };
-
-  const handleDelete = (tempId) => {
-    const confirmDelete = window.confirm('¿Está seguro de que desea eliminar esta obra?');
-    if (!confirmDelete) return;
-    const updatedObras = obras.filter((obra) => obra.tempId !== tempId); // Filtrar por ID temporal
-    setObras(updatedObras);
-    setObrasIniciales(updatedObras); // Actualizar también las obras iniciales
-    setSnackbar({ open: true, message: 'Obra eliminada correctamente', severity: 'success' });
-  };
-
+  // Define the columns for the DataGrid
   const columns = [
     { field: 'direccion', headerName: 'Dirección', flex: 1 },
     { field: 'lat', headerName: 'Latitud', flex: 1 },
     { field: 'lng', headerName: 'Longitud', flex: 1 },
     { field: 'presupuesto', headerName: 'Presupuesto', flex: 1 },
-    { field: 'estado', headerName: 'Estado', flex: 1 },
-    ...(modo !== 'pedido' ? [{
-      field: 'acciones',
-      headerName: 'Opciones',
-      sortable: false,
-      renderCell: (params) => (
-        <Box>
-          <IconButton size="small" color="primary" onClick={() => { openObraModal(params.row)}}>
-            <SettingsIcon />
-          </IconButton>
-          <IconButton size="small" color="error" onClick={() => handleDelete(params.row.tempId)}>
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      )
-    }] : []),
+    {
+      field: 'estado',
+      headerName: 'Estado',
+      flex: 1,
+      renderCell: (params) => <EstadoChip estado={params.value} />, // Use EstadoChip for estado
+    },
+    ...(modo !== 'pedido'
+      ? [
+          {
+            field: 'acciones',
+            headerName: 'Opciones',
+            sortable: false,
+            renderCell: (params) => (
+              <Box>
+                {/* Edit Button */}
+                <IconButton
+                  size="small"
+                  color="primary"
+                  onClick={() => openObraModal(params.row, 'modificar')}
+                >
+                  <SettingsIcon />
+                </IconButton>
+                {/* Delete Button */}
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => handleDelete(params.row.tempId)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
     <Box marginTop={1}>
+      {/* AppBar for Search and Action Buttons */}
       <AppBar position="static">
         <Toolbar>
+          {/* Search Input */}
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -131,10 +101,11 @@ const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }
             <StyledInputBase
               placeholder="Buscar obra…"
               value={searchTerm}
-              onChange={handleSearch}
+              onChange={(e) => handleSearch(e.target.value)}
               inputProps={{ 'aria-label': 'search' }}
             />
           </Search>
+          {/* Action Button: Add or Select Obra */}
           <Button
             variant="contained"
             color="success"
@@ -142,10 +113,9 @@ const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }
             startIcon={modo !== 'pedido' ? <DomainAddIcon /> : <NavigateNextIcon />}
             onClick={() => {
               if (modo === 'pedido') {
-                onObraSelect(obraSeleccionada);
+                onObraSelect(obraSeleccionada); // Select obra in "pedido" mode
               } else {
-                setModoModal('nuevo');
-                setObraModalOpen(true);
+                openObraModal(null, 'nuevo'); // Open modal to add a new obra
               }
             }}
           >
@@ -153,25 +123,28 @@ const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }
           </Button>
         </Toolbar>
       </AppBar>
+
+      {/* DataGrid to Display Obras */}
       <DataGrid
         rows={obras}
         columns={columns}
         pageSize={5}
         pageSizeOptions={[5, 10, 20]}
-        getRowId={(row) => row.tempId}
-        checkboxSelection
+        getRowId={(row) => row.tempId} // Use tempId as unique identifier
         disableMultipleRowSelection
-        onRowSelectionModelChange={(newSelection) => {
-          setObraSeleccionada(obrasIniciales.find(obra => obra.id === newSelection[0]) || {});
-        }}
+        onRowSelectionModelChange={(ids) => {
+          const selectedId = ids[0];
+          const selectedObra = obras.find((obra) => obra.id === selectedId);
+          seleccionarObra(selectedObra || null); // Track the selected row
+      }}
         localeText={{
           noRowsLabel: 'No se encontraron resultados',
-          MuiTablePagination: {
-            labelRowsPerPage: 'Obras por página:',
-          },
+          MuiTablePagination: { labelRowsPerPage: 'Obras por página:' },
         }}
         sx={{ width: '100%' }}
       />
+
+      {/* Modal for Adding/Editing Obras */}
       <ObraModal
         open={obraModalOpen}
         onClose={closeObraModal}
@@ -180,19 +153,14 @@ const DataGridObras = ({ obrasIniciales, setObrasIniciales, modo, onObraSelect }
         obraParametro={obraSeleccionada}
         modo={modoModal}
       />
-      <Snackbar
+
+      {/* Snackbar for Notifications */}
+      <SnackbarComponent
         open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      >
-        <MuiAlert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </MuiAlert>
-      </Snackbar>
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={closeSnackbar}
+      />
     </Box>
   );
 };

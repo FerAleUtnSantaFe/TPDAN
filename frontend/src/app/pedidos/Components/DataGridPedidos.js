@@ -9,6 +9,8 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import InputBase from '@mui/material/InputBase';
 import { findPedidos, updatePedido } from '@/app/APIs/PedidosAPI';
+import EstadoChipPedidos from './EstadoChipPedidos';
+import EstadoModalPedidos from './EstadoPedidoModal';
 
 function DataGridPedidos() {
 
@@ -16,6 +18,9 @@ function DataGridPedidos() {
     const [searchTerm, setSearchTerm] = useState('');
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
     const [pedidos, setPedidos] = useState([]);
+    const [selectedPedido, setSelectedPedido] = useState(null); // Track the selected pedido for editing
+    const [modalOpen, setModalOpen] = useState(false); // Track the modal state
+
     useEffect(() => {
         cargarPedidos();
     }, []);
@@ -44,34 +49,21 @@ function DataGridPedidos() {
         setClientes(filtered);
     };
 
-    const handleEdit = async (pedido) => {
-        const opcionesEstado =
-            pedido.estado === 'ACEPTADO'
-                ? ['CANCELADO']
-                : pedido.estado === 'EN_PREPARACION'
-                ? ['ENTREGADO', 'CANCELADO']
-                : [];
-    
-        const nuevoEstado = prompt(
-            `El estado actual es ${pedido.estado}. Opciones disponibles: ${opcionesEstado.join(', ')}`
-        );
-    
-        if (!opcionesEstado.includes(nuevoEstado)) {
-            alert('Estado no permitido.');
-            return;
-        }
-    
+    const handleEdit = (pedido) => {
+        setSelectedPedido(pedido); // Set the selected pedido
+        setModalOpen(true); // Open the modal
+    };
+
+    const handleSaveEstado = async (newEstado) => {
         try {
-            // Llamar a la API para actualizar el estado
-            const updatedPedido = await updatePedido(pedido.id, { estado: nuevoEstado });
-            alert(`Estado actualizado a ${updatedPedido.estado}`);
-            // Actualizar el estado en el frontend
+            const updatedPedido = await updatePedido(selectedPedido.id, { estado: newEstado });
             setPedidos((prevPedidos) =>
-                prevPedidos.map((p) => (p.id === pedido.id ? { ...p, estado: nuevoEstado } : p))
+                prevPedidos.map((p) => (p.id === selectedPedido.id ? { ...p, estado: newEstado } : p))
             );
+            setSnackbar({ open: true, message: `Estado actualizado a ${newEstado}`, severity: 'success' });
         } catch (error) {
             console.error('Error al actualizar el pedido:', error);
-            alert('No se pudo actualizar el estado del pedido.');
+            setSnackbar({ open: true, message: 'Error al actualizar el estado', severity: 'error' });
         }
     };
 
@@ -81,24 +73,28 @@ function DataGridPedidos() {
         { field: 'fecha', headerName: 'Fecha', flex: 1 },
         { field: 'cliente', headerName: 'ID cliente', flex: 1 },
         { field: 'obra', headerName: 'ID Obra', flex: 1 },
-        { field: 'estado', headerName: 'Estado', flex: 1 },
+        {
+            field: 'estado',
+            headerName: 'Estado',
+            flex: 1,
+            renderCell: (params) => <EstadoChipPedidos estado={params.value} />, // Use EstadoChipPedidos
+        },
         { field: 'total', headerName: 'Total', flex: 1 },
         {
-            field: 'editar', headerName: 'Editar', sortable: false, flex: 1,
+            field: 'editar',
+            headerName: 'Editar',
+            sortable: false,
+            flex: 1,
             renderCell: (params) => (
-                (params.row.estado === 'ACEPTADO' || params.row.estado === 'EN_PREPARACION') && (
-                    <Box>
-                        <IconButton size="small" color="primary" onClick={() => handleEdit(params.row)}>
-                            <EditIcon />
-                        </IconButton>
-                    </Box>
-                )
-            )
+                <IconButton size="small" color="primary" onClick={() => handleEdit(params.row)}>
+                    <EditIcon />
+                </IconButton>
+            ),
         },
     ];
 
     return (
-        <Box>
+        <>
             <AppBar position="static">
                 <Toolbar>
                     <Search>
@@ -141,7 +137,22 @@ function DataGridPedidos() {
                     {snackbar.message}
                 </MuiAlert>
             </Snackbar>
-        </Box>
+            {selectedPedido && (
+                <EstadoModalPedidos
+                    open={modalOpen}
+                    onClose={() => setModalOpen(false)}
+                    onSave={handleSaveEstado}
+                    currentEstado={selectedPedido.estado}
+                    availableEstados={
+                        selectedPedido.estado === 'ACEPTADO'
+                            ? ['CANCELADO']
+                            : selectedPedido.estado === 'EN_PREPARACION'
+                                ? ['ENTREGADO', 'CANCELADO']
+                                : []
+                    }
+                />
+            )}
+        </>
     );
 }
 

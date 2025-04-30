@@ -82,10 +82,10 @@ public class ClienteController {
         log.info("Eliminando cliente con ID: {}", id);
         if (!clienteService.findById(id).isPresent()) {
             log.warn("Cliente con ID {} no encontrado", id);
-            throw new ClienteNotFoundException("Cliente " + id + " no encontrado para borrar");
+            return ResponseEntity.notFound().build();
         }
         clienteService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}/{monto}")

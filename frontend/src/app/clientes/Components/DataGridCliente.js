@@ -11,63 +11,20 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useRouter } from 'next/navigation';
 import { SearchIconWrapper, StyledInputBase, Search } from '@/app/styles/styles';
-import { useState, useEffect } from 'react';
-import { cargarClientes, eliminarCliente } from '../Controllers/DataGridClienteController';
+import { useCliente } from '../Hooks/useCliente';
+
 
 export default function DataGridCliente({ modo, onClienteSelect }) {
     const router = useRouter();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-    const [clientes, setClientes] = useState([]);
-    const [clientesOriginales, setClientesOriginales] = useState([]); // Estado para los clientes originales
-    const [clienteSeleccionado, setClienteSeleccionado] = useState({});
-
-    useEffect(() => {
-        const fetchClientes = async () => {
-            try {
-                const data = await cargarClientes();
-                setClientes(data);
-                setClientesOriginales(data); // Guardar los clientes originales
-            } catch (error) {
-                console.error('Error al cargar los clientes:', error);
-            }
-        };
-        fetchClientes();
-    }, []);
-
-    const handleSearch = (event) => {
-        const value = event.target.value.toLowerCase();
-        setSearchTerm(value);
-
-        if (value === '') {
-            // Si el campo de búsqueda está vacío, restaurar los clientes originales
-            setClientes(clientesOriginales);
-        } else {
-            // Filtrar los clientes según el término de búsqueda
-            const filtered = clientesOriginales.filter(cliente =>
-                cliente.cuit.toLowerCase().includes(value) ||
-                cliente.nombre.toLowerCase().includes(value) ||
-                cliente.correoElectronico.toLowerCase().includes(value) ||
-                cliente.maximoDescubierto.toString().includes(value) ||
-                cliente.maximoDeObras.toString().includes(value)
-            );
-            setClientes(filtered);
-        }
-    };
-
-    const handleDelete = async (cliente) => {
-        if (window.confirm(`¿Está seguro de que desea eliminar el cliente ${cliente.nombre}?`)) {
-            const result = await eliminarCliente(cliente.id);
-            if (result) {
-                setSnackbar({ open: true, message: 'Cliente eliminado con éxito', severity: 'success' });
-                const updatedClientes = await cargarClientes();
-                setClientes(updatedClientes);
-                setClientesOriginales(updatedClientes); // Actualizar los clientes originales
-            } else {
-                setSnackbar({ open: true, message: 'Error al eliminar el cliente en base de datos', severity: 'error' });
-            }
-        }
-    };
+    const {
+        clientes,
+        clienteSeleccionado,
+        snackbar,
+        buscarCliente,
+        eliminarCliente,
+        seleccionarCliente,
+        closeSnackbar,
+    } = useCliente();
 
     // Configuración de las columnas
     const columns = [
@@ -87,7 +44,7 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
                         <IconButton size="small" color="primary" onClick={() => router.push(`/clientes/modificar?id=${params.row.id}`)}>
                             <SettingsIcon />
                         </IconButton>
-                        <IconButton size="small" color="error" onClick={() => handleDelete(params.row)}>
+                        <IconButton size="small" color="error" onClick={() => eliminarCliente(params.row)}>
                             <DeleteIcon />
                         </IconButton>
                     </Box>
@@ -106,8 +63,7 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
                         </SearchIconWrapper>
                         <StyledInputBase
                             placeholder="Buscar cliente…"
-                            value={searchTerm}
-                            onChange={handleSearch}
+                            onChange={(e) => buscarCliente(e.target.value)}
                             inputProps={{ 'aria-label': 'search' }}
                         />
                     </Search>
@@ -116,12 +72,12 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
                         color="success"
                         sx={{ ml: 'auto' }}
                         startIcon={modo !== 'pedido' ? <PersonAddIcon /> : <NavigateNextIcon />}
-                        onClick={() => {
+                        onClick={() => { /// MODIFICAR ESTO NO DEBE ACTUALZAR UN HOOK DESDE UN IF
                             if (modo === 'pedido') {
                                 if (clienteSeleccionado !== '') {
-                                    onClienteSelect(clienteSeleccionado);
+                                    onClienteSelect(clienteSeleccionado); // Llama a la función de selección de cliente
                                 } else {
-                                    setSnackbar({ open: true, message: 'Debe seleccionar un cliente para continuar', severity: 'warning' });
+                                    alert('Debe seleccionar un cliente para continuar');
                                 }
                             } else {
                                 router.push('/clientes/nuevo');
@@ -138,10 +94,11 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
                 columns={columns}
                 initialState={{ pagination: { paginationModel: { page: 0, pageSize: 5 } } }}
                 pageSizeOptions={[5, 10]}
-                checkboxSelection
                 disableMultipleRowSelection
-                onRowSelectionModelChange={(newSelection) => {
-                    setClienteSeleccionado(clientesOriginales.find(cliente => cliente.id === newSelection[0]) || {});
+                onRowSelectionModelChange={(ids) => {
+                    const selectedId = ids[0];
+                    const selectedClient = clientes.find((cliente) => cliente.id === selectedId);
+                    seleccionarCliente(selectedClient || null); // Track the selected row
                 }}
                 localeText={{
                     noRowsLabel: 'No se encontraron resultados',
@@ -150,8 +107,8 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
                 sx={{ width: '100%' }}
             />
 
-            <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
-                <MuiAlert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity} sx={{ width: '100%' }}>
+            <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={() => closeSnackbar()}>
+                <MuiAlert onClose={() => closeSnackbar()} severity={snackbar.severity} sx={{ width: '100%' }}>
                     {snackbar.message}
                 </MuiAlert>
             </Snackbar>
