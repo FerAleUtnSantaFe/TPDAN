@@ -1,5 +1,9 @@
 package isi.dan.ms.pedidos.dao;
 
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -23,10 +26,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import isi.dan.ms.pedidos.modelo.Estado;
 import isi.dan.ms.pedidos.modelo.Pedido;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @DataMongoTest
@@ -41,7 +40,7 @@ public class PedidoRepositoryTest {
 
     @Autowired
     private PedidoRepository pedidoRepository;
-    
+
     private static final Integer CANTIDAD_PEDIDOS = 5;
     private static Pedido pedido;
     private static Estado estado;
@@ -66,6 +65,16 @@ public class PedidoRepositoryTest {
     void init() {
         pedidoRepository.save(pedido);
         log.info("Pedidos guardados: {}", pedidoRepository.count());
+        for (int i = 1; i < CANTIDAD_PEDIDOS; i++) {
+            Pedido p = new Pedido();
+            p.setNumeroPedido(i + 1);
+            p.setObra(1);
+            p.setCliente(1);
+            p.setEstado(Estado.ACEPTADO);
+            p.setId("1A" + i); // para que tengan ID único
+            pedidoRepository.save(p);
+        }
+        log.info("Pedidos guardados: {}", pedidoRepository.count());
     }
 
     @AfterEach
@@ -87,7 +96,7 @@ public class PedidoRepositoryTest {
     }
 
     @Test
-    @Order(1)
+    @Order(2)
     void testFind() {
         Pedido foundPedido = pedidoRepository.findById("1A").get();
         log.info("ENCONTRÉ: {}", foundPedido);
@@ -95,4 +104,3 @@ public class PedidoRepositoryTest {
     }
 
 }
-

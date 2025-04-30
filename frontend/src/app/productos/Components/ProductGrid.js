@@ -7,12 +7,14 @@ import { Box, Grid2 } from "@mui/material";
 import { useEffect, useState } from "react";
 
 export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
-  const [productos, setProductos] = useState([]);
+  const [productosOriginales, setProductosOriginales] = useState([]); // Original list of products
+  const [productosFiltrados, setProductosFiltrados] = useState([]); // Filtered and sorted list
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProductoId, setSelectedProductoId] = useState(null);
   const [productosSeleccionados, setProductosSeleccionados] = useState([]);
   const [orden, setOrden] = useState("nombre");
 
+  // Function to sort products based on the selected order
   const ordenarProductos = (lista) => {
     const sorted = [...lista];
     if (orden === "nombre") {
@@ -25,11 +27,10 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
     return sorted;
   };
 
-  const handleModalClose = async () => {
-    setIsModalOpen(false);
-    setSelectedProductoId(null);
-    const updatedProductos = await fetchProductos();
-    setProductos(ordenarProductos(updatedProductos));
+  // Function to handle filtering and sorting together
+  const actualizarProductosFiltrados = (filteredList) => {
+    const sortedList = ordenarProductos(filteredList);
+    setProductosFiltrados(sortedList); // Updates the filtered list
   };
 
   const handleEdit = (id) => {
@@ -37,23 +38,27 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
     setIsModalOpen(true);
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      const data = await fetchProductos();
-      setProductos(ordenarProductos(data));
-    }
-    fetchData();
-  }, [orden]);
+  // Function to handle modal close and refresh products
+  const handleModalClose = async () => {
+    setIsModalOpen(false);
+    setSelectedProductoId(null);
+    const updatedProductos = await fetchProductos();
+    setProductosOriginales(updatedProductos);
+    actualizarProductosFiltrados(updatedProductos);
+  };
 
+  // Function to handle product deletion
   const handleDeleteProducto = async (id) => {
     const result = await handleDelete(id);
     alert(result.message);
     if (result.success) {
       const updatedProductos = await fetchProductos();
-      setProductos(ordenarProductos(updatedProductos));
+      setProductosOriginales(updatedProductos);
+      actualizarProductosFiltrados(updatedProductos);
     }
   };
 
+  // Function to handle quantity change for selected products
   const handleCantidadChange = (producto, cantidad) => {
     setProductosSeleccionados((prev) => {
       const index = prev.findIndex((p) => p.id === producto.id);
@@ -67,13 +72,26 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
     });
   };
 
+  // Fetch products on component mount
+  useEffect(() => {
+    async function fetchData() {
+      const data = await fetchProductos();
+      setProductosOriginales(data);
+      actualizarProductosFiltrados(data);
+    }
+    fetchData();
+  }, []);
+
+  // Re-sort products whenever the sorting order changes
+  useEffect(() => {
+    actualizarProductosFiltrados(productosFiltrados);
+  }, [orden]);
+
   return (
     <Box sx={{ maxWidth: 1200, margin: "0 auto" }}>
       <SearchBar
-        productos={productos}
-        setProductos={(newProductos) =>
-          setProductos(ordenarProductos(newProductos))
-        }
+        productos={productosOriginales}
+        setProductosFiltrados={actualizarProductosFiltrados} // Passed here
         productosSeleccionados={productosSeleccionados}
         isPedidoMode={isPedidoMode}
         onListaProductosSelect={onListaProductosSelect}
@@ -93,7 +111,7 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
           gap: 6.2,
         }}
       >
-        {productos.map((producto) => (
+        {productosFiltrados.map((producto) => (
           <Grid2 item xs={12} sm={6} md={4} lg={3} key={producto.id}>
             <ProductCard
               producto={producto}
