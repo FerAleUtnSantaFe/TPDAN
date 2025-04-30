@@ -29,9 +29,12 @@ export async function findbyIdCliente(idCli) {
 }
 
 // Crear un nuevo cliente
-export async function createCliente(cliente, obras, usuarios) {
-    const obrasLimpias = obras.map(({ tempId, ...obra }) => obra); // Eliminar tempId de cada obra
-    const usuariosLimpios = usuarios.map(({ tempId, ...usuario }) => usuario); // Eliminar tempId de cada usuario
+export async function createCliente(cliente) {
+
+    console.log("cliente entrante: ", cliente)
+
+    const obrasLimpias = cliente.obras.map(({ tempId, ...obra }) => obra); // Eliminar tempId de cada obra
+    const usuariosLimpios = cliente.usuarios.map(({ tempId, ...usuario }) => usuario); // Eliminar tempId de cada usuario
 
     const clienteCompleto = {
         ...cliente,
@@ -60,10 +63,12 @@ export async function createCliente(cliente, obras, usuarios) {
 }
 
 // Actualizar un cliente existente
-export async function updateCliente(idCli, cliente, obras, usuarios) {
-
-    const obrasLimpias = obras.map(({ tempId, ...obra }) => obra); // Eliminar tempId de cada obra
-    const usuariosLimpios = usuarios.map(({ tempId, ...usuario }) => usuario); // Eliminar tempId de cada usuario
+export async function updateCliente(idCli, cliente) {
+    
+    console.log("cliente entrante: ", cliente)
+    
+    const obrasLimpias = cliente.obras.map(({ tempId, ...obra }) => obra); // Eliminar tempId de cada obra
+    const usuariosLimpios = cliente.usuarios.map(({ tempId, ...usuario }) => usuario); // Eliminar tempId de cada usuario
 
     const clienteCompleto = {
         ...cliente,
@@ -95,16 +100,37 @@ export async function updateCliente(idCli, cliente, obras, usuarios) {
 // Eliminar un cliente por ID
 export async function deleteCliente(idCli) {
     try {
-        console.log(idCli);
+        
         const response = await fetch(`${BASE_URL}/${idCli}`, {
             method: 'DELETE'
         });
+        console.log(response, response.ok);
         if (!response.ok) {
             throw new Error(`Error al eliminar el cliente con ID ${idCli}: ${response.statusText}`);
         }
+        console.log("response: ", response.json());
         return await response.json();
     } catch (error) {
         console.error('Error en deleteCliente:', error);
+        throw error;
+    }
+}
+
+export async function updateEstadoObra(idCli, idObra, estado) {
+    try {
+        const response = await fetch(`${BASE_URL}/${idCli}/${idObra}`, {
+                method: 'PUT',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(estado)
+          });
+        if (!response.ok) {
+            throw new Error(`Error al actualizar el estado de la obra: ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error en updateEstadoObra:', error);
         throw error;
     }
 }
