@@ -1,6 +1,8 @@
 import {
   Alert,
   Button,
+  Card,
+  CardContent,
   Container,
   InputAdornment,
   Snackbar,
@@ -67,90 +69,96 @@ export default function NuevoProductoForm({ handleSubmit }) {
   };
 
   return (
-    <Container>
-      <Typography
-        variant="h3"
-        color="primary"
-        gutterBottom
-        sx={{ margin: 1, textAlign: "center" }}
-      >
-        Gestión de productos: Nuevo Producto
-      </Typography>
-      <form onSubmit={handleFormSubmit}>
-        <TextField
-          required
-          fullWidth
-          label="Nombre"
-          name="nombre"
-          value={formData.nombre}
-          onChange={handleChange}
-          margin="normal"
-        />
-        <TextField
-          required
-          fullWidth
-          label="Stock Mínimo"
-          name="stockMinimo"
-          type="number"
-          value={formData.stockMinimo}
-          onChange={handleChange}
-          margin="normal"
-        />
-        <TextField
-          required
-          fullWidth
-          label="Precio"
-          name="precio"
-          type="number"
-          value={formData.precio}
-          onChange={handleChange}
-          margin="normal"
-        />
-        <CategoriaSelect
-          value={formData.categoria}
-          onChange={(value) => setFormData({ ...formData, categoria: value })}
-        />
-        <TextField
-          required
-          fullWidth
-          label="Descuento Promocional"
-          name="descuentoPromocional"
-          type="number"
-          value={formData.descuentoPromocional}
-          onChange={handleChange}
-          margin="normal"
-          SlotProps={{
-            endAdornment: <InputAdornment position="end">%</InputAdornment>,
-          }}
-          helperText="Ingrese un valor entre 0 y 100"
-        />
-        <TextField
-          required
-          fullWidth
-          label="Descripción"
-          name="descripcion"
-          value={formData.descripcion}
-          onChange={handleChange}
-          margin="normal"
-          helperText={`${formData.descripcion.length}/170 caracteres`}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          size="large"
-          sx={{ marginTop: 2 }}
-        >
-          Crear Producto
-        </Button>
-      </form>
-      <Snackbar
-        open={alert.open}
-        autoHideDuration={3000}
-        onClose={() => setAlert({ ...alert, open: false })}
-      >
-        <Alert severity={alert.severity}>{alert.message}</Alert>
-      </Snackbar>
+    <Container sx={{ marginTop: 4 }}>
+      <Card sx={{ marginBottom: 4 }}>
+        <CardContent>
+          <Typography
+            variant="h3"
+            color="primary"
+            gutterBottom
+            sx={{ margin: 1, textAlign: "center" }}
+          >
+            Gestión de productos: Nuevo Producto
+          </Typography>
+          <form onSubmit={handleFormSubmit}>
+            <TextField
+              required
+              fullWidth
+              label="Nombre"
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleChange}
+              margin="normal"
+            />
+            <TextField
+              required
+              fullWidth
+              label="Stock Mínimo"
+              name="stockMinimo"
+              type="number"
+              value={formData.stockMinimo}
+              onChange={handleChange}
+              margin="normal"
+            />
+            <TextField
+              required
+              fullWidth
+              label="Precio"
+              name="precio"
+              type="number"
+              value={formData.precio}
+              onChange={handleChange}
+              margin="normal"
+            />
+            <CategoriaSelect
+              value={formData.categoria}
+              onChange={(value) =>
+                setFormData({ ...formData, categoria: value })
+              }
+            />
+            <TextField
+              required
+              fullWidth
+              label="Descuento Promocional"
+              name="descuentoPromocional"
+              type="number"
+              value={formData.descuentoPromocional}
+              onChange={handleChange}
+              margin="normal"
+              SlotProps={{
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              }}
+              helperText="Ingrese un valor entre 0 y 100"
+            />
+            <TextField
+              required
+              fullWidth
+              label="Descripción"
+              name="descripcion"
+              value={formData.descripcion}
+              onChange={handleChange}
+              margin="normal"
+              helperText={`${formData.descripcion.length}/170 caracteres`}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              size="large"
+              sx={{ marginTop: 2 }}
+            >
+              Crear Producto
+            </Button>
+          </form>
+          <Snackbar
+            open={alert.open}
+            autoHideDuration={3000}
+            onClose={() => setAlert({ ...alert, open: false })}
+          >
+            <Alert severity={alert.severity}>{alert.message}</Alert>
+          </Snackbar>
+        </CardContent>
+      </Card>
     </Container>
   );
 }

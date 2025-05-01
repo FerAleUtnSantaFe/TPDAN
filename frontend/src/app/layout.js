@@ -6,10 +6,15 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
-        <div>
-        {children}
-        </div>
+      <body
+        style={{
+          margin: 0,
+          padding: 0,
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #dbeafe, #fef9c3)", // Apply the gradient here
+        }}
+      >
+        <div>{children}</div>
       </body>
     </html>
   );

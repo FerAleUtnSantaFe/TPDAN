@@ -11,6 +11,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
     AppBar,
     Button,
+    Card,
+    CardContent,
     IconButton,
     MenuItem,
     Snackbar,
@@ -175,7 +177,11 @@ function DataGridPedidos() {
           </Button>
         </Toolbar>
       </AppBar>
-      <DataGrid rows={pedidos} columns={columns} pageSize={5} />
+      <Card sx={{ marginBottom: 4 }}>
+        <CardContent>
+          <DataGrid rows={pedidos} columns={columns} pageSize={5} />
+        </CardContent>
+      </Card>
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}

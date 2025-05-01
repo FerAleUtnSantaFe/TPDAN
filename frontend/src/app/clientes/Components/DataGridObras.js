@@ -1,22 +1,21 @@
-import React from 'react';
-import { DataGrid } from '@mui/x-data-grid';
-import {
-  AppBar,
-  Box,
-  IconButton,
-  Toolbar,
-  Button,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import SettingsIcon from '@mui/icons-material/Settings';
+import SnackbarComponent from '@/app/Components/SnackBarComponent';
+import { Search, SearchIconWrapper, StyledInputBase } from '@/app/styles/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DomainAddIcon from '@mui/icons-material/DomainAdd';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import ObraModal from './ObraModal';
+import SearchIcon from '@mui/icons-material/Search';
+import SettingsIcon from '@mui/icons-material/Settings';
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Toolbar
+} from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { useObras } from '../Hooks/useObras';
-import { SearchIconWrapper, StyledInputBase, Search } from '@/app/styles/styles';
-import SnackbarComponent from '@/app/Components/SnackBarComponent';
 import EstadoChip from './EstadoChip';
+import ObraModal from './ObraModal';
 
 /**
  * DataGridObras Component
@@ -125,6 +124,7 @@ const DataGridObras = ({ modo, onObraSelect}) => {
       </AppBar>
 
       {/* DataGrid to Display Obras */}
+
       <DataGrid
         rows={obras}
         columns={columns}
@@ -143,7 +143,6 @@ const DataGridObras = ({ modo, onObraSelect}) => {
         }}
         sx={{ width: '100%' }}
       />
-
       {/* Modal for Adding/Editing Obras */}
       <ObraModal
         open={obraModalOpen}
