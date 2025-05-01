@@ -26,7 +26,7 @@ import { useState } from "react";
 
 export default function SearchBar({
   productos,
-  setProductos,
+  setProductosFiltrados, // Ensure this is included
   productosSeleccionados,
   isPedidoMode,
   onListaProductosSelect,
@@ -55,7 +55,7 @@ export default function SearchBar({
       priceRange[1] === 1000
     ) {
       const reinicio = await fetchProductos();
-      setProductos(reinicio);
+      setProductosFiltrados(reinicio); // This should work if the prop is passed correctly
       return;
     }
 
@@ -66,7 +66,7 @@ export default function SearchBar({
       priceRange
     );
 
-    setProductos(productosFiltrados);
+    setProductosFiltrados(productosFiltrados); // This should also work
   }
 
   const GenerarPedido = () => {
