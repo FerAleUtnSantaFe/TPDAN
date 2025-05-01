@@ -85,7 +85,7 @@ public class ClienteController {
             return ResponseEntity.notFound().build();
         }
         clienteService.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/{monto}")

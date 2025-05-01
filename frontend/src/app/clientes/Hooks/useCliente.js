@@ -4,7 +4,8 @@ import { useClienteContext } from './ClienteContext';
 
 
 /* 
-    ESTE ARCHIVO ES UN CUSTOM HOOK QUE SE UTILIZA PARA MANEJAR EL ESTADO DE LOS CLIENTES EN EL DATAGRID Y NO INCLUYE OBRAS NI USUARIOS DE CADA CLIENTE.
+    Client state management using useReducer.
+    This hook manages the state of clients, including fetching, filtering, and deleting clients.
 */
 
 //Acciones para el reducer
@@ -47,6 +48,7 @@ const clienteReducer = (state, action) => {
     }
 };
 
+
 // Custom hook
 export const useCliente = () => {
     const { clienteSeleccionado, updateClienteSeleccionado } = useClienteContext(); // Access ClienteContext
@@ -56,7 +58,7 @@ export const useCliente = () => {
     useEffect(() => {
         const fetchClientes = async () => {
             try {
-                const data = await await findClientes();
+                const data = await findClientes();
                 data.map((cliente) => ({
                     id: cliente.id,
                     cuit: cliente.cuit,
@@ -96,7 +98,18 @@ export const useCliente = () => {
                         type: ACTIONS.UPDATE_SNACKBAR,
                         payload: { open: true, message: 'Cliente eliminado con éxito', severity: 'success' },
                     });
-                    const updatedClientes = await cargarClientes();
+                    const updatedClientes = await findClientes();
+                    updatedClientes.map((cliente) => ({
+                        id: cliente.id,
+                        cuit: cliente.cuit,
+                        nombre: cliente.nombre,
+                        correoElectronico: cliente.correoElectronico,
+                        maximoDescubierto: cliente.maximoDescubierto,
+                        maximoDeObras: cliente.maximoDeObras,
+                        obrasActivas: cliente.obrasActivas,
+                        obras: cliente.obras || [],
+                        usuarios: cliente.usuarios || []
+                    }));
                     dispatch({ type: ACTIONS.UPDATE_CLIENTES, payload: updatedClientes });
                 } else {
                     dispatch({

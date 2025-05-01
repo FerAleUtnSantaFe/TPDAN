@@ -47,6 +47,8 @@ public class ClienteService {
         cliente.setMaximoDeObras(clienteActualizado.getMaximoDeObras());
         cliente.setObrasActivas(clienteActualizado.getObrasActivas());    
 
+        habilitarObras(clienteActualizado);
+
         return clienteRepository.save(cliente);
     }
 

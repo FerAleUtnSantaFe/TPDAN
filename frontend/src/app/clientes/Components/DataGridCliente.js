@@ -31,8 +31,8 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
         { field: 'cuit', headerName: 'CUIL', flex: 1 },
         { field: 'nombre', headerName: 'Nombre', flex: 1 },
         { field: 'correoElectronico', headerName: 'Correo', flex: 1 },
-        { field: 'maximoDeObras', headerName: 'Obras Activas', flex: 1 },
-        { field: 'maximoDescubierto', headerName: 'Descubierto', flex: 1 },
+        { field: 'maximoDeObras', headerName: 'Maximas Obras Activas', flex: 1 },
+        { field: 'maximoDescubierto', headerName: 'Maximo Descubierto', flex: 1 },
         ...(modo !== 'pedido' ? [ // Si el modo no es "pedido", agrega la columna "opciones"
             {
                 field: 'opciones',

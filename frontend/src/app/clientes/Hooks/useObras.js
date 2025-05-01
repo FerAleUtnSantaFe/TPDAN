@@ -165,6 +165,7 @@ export const useObras = () => {
     if (currentEstado === 'PENDIENTE' && newEstado === 'HABILITADA') {
       if (clienteSeleccionado.obrasActivas < clienteSeleccionado.maximoDeObras) {
         updatedObrasActivas += 1;
+                                                        console.log('Obra habilitada correctamente', updatedObrasActivas);
       } else {
         dispatch({
           type: ACTIONS.SET_SNACKBAR,
@@ -174,6 +175,7 @@ export const useObras = () => {
       }
     } else if (currentEstado === 'HABILITADA' && (newEstado === 'PENDIENTE' || newEstado === 'FINALIZADA')) {
       updatedObrasActivas -= 1;
+                                                                        console.log('Obra deshabilitada correctamente: ', updatedObrasActivas);
     } else if (currentEstado === 'FINALIZADA') {
       dispatch({
         type: ACTIONS.SET_SNACKBAR,
@@ -190,11 +192,12 @@ export const useObras = () => {
     }));
 
     // Automatically habilitate a pending obra if a finalizada obra is saved
-    if (currentEstado === 'FINALIZADA' && newEstado === 'FINALIZADA') {
+    if (currentEstado === 'HABILITADA' && newEstado === 'FINALIZADA') {
       const pendingObra = updatedObras.find((obra) => obra.estado === 'PENDIENTE');
       if (pendingObra) {
         pendingObra.estado = 'HABILITADA';
         updatedObrasActivas += 1;
+                                                  console.log('Obra habilitada automáticamente: ', updatedObrasActivas);
       }
     }
 

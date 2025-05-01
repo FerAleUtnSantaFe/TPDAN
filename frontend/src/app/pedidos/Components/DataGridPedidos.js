@@ -46,7 +46,7 @@ function DataGridPedidos() {
             pedido.cliente.toLowerCase().includes(searchTerm) ||
             pedido.estado.toLowerCase().includes(searchTerm)
         );
-        setClientes(filtered);
+        setPedidos(filtered);
     };
 
     const handleEdit = (pedido) => {
