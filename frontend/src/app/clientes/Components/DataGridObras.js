@@ -25,7 +25,7 @@ import ObraModal from './ObraModal';
  * @param {string} modo - Determines the mode of the component ("pedido" or default).
  * @param {function} onObraSelect - Callback function to handle obra selection (used in "pedido" mode).
  */
-const DataGridObras = ({ modo, onObraSelect}) => {
+const DataGridObras = ({ modo, onObraSelect }) => {
   // Custom hook to manage the state and logic for obras
   const {
     obras,
@@ -58,13 +58,14 @@ const DataGridObras = ({ modo, onObraSelect}) => {
     },
     ...(modo !== 'pedido'
       ? [
-          {
-            field: 'acciones',
-            headerName: 'Opciones',
-            sortable: false,
-            renderCell: (params) => (
-              <Box>
-                {/* Edit Button */}
+        {
+          field: 'acciones',
+          headerName: 'Opciones',
+          sortable: false,
+          renderCell: (params) => (
+            <Box>
+              {/* Edit Button */}
+              {params.row.id !== null && (
                 <IconButton
                   size="small"
                   color="primary"
@@ -72,18 +73,19 @@ const DataGridObras = ({ modo, onObraSelect}) => {
                 >
                   <SettingsIcon />
                 </IconButton>
-                {/* Delete Button */}
-                <IconButton
-                  size="small"
-                  color="error"
-                  onClick={() => handleDelete(params.row.tempId)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            ),
-          },
-        ]
+              )}
+              {/* Delete Button */}
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => handleDelete(params.row.tempId)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+          ),
+        },
+      ]
       : []),
   ];
 
@@ -136,7 +138,7 @@ const DataGridObras = ({ modo, onObraSelect}) => {
           const selectedId = ids[0];
           const selectedObra = obras.find((obra) => obra.id === selectedId);
           seleccionarObra(selectedObra || null); // Track the selected row
-      }}
+        }}
         localeText={{
           noRowsLabel: 'No se encontraron resultados',
           MuiTablePagination: { labelRowsPerPage: 'Obras por página:' },

@@ -37,45 +37,32 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
     closeSnackbar,
   } = useCliente();
 
-  // Configuración de las columnas
-  const columns = [
-    { field: "cuit", headerName: "CUIL", flex: 1 },
-    { field: "nombre", headerName: "Nombre", flex: 1 },
-    { field: "correoElectronico", headerName: "Correo", flex: 1 },
-    { field: "maximoDeObras", headerName: "Obras Activas", flex: 1 },
-    { field: "maximoDescubierto", headerName: "Descubierto", flex: 1 },
-    ...(modo !== "pedido"
-      ? [
-          // Si el modo no es "pedido", agrega la columna "opciones"
-          {
-            field: "opciones",
-            headerName: "Opciones",
-            sortable: false,
-            flex: 1,
-            renderCell: (params) => (
-              <Box>
-                <IconButton
-                  size="small"
-                  color="primary"
-                  onClick={() =>
-                    router.push(`/clientes/modificar?id=${params.row.id}`)
-                  }
-                >
-                  <SettingsIcon />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  color="error"
-                  onClick={() => eliminarCliente(params.row)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            ),
-          },
-        ]
-      : []),
-  ];
+    // Configuración de las columnas
+    const columns = [
+        { field: 'cuit', headerName: 'CUIL', flex: 1 },
+        { field: 'nombre', headerName: 'Nombre', flex: 1 },
+        { field: 'correoElectronico', headerName: 'Correo', flex: 1 },
+        { field: 'maximoDeObras', headerName: 'Maximas Obras Activas', flex: 1 },
+        { field: 'maximoDescubierto', headerName: 'Maximo Descubierto', flex: 1 },
+        ...(modo !== 'pedido' ? [ // Si el modo no es "pedido", agrega la columna "opciones"
+            {
+                field: 'opciones',
+                headerName: 'Opciones',
+                sortable: false,
+                flex: 1,
+                renderCell: (params) => (
+                    <Box>
+                        <IconButton size="small" color="primary" onClick={() => router.push(`/clientes/modificar?id=${params.row.id}`)}>
+                            <SettingsIcon />
+                        </IconButton>
+                        <IconButton size="small" color="error" onClick={() => eliminarCliente(params.row)}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Box>
+                )
+            }
+        ] : [])
+    ];
 
   return (
     <Box marginTop={1}>

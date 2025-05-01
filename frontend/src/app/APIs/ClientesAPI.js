@@ -108,8 +108,8 @@ export async function deleteCliente(idCli) {
         if (!response.ok) {
             throw new Error(`Error al eliminar el cliente con ID ${idCli}: ${response.statusText}`);
         }
-        console.log("response: ", response.json());
-        return await response.json();
+        
+        return true;
     } catch (error) {
         console.error('Error en deleteCliente:', error);
         throw error;
