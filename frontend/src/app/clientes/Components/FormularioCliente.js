@@ -138,26 +138,9 @@ const FormularioCliente = ({ modo }) => {
             </CardContent>
           </Card>
 
-          {/* Users Section */}
-          <Card sx={{ marginBottom: 4 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Usuarios
-              </Typography>
-              <DataGridUsuarios />
-            </CardContent>
-          </Card>
-
-          {/* Obras Section */}
-          <Card sx={{ marginBottom: 4 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Obras
-              </Typography>
-              <DataGridObras />
-            </CardContent>
-          </Card>
-
+          <DataGridUsuarios />
+          <DataGridObras />
+          
           {/* Submit Button */}
           <Button
             type="submit"
