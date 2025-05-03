@@ -19,13 +19,23 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
 
     const ordenarProductos = (lista) => {
         const sorted = [...lista];
-        if (orden === "nombre") {
-            sorted.sort((a, b) => a.nombre.localeCompare(b.nombre));
-        } else if (orden === "precioAsc") {
-            sorted.sort((a, b) => a.precio - b.precio);
-        } else if (orden === "precioDesc") {
-            sorted.sort((a, b) => b.precio - a.precio);
-        }
+
+        // Ordenar primero por stock y luego por el criterio seleccionado
+        sorted.sort((a, b) => {
+            if (a.stockActual > 0 && b.stockActual === 0) return -1; // Los que tienen stock primero
+            if (a.stockActual === 0 && b.stockActual > 0) return 1; // Los que no tienen stock después
+
+            // Si ambos tienen o no tienen stock, aplicar el criterio de orden
+            if (orden === "nombre") {
+                return a.nombre.localeCompare(b.nombre);
+            } else if (orden === "precioAsc") {
+                return a.precio - b.precio; // Menor a Mayor
+            } else if (orden === "precioDesc") {
+                return b.precio - a.precio; // Mayor a Menor
+            }
+            return 0;
+        });
+
         return sorted;
     };
 
@@ -88,6 +98,8 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
                 productosSeleccionados={productosSeleccionados}
                 orden={orden}
                 setOrden={setOrden}
+                actualizarProductosFiltrados={actualizarProductosFiltrados} // Pasar función para actualizar productos
+                productosOriginales={productosOriginales} // Pasar productos originales
                 handleNew={() => console.log("Nuevo producto")}
             />
 
@@ -98,7 +110,7 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
                     <Box sx={{ flexShrink: 0 }}>
                         <SidebarFilter
                             productos={productosOriginales}
-                            setProductosFiltrados={setProductosFiltrados}
+                            setProductosFiltrados={actualizarProductosFiltrados}
                         />
                     </Box>
                 )}
@@ -109,7 +121,7 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
                         flex: 1,
                         display: "grid",
                         gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", // Asegura que las tarjetas se alineen correctamente
-                        gap: 3.5, // Espaciado entre tarjetas
+                        gap: 8, // Espaciado entre tarjetas
                         alignItems: "start", // Alinea las tarjetas al inicio
                     }}
                 >

@@ -53,6 +53,9 @@ export default function ProductCard({
                 overflow: "hidden",
                 boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)", // Sombra sutil
                 transition: "all 0.3s ease-in-out", // Transición para el hover
+                backgroundColor: producto.stockActual > 0 ? "white" : "#f5f5f5", // Fondo gris si no hay stock
+                opacity: producto.stockActual > 0 ? 1 : 0.6, // Reducir opacidad si no hay stock
+                pointerEvents: producto.stockActual > 0 ? "auto" : "none", // Deshabilitar interacciones si no hay stock
             }}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
