@@ -1,7 +1,9 @@
+const BASE_URL = "http://localhost:80/api/productos"; // Declaración de la URL base
+
 // Obtener productos
 export async function fetchProductos() {
   try {
-    const response = await fetch("http://localhost:80/api/productos");
+    const response = await fetch(`${BASE_URL}`);
     if (!response.ok) {
       throw new Error(`Error al obtener los productos: ${response.statusText}`);
     }
@@ -15,7 +17,7 @@ export async function fetchProductos() {
 // Obtener producto por ID
 export async function getProductoById(id) {
   try {
-    const response = await fetch(`http://localhost:80/api/productos/${id}`);
+    const response = await fetch(`${BASE_URL}/${id}`);
     if (!response.ok) {
       throw new Error(
         `Error al obtener el producto con ID ${id}: ${response.statusText}`
@@ -37,7 +39,7 @@ export async function createProducto(producto) {
         producto.precio * (1 - producto.descuentoPromocional / 100);
     }
 
-    const response = await fetch("http://localhost:80/api/productos", {
+    const response = await fetch(`${BASE_URL}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -49,7 +51,7 @@ export async function createProducto(producto) {
       const errorData = await response.json();
       throw new Error(
         errorData.message ||
-          `Error al crear el producto: ${response.statusText}`
+        `Error al crear el producto: ${response.statusText}`
       );
     }
 
@@ -71,7 +73,7 @@ export async function editProducto(id, producto) {
       producto.precio =
         producto.precio * (1 - producto.descuentoPromocional / 100);
     }
-    const response = await fetch(`http://localhost:80/api/productos/${id}`, {
+    const response = await fetch(`${BASE_URL}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -86,7 +88,7 @@ export async function editProducto(id, producto) {
       const errorData = await response.json();
       throw new Error(
         errorData.message ||
-          `Error al editar el producto: ${response.statusText}`
+        `Error al editar el producto: ${response.statusText}`
       );
     }
 
@@ -100,7 +102,7 @@ export async function editProducto(id, producto) {
 // Eliminar producto
 export async function deleteProducto(id) {
   try {
-    const response = await fetch(`http://localhost:80/api/productos/${id}`, {
+    const response = await fetch(`${BASE_URL}/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -111,7 +113,7 @@ export async function deleteProducto(id) {
       const errorData = await response.json();
       throw new Error(
         errorData.message ||
-          `Error al eliminar el producto: ${response.statusText}`
+        `Error al eliminar el producto: ${response.statusText}`
       );
     }
 

@@ -1,136 +1,139 @@
 import { fetchProductos } from "@/app/APIs/ProductosAPI";
 import ProductCard from "@/app/productos/Components/ProductCard";
-import SearchBar from "@/app/productos/Components/SearchBar";
+import SidebarFilter from "@/app/productos/Components/SidebarFilter";
+import TopBar from "@/app/productos/Components/TopBar";
 import { handleDelete } from "@/app/productos/controllers/Controllers";
 import ModificarProductoModal from "@/app/productos/modificar/ModificarProducto";
-import { Box, Grid2 } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 
 export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
-  const [productosOriginales, setProductosOriginales] = useState([]); // Original list of products
-  const [productosFiltrados, setProductosFiltrados] = useState([]); // Filtered and sorted list
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProductoId, setSelectedProductoId] = useState(null);
-  const [productosSeleccionados, setProductosSeleccionados] = useState([]);
-  const [orden, setOrden] = useState("nombre");
+    const [productosOriginales, setProductosOriginales] = useState([]);
+    const [productosFiltrados, setProductosFiltrados] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedProductoId, setSelectedProductoId] = useState(null);
+    const [productosSeleccionados, setProductosSeleccionados] = useState([]);
+    const [orden, setOrden] = useState("nombre");
 
-  // Function to sort products based on the selected order
-  const ordenarProductos = (lista) => {
-    const sorted = [...lista];
-    if (orden === "nombre") {
-      sorted.sort((a, b) => a.nombre.localeCompare(b.nombre));
-    } else if (orden === "precioAsc") {
-      sorted.sort((a, b) => a.precio - b.precio);
-    } else if (orden === "precioDesc") {
-      sorted.sort((a, b) => b.precio - a.precio);
-    }
-    return sorted;
-  };
+    const isSmallScreen = useMediaQuery("(max-width: 768px)");
 
-  // Function to handle filtering and sorting together
-  const actualizarProductosFiltrados = (filteredList) => {
-    const sortedList = ordenarProductos(filteredList);
-    setProductosFiltrados(sortedList); // Updates the filtered list
-  };
+    const ordenarProductos = (lista) => {
+        const sorted = [...lista];
+        if (orden === "nombre") {
+            sorted.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        } else if (orden === "precioAsc") {
+            sorted.sort((a, b) => a.precio - b.precio);
+        } else if (orden === "precioDesc") {
+            sorted.sort((a, b) => b.precio - a.precio);
+        }
+        return sorted;
+    };
 
-  const handleEdit = (id) => {
-    setSelectedProductoId(id);
-    setIsModalOpen(true);
-  };
+    const actualizarProductosFiltrados = (filteredList) => {
+        const sortedList = ordenarProductos(filteredList);
+        setProductosFiltrados(sortedList);
+    };
 
-  // Function to handle modal close and refresh products
-  const handleModalClose = async () => {
-    setIsModalOpen(false);
-    setSelectedProductoId(null);
-    const updatedProductos = await fetchProductos();
-    setProductosOriginales(updatedProductos);
-    actualizarProductosFiltrados(updatedProductos);
-  };
+    const handleEdit = (id) => {
+        setSelectedProductoId(id);
+        setIsModalOpen(true);
+    };
 
-  // Function to handle product deletion
-  const handleDeleteProducto = async (id) => {
-    const result = await handleDelete(id);
-    alert(result.message);
-    if (result.success) {
-      const updatedProductos = await fetchProductos();
-      setProductosOriginales(updatedProductos);
-      actualizarProductosFiltrados(updatedProductos);
-    }
-  };
+    const handleModalClose = async () => {
+        setIsModalOpen(false);
+        setSelectedProductoId(null);
+        const updatedProductos = await fetchProductos();
+        setProductosOriginales(updatedProductos);
+        actualizarProductosFiltrados(updatedProductos);
+    };
 
-  // Function to handle quantity change for selected products
-  const handleCantidadChange = (producto, cantidad) => {
-    setProductosSeleccionados((prev) => {
-      const index = prev.findIndex((p) => p.id === producto.id);
-      if (index !== -1) {
-        const updated = [...prev];
-        updated[index].cantidad = cantidad;
-        return updated.filter((p) => p.cantidad > 0);
-      } else {
-        return [...prev, { ...producto, cantidad }];
-      }
-    });
-  };
+    const handleDeleteProducto = async (id) => {
+        const result = await handleDelete(id);
+        alert(result.message);
+        if (result.success) {
+            const updatedProductos = await fetchProductos();
+            setProductosOriginales(updatedProductos);
+            actualizarProductosFiltrados(updatedProductos);
+        }
+    };
 
-  // Fetch products on component mount
-  useEffect(() => {
-    async function fetchData() {
-      const data = await fetchProductos();
-      setProductosOriginales(data);
-      actualizarProductosFiltrados(data);
-    }
-    fetchData();
-  }, []);
+    const handleCantidadChange = (producto, cantidad) => {
+        setProductosSeleccionados((prev) => {
+            const index = prev.findIndex((p) => p.id === producto.id);
+            if (index !== -1) {
+                const updated = [...prev];
+                updated[index].cantidad = cantidad;
+                return updated.filter((p) => p.cantidad > 0);
+            } else {
+                return [...prev, { ...producto, cantidad }];
+            }
+        });
+    };
 
-  // Re-sort products whenever the sorting order changes
-  useEffect(() => {
-    actualizarProductosFiltrados(productosFiltrados);
-  }, [orden]);
+    useEffect(() => {
+        async function fetchData() {
+            const data = await fetchProductos();
+            setProductosOriginales(data);
+            actualizarProductosFiltrados(data);
+        }
+        fetchData();
+    }, []);
 
-  return (
-    <Box sx={{ maxWidth: 1200, margin: "0 auto" }}>
-      <SearchBar
-        productos={productosOriginales}
-        setProductosFiltrados={actualizarProductosFiltrados} // Passed here
-        productosSeleccionados={productosSeleccionados}
-        isPedidoMode={isPedidoMode}
-        onListaProductosSelect={onListaProductosSelect}
-        orden={orden}
-        setOrden={setOrden}
-      />
-      <Grid2
-        container
-        spacing={3}
-        sx={{
-          marginTop: 2,
-          alignItems: "center",
-          display: "flex",
-          justifyContent: "flex-start",
-          flexDirection: "row",
-          flexWrap: "wrap",
-          gap: 6.2,
-        }}
-      >
-        {productosFiltrados.map((producto) => (
-          <Grid2 item xs={12} sm={6} md={4} lg={3} key={producto.id}>
-            <ProductCard
-              producto={producto}
-              handleEdit={handleEdit}
-              handleDelete={handleDeleteProducto}
-              onCantidadChange={handleCantidadChange}
-              isPedidoMode={isPedidoMode}
+    return (
+        <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+            {/* Top Bar */}
+            <TopBar
+                isPedidoMode={isPedidoMode}
+                onListaProductosSelect={onListaProductosSelect}
+                productosSeleccionados={productosSeleccionados}
+                orden={orden}
+                setOrden={setOrden}
+                handleNew={() => console.log("Nuevo producto")}
             />
-          </Grid2>
-        ))}
-      </Grid2>
 
-      {isModalOpen && (
-        <ModificarProductoModal
-          open={isModalOpen}
-          onClose={handleModalClose}
-          productoId={selectedProductoId}
-        />
-      )}
-    </Box>
-  );
+            {/* Main Content */}
+            <Box sx={{ display: "flex", flex: 1, gap: 2, marginTop: 2 }}>
+                {/* Sidebar Filter */}
+                {!isSmallScreen && (
+                    <Box sx={{ flexShrink: 0 }}>
+                        <SidebarFilter
+                            productos={productosOriginales}
+                            setProductosFiltrados={setProductosFiltrados}
+                        />
+                    </Box>
+                )}
+
+                {/* Product Grid */}
+                <Box
+                    sx={{
+                        flex: 1,
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", // Asegura que las tarjetas se alineen correctamente
+                        gap: 3.5, // Espaciado entre tarjetas
+                        alignItems: "start", // Alinea las tarjetas al inicio
+                    }}
+                >
+                    {productosFiltrados.map((producto) => (
+                        <ProductCard
+                            key={producto.id}
+                            producto={producto}
+                            handleEdit={handleEdit}
+                            handleDelete={handleDeleteProducto}
+                            isPedidoMode={isPedidoMode}
+                            onCantidadChange={handleCantidadChange}
+                        />
+                    ))}
+                </Box>
+            </Box>
+
+            {/* Modificar Producto Modal */}
+            {isModalOpen && (
+                <ModificarProductoModal
+                    open={isModalOpen}
+                    onClose={handleModalClose}
+                    productoId={selectedProductoId}
+                />
+            )}
+        </Box>
+    );
 }
