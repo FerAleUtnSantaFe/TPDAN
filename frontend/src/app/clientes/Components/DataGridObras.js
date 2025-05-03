@@ -9,8 +9,11 @@ import {
   AppBar,
   Box,
   Button,
+  Card,
+  CardContent,
   IconButton,
-  Toolbar
+  Toolbar,
+  Typography
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useObras } from '../Hooks/useObras';
@@ -126,25 +129,32 @@ const DataGridObras = ({ modo, onObraSelect }) => {
       </AppBar>
 
       {/* DataGrid to Display Obras */}
+      <Card sx={{ marginBottom: 4 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Obras
+          </Typography>
+          <DataGrid
+            rows={obras}
+            columns={columns}
+            pageSize={5}
+            pageSizeOptions={[5, 10, 20]}
+            getRowId={(row) => row.tempId} // Use tempId as unique identifier
+            disableMultipleRowSelection
+            onRowSelectionModelChange={(ids) => {
+              const selectedId = ids[0];
+              const selectedObra = obras.find((obra) => obra.id === selectedId);
+              seleccionarObra(selectedObra || null); // Track the selected row
+            }}
+            localeText={{
+              noRowsLabel: 'No se encontraron resultados',
+              MuiTablePagination: { labelRowsPerPage: 'Obras por página:' },
+            }}
+            sx={{ width: '100%' }}
+          />
+        </CardContent>
+      </Card>
 
-      <DataGrid
-        rows={obras}
-        columns={columns}
-        pageSize={5}
-        pageSizeOptions={[5, 10, 20]}
-        getRowId={(row) => row.tempId} // Use tempId as unique identifier
-        disableMultipleRowSelection
-        onRowSelectionModelChange={(ids) => {
-          const selectedId = ids[0];
-          const selectedObra = obras.find((obra) => obra.id === selectedId);
-          seleccionarObra(selectedObra || null); // Track the selected row
-        }}
-        localeText={{
-          noRowsLabel: 'No se encontraron resultados',
-          MuiTablePagination: { labelRowsPerPage: 'Obras por página:' },
-        }}
-        sx={{ width: '100%' }}
-      />
       {/* Modal for Adding/Editing Obras */}
       <ObraModal
         open={obraModalOpen}

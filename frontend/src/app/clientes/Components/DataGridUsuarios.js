@@ -1,6 +1,6 @@
 import React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { AppBar, Box, IconButton, Toolbar, Button } from '@mui/material';
+import { AppBar, Box, IconButton, Toolbar, Button, Card, CardContent, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -72,16 +72,26 @@ const DataGridUsuarios = () => {
           </Button>
         </Toolbar>
       </AppBar>
-      <DataGrid
-        rows={usuarios}
-        columns={columns}
-        getRowId={(row) => row.tempId}
-        pageSize={5}
-        pageSizeOptions={[5, 10, 20]}
-        disableMultipleRowSelection
-        localeText={{ noRowsLabel: 'No se encontraron resultados' }}
-        sx={{ width: '100%' }}
-      />
+
+      {/* Users Section */}
+      <Card sx={{ marginBottom: 4 }}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Usuarios
+          </Typography>
+          <DataGrid
+            rows={usuarios}
+            columns={columns}
+            getRowId={(row) => row.tempId}
+            pageSize={5}
+            pageSizeOptions={[5, 10, 20]}
+            disableMultipleRowSelection
+            localeText={{ noRowsLabel: 'No se encontraron resultados' }}
+            sx={{ width: '100%' }}
+          />
+        </CardContent>
+      </Card>
+
       <UsuarioModal
         open={usuariosModalOpen}
         onClose={closeUsuarioModal}

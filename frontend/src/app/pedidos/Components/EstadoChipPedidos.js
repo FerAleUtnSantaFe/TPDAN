@@ -9,22 +9,22 @@ import { Chip } from '@mui/material';
  * @returns {JSX.Element} - The chip component with the appropriate color and label.
  */
 const EstadoChipPedidos = ({ estado }) => {
-  const estadoColors = {
-    ACEPTADO: 'success',
-    CANCELADO: 'error',
-    EN_PREPARACION: 'warning',
-    ENTREGADO: 'success',
-    RECHAZADO: 'error',
-    RECIBIDO: 'warning',
-  };
+    const estadoColors = {
+        ACEPTADO: 'success',
+        CANCELADO: 'error',
+        EN_PREPARACION: 'warning',
+        ENTREGADO: 'success',
+        RECHAZADO: 'error',
+        RECIBIDO: 'warning',
+    };
 
-  return (
-    <Chip
-      label={estado}
-      color={estadoColors[estado] || 'default'}
-      sx={{ fontWeight: 'bold', fontSize: '0.9rem' }}
-    />
-  );
+    return (
+        <Chip
+            label={estado}
+            color={estadoColors[estado] || 'default'}
+            sx={{ fontWeight: 'bold', fontSize: '0.9rem' }}
+        />
+    );
 };
 
 export default EstadoChipPedidos;
