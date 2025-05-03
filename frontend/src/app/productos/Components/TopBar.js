@@ -8,8 +8,6 @@ export default function TopBar({
     productosSeleccionados,
     orden,
     setOrden,
-    actualizarProductosFiltrados, // Nueva prop para actualizar los productos al cambiar el orden
-    productosOriginales, // Productos originales para reordenar
 }) {
     const GenerarPedido = () => {
         onListaProductosSelect(productosSeleccionados);
@@ -21,24 +19,7 @@ export default function TopBar({
         router.push("/productos/nuevo");
     };
 
-    const handleOrdenChange = (e) => {
-        const nuevoOrden = e.target.value;
-        setOrden(nuevoOrden); // Cambia el criterio de orden automáticamente
-        const productosOrdenados = [...productosOriginales].sort((a, b) => {
-            if (a.stockActual > 0 && b.stockActual === 0) return -1;
-            if (a.stockActual === 0 && b.stockActual > 0) return 1;
-
-            if (nuevoOrden === "nombre") {
-                return a.nombre.localeCompare(b.nombre);
-            } else if (nuevoOrden === "precioAsc") {
-                return a.precio - b.precio;
-            } else if (nuevoOrden === "precioDesc") {
-                return b.precio - a.precio;
-            }
-            return 0;
-        });
-        actualizarProductosFiltrados(productosOrdenados); // Actualiza los productos filtrados
-    };
+    
 
     return (
         <Box
@@ -71,7 +52,7 @@ export default function TopBar({
             <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                 <Select
                     value={orden}
-                    onChange={handleOrdenChange} // Aplicar automáticamente el orden
+                    onChange={(e) => setOrden(e.target.value)} // Aplicar automáticamente el orden
                     displayEmpty
                     sx={{
                         minWidth: 200,

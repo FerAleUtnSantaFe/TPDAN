@@ -79,7 +79,10 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
             }
         });
     };
-
+    // Re-sort products whenever the sorting order changes
+    useEffect(() => {
+        actualizarProductosFiltrados(productosFiltrados);
+    }, [orden]);
     useEffect(() => {
         async function fetchData() {
             const data = await fetchProductos();
@@ -98,9 +101,6 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
                 productosSeleccionados={productosSeleccionados}
                 orden={orden}
                 setOrden={setOrden}
-                actualizarProductosFiltrados={actualizarProductosFiltrados} // Pasar función para actualizar productos
-                productosOriginales={productosOriginales} // Pasar productos originales
-                handleNew={() => console.log("Nuevo producto")}
             />
 
             {/* Main Content */}
