@@ -50,8 +50,6 @@ export const handleDelete = async (id) => {
       };
     }
 
-    console.log("Eliminando producto con ID:", id);
-
     const result = await deleteProducto(id);
     return result;
   } catch (error) {
@@ -95,9 +93,6 @@ export const SearchProductos = (
 
 export const SeleccionarProductos = (productosSeleccionados) => {
   if (!productosSeleccionados || productosSeleccionados.length === 0) {
-    console.log("No hay productos seleccionados.");
     return;
   }
-
-  console.log("Productos seleccionados:", productosSeleccionados);
 };

@@ -120,6 +120,10 @@ function DataGridPedidos() {
             columns={columns}
             pageSize={5}
             disableSelectionOnClick
+            localeText={{
+              noRowsLabel: "No se encontraron resultados",
+              MuiTablePagination: { labelRowsPerPage: "Pedidos por página:" },
+            }}
           />
         </CardContent>
       </Card>

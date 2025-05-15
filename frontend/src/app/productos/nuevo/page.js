@@ -11,7 +11,6 @@ export default function NuevoProducto() {
   const handleSubmit = async (formData) => {
     try {
       const result = await createProducto(formData); // Usa el resultado devuelto por createProducto
-      console.log("Resultado de createProducto:", result);
 
       // Si el producto se creó correctamente, redirige a la página principal
       router.push("/productos");

@@ -9,6 +9,7 @@ import {
   Card,
   CardContent,
   Grid,
+  Box,
 } from '@mui/material';
 import NavBar from '@/app/Components/NavBar';
 import DataGridUsuarios from './DataGridUsuarios';
@@ -38,12 +39,11 @@ const FormularioCliente = ({ modo }) => {
       <NavBar />
 
       {/* Main Container */}
-      <Container maxWidth="md" sx={{ marginTop: 4 }}>
+      <Container maxWidth="md" sx={{ marginTop: 1 }}>
         {/* Title */}
         <Typography
-          variant="h4"
+          variant="h1"
           gutterBottom
-          color="primary"
           align="center"
         >
           {modo === 'nuevo'
@@ -54,9 +54,9 @@ const FormularioCliente = ({ modo }) => {
         {/* Form */}
         <form onSubmit={handleSubmit}>
           {/* Client Details Section */}
-          <Card sx={{ marginBottom: 4 }}>
+          <Card sx={{ marginBottom: 1 }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h4" gutterBottom>
                 Detalles del Cliente
               </Typography>
               <Grid container spacing={2}>
@@ -142,16 +142,14 @@ const FormularioCliente = ({ modo }) => {
           <DataGridObras />
           
           {/* Submit Button */}
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            size="large"
-            fullWidth
-            sx={{ marginTop: 2 }}
-          >
-            {modo === 'nuevo' ? 'Crear Cliente' : 'Guardar Cambios'}
-          </Button>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", marginBottom: 2 }}>
+            <Button
+              type="submit"
+              variant="contained"
+            >
+              {modo === 'nuevo' ? 'Crear Cliente' : 'Guardar Cambios'}
+            </Button>
+          </Box>
         </form>
       </Container>
 

@@ -92,7 +92,7 @@ export const useCliente = () => {
         if (window.confirm(`¿Está seguro de que desea eliminar el cliente ${cliente.nombre}?`)) {
             try {
                 const result = await deleteCliente(cliente.id);
-                console.log('Resultado de la eliminación:', result);
+                
                 if (result) {
                     dispatch({
                         type: ACTIONS.UPDATE_SNACKBAR,
@@ -131,7 +131,6 @@ export const useCliente = () => {
     const seleccionarCliente = (cliente) => {
         dispatch({ type: ACTIONS.SELECT_CLIENTE, payload: cliente });
         updateClienteSeleccionado(cliente); // Update the selected client in the context
-        console.log('ESTO SE DEBERIA LLAMAR 1 VEZ NOMAS useCliente:', cliente);
     };
 
     // Close snackbar

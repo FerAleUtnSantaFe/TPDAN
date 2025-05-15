@@ -127,7 +127,7 @@ const UsuarioModal = ({ open, onClose, onAdd, onEdit, usuarioParametro }) => {
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       {/* Modal Title */}
-      <DialogTitle>
+      <DialogTitle variant="h3" gutterBottom>
         {usuarioParametro ? 'Editar Usuario' : 'Agregar Usuario'}
       </DialogTitle>
 
@@ -186,10 +186,10 @@ const UsuarioModal = ({ open, onClose, onAdd, onEdit, usuarioParametro }) => {
 
       {/* Modal Actions */}
       <DialogActions>
-        <Button color="error" onClick={handleClose}>
+        <Button color="error" variant='contained' onClick={handleClose}>
           Cancelar
         </Button>
-        <Button color="primary" onClick={handleSubmit}>
+        <Button color="primary" variant='contained' onClick={handleSubmit}>
           {usuarioParametro ? 'Guardar' : 'Agregar'}
         </Button>
       </DialogActions>

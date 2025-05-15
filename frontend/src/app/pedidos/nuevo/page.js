@@ -20,7 +20,6 @@ export default function PedidosPage() {
     const [selectedObra, setSelectedObra] = useState(null); // Obra seleccionada
     const [selectedProductos, setSelectedProductos] = useState([]); // Productos seleccionados
 
-    /////////////// SEGIR ACA, SE ROMPIO LA CREACION DE PEDIDOS
 
     const handleClienteSelect = (cliente) => {
         if (cliente) {
@@ -33,7 +32,6 @@ export default function PedidosPage() {
 
     // Handle obra selection
     const handleObraSelect = (obra) => {
-        console.log("obra seleccionada: ", obra);
         if (obra && obra.estado === 'HABILITADA') {
             setSelectedObra(obra);
             setCurrentStep(2); // Move to the next step
@@ -52,7 +50,7 @@ export default function PedidosPage() {
             <NavBar />
             <ClienteProvider >
                 <Container>
-                    <Typography variant="h3" color='primary' gutterBottom sx={{ margin: 1, textAlign: 'center' }}>
+                    <Typography variant="h1" gutterBottom sx={{ margin: 2, textAlign: 'center' }}>
                         Gestión de pedidos: Nuevo pedido
                     </Typography>
                     <ProgressBarPedido currentStep={currentStep} />
@@ -82,7 +80,6 @@ export default function PedidosPage() {
                     {currentStep === 3 && (
                         <CargandoPedido onEnd={() => {
                             setCurrentStep(4)
-                            console.log("selected productos en paso 4: ", selectedProductos);
                         }}
                         />
 

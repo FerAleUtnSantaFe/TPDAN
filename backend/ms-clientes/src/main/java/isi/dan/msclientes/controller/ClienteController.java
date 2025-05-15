@@ -20,11 +20,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import isi.dan.msclientes.aop.LogExecutionTime;
+import isi.dan.msclientes.aop.RequireRole;
 import isi.dan.msclientes.exception.ClienteNotFoundException;
 import isi.dan.msclientes.model.Cliente;
 import isi.dan.msclientes.model.Estado;
 import isi.dan.msclientes.model.Obra;
 import isi.dan.msclientes.servicios.ClienteService;
+import jakarta.servlet.http.HttpServletRequest;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -39,13 +41,23 @@ public class ClienteController {
     // @Value("${dan.clientes.instancia}")
     // private String instancia;
 
+    @GetMapping("/test")
+    @RequireRole("ROLE_NOEXIST")
+    public ResponseEntity<String> test(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        System.out.println("Authorization Header: " + authHeader);
+        return ResponseEntity.ok("Header received");
+    }
+
     @PostMapping
     @LogExecutionTime
+    @RequireRole("ROLE_ADMIN")
     public Cliente create(@RequestBody @Validated Cliente cliente) {
         log.info("Creando cliente: {}", cliente);
         return clienteService.save(cliente);
     }
 
+    //@Secured(roles = {"ADMIN", "USER"})
     @GetMapping
     @LogExecutionTime
     public List<Cliente> getAll() {
@@ -65,6 +77,7 @@ public class ClienteController {
 
     @PutMapping("/{id}")
     @LogExecutionTime
+    @RequireRole("ROLE_ADMIN")
     public ResponseEntity<Cliente> update(@PathVariable final Integer id, @RequestBody Cliente cliente)
             throws ClienteNotFoundException {
         log.info("Actualizando cliente con ID: {}", id);
@@ -78,6 +91,7 @@ public class ClienteController {
 
     @DeleteMapping("/{id}")
     @LogExecutionTime
+    @RequireRole("ROLE_ADMIN")
     public ResponseEntity<Void> delete(@PathVariable Integer id) throws ClienteNotFoundException {
         log.info("Eliminando cliente con ID: {}", id);
         if (!clienteService.findById(id).isPresent()) {

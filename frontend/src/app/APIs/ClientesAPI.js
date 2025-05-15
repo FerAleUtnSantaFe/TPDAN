@@ -3,7 +3,13 @@ const BASE_URL = "http://localhost:80/api/clientes"; // Cambia esto si tu backen
 // Obtener todos los clientes
 export async function findClientes() {
     try {
-        const response = await fetch(`${BASE_URL}`);
+        const response = await fetch(`${BASE_URL}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        );
         if (!response.ok) {
             throw new Error(`Error al obtener los clientes: ${response.statusText}`);
         }
@@ -17,7 +23,12 @@ export async function findClientes() {
 // Obtener un cliente por ID
 export async function findbyIdCliente(idCli) {
     try {
-        const response = await fetch(`${BASE_URL}/${idCli}`);
+        const response = await fetch(`${BASE_URL}/${idCli}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         if (!response.ok) {
             throw new Error(`Error al obtener el cliente con ID ${idCli}: ${response.statusText}`);
         }
@@ -31,8 +42,6 @@ export async function findbyIdCliente(idCli) {
 // Crear un nuevo cliente
 export async function createCliente(cliente) {
 
-    console.log("cliente entrante: ", cliente)
-
     const obrasLimpias = cliente.obras.map(({ tempId, ...obra }) => obra); // Eliminar tempId de cada obra
     const usuariosLimpios = cliente.usuarios.map(({ tempId, ...usuario }) => usuario); // Eliminar tempId de cada usuario
 
@@ -42,11 +51,11 @@ export async function createCliente(cliente) {
         usuarios: usuariosLimpios
     };
 
-    console.log("cliente completo: ", clienteCompleto)
     try {
         const response = await fetch(`${BASE_URL}`, {
             method: 'POST',
             headers: {
+
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(clienteCompleto)
@@ -64,9 +73,7 @@ export async function createCliente(cliente) {
 
 // Actualizar un cliente existente
 export async function updateCliente(idCli, cliente) {
-    
-    console.log("cliente entrante: ", cliente)
-    
+
     const obrasLimpias = cliente.obras.map(({ tempId, ...obra }) => obra); // Eliminar tempId de cada obra
     const usuariosLimpios = cliente.usuarios.map(({ tempId, ...usuario }) => usuario); // Eliminar tempId de cada usuario
 
@@ -75,40 +82,44 @@ export async function updateCliente(idCli, cliente) {
         obras: obrasLimpias,
         usuarios: usuariosLimpios
     };
-    
-    console.log("cliente completo: ", clienteCompleto)
+
     try {
         const response = await fetch(`${BASE_URL}/${idCli}`, {
             method: 'PUT',
             headers: {
-            'Content-Type': 'application/json',
+
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(clienteCompleto)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error al actualizar el cliente con ID ${idCli}: ${response.statusText}`);
-      }
-  
-      return await response.json();
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error al actualizar el cliente con ID ${idCli}: ${response.statusText}`);
+        }
+
+        return await response.json();
     } catch (error) {
-      console.error('Error en updateCliente:', error);
-      throw error;
+        console.error('Error en updateCliente:', error);
+        throw error;
     }
-  }
+}
 
 // Eliminar un cliente por ID
 export async function deleteCliente(idCli) {
     try {
-        
+
         const response = await fetch(`${BASE_URL}/${idCli}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+
+                'Content-Type': 'application/json',
+            },
         });
-        console.log(response, response.ok);
+        
         if (!response.ok) {
             throw new Error(`Error al eliminar el cliente con ID ${idCli}: ${response.statusText}`);
         }
-        
+
         return true;
     } catch (error) {
         console.error('Error en deleteCliente:', error);
@@ -119,12 +130,13 @@ export async function deleteCliente(idCli) {
 export async function updateEstadoObra(idCli, idObra, estado) {
     try {
         const response = await fetch(`${BASE_URL}/${idCli}/${idObra}`, {
-                method: 'PUT',
-                headers: {
+            method: 'PUT',
+            headers: {
+
                 'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(estado)
-          });
+            },
+            body: JSON.stringify(estado)
+        });
         if (!response.ok) {
             throw new Error(`Error al actualizar el estado de la obra: ${response.statusText}`);
         }

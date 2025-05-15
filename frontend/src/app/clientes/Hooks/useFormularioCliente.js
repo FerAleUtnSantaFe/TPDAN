@@ -47,7 +47,7 @@ export const useFormularioCliente = (modo) => {
         // Only fetch if clienteSeleccionado is not already set
         fetchCliente();
       }
-      console.log('ACA LO CARGO 1 SOLA VEZ useFormularioCliente:', clienteSeleccionado);
+      
     }
   }, [clienteSeleccionado, modo, searchParams, updateClienteSeleccionado]);
 

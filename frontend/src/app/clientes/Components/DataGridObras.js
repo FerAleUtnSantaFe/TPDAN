@@ -129,9 +129,9 @@ const DataGridObras = ({ modo, onObraSelect }) => {
       </AppBar>
 
       {/* DataGrid to Display Obras */}
-      <Card sx={{ marginBottom: 4 }}>
+      <Card sx={{ marginBottom: 1 }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h4" gutterBottom>
             Obras
           </Typography>
           <DataGrid

@@ -86,7 +86,7 @@ export default function DataGridCliente({ modo, onClienteSelect }) {
               modo !== "pedido" ? <PersonAddIcon /> : <NavigateNextIcon />
             }
             onClick={() => {
-              /// MODIFICAR ESTO NO DEBE ACTUALZAR UN HOOK DESDE UN IF
+              // Si el modo es "pedido", selecciona el cliente
               if (modo === "pedido") {
                 if (clienteSeleccionado !== "") {
                   onClienteSelect(clienteSeleccionado); // Llama a la función de selección de cliente

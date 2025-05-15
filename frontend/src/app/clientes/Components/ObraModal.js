@@ -148,7 +148,7 @@ const ObraModal = ({ open, onClose, onAdd, onEdit, obraParametro, modo }) => {
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       {/* Modal Title */}
-      <DialogTitle>
+      <DialogTitle variant="h3" gutterBottom>
         {modo === 'nuevo' ? 'Agregar Obra' : 'Modificar Obra'}
       </DialogTitle>
 
@@ -229,10 +229,10 @@ const ObraModal = ({ open, onClose, onAdd, onEdit, obraParametro, modo }) => {
 
       {/* Modal Actions */}
       <DialogActions>
-        <Button color="error" onClick={handleClose}>
+        <Button color="error" variant="contained" onClick={handleClose}>
           Cancelar
         </Button>
-        <Button color="primary" onClick={handleSubmit}>
+        <Button color="primary" variant="contained"  onClick={handleSubmit}>
           {modo === 'nuevo' ? 'Agregar' : 'Guardar'}
         </Button>
       </DialogActions>

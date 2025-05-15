@@ -49,7 +49,7 @@ const DataGridUsuarios = () => {
 
   return (
     <Box marginTop={1}>
-      <AppBar position="static">
+      <AppBar position="static" >
         <Toolbar>
           <Search>
             <SearchIconWrapper>
@@ -74,9 +74,9 @@ const DataGridUsuarios = () => {
       </AppBar>
 
       {/* Users Section */}
-      <Card sx={{ marginBottom: 4 }}>
+      <Card sx={{ marginBottom: 1 }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h4" gutterBottom>
             Usuarios
           </Typography>
           <DataGrid

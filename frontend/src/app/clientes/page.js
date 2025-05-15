@@ -13,7 +13,7 @@ export default function ClientePage() {
             <ClienteProvider>
                 <NavBar />
                 <Container>
-                    <Typography variant="h3" color='primary' gutterBottom sx={{ margin: 1, textAlign: 'center' }}>
+                    <Typography variant="h1" gutterBottom sx={{ margin: 2, textAlign: 'center' }}>
                         Gestión de clientes
                     </Typography>
                     <DataGridCliente />

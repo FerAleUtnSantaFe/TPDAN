@@ -73,7 +73,7 @@ export async function updatePedido(idPedido, estado) {
 // Eliminar un pedido por ID
 export async function deletePedido(idPedido) {
     try {
-        console.log(idPedido);
+        
         const response = await fetch(`${BASE_URL}/${idPedido}`, {
             method: 'DELETE'
         });

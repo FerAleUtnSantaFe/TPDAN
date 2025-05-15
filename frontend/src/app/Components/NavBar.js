@@ -1,24 +1,26 @@
+"use client";
+
+import React from "react";
+import { AppBar, Toolbar, Typography, Box, IconButton, Button, Menu, MenuItem, Container } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { SvgIcon } from "@mui/material";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import { useRouter } from "next/navigation"; // Importar useRouter
-import * as React from "react";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { useRouter } from "next/navigation";
 import Logo from "../../../public/Logo.svg";
+import { SvgIcon } from "@mui/material";
+import Cookies from "js-cookie";
 
-const pages = ["clientes", "productos", "pedidos"];
+const pages = ["Clientes", "Productos", "Pedidos"];
 
-function NavBar() {
+export default function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const router = useRouter(); // Inicializar useRouter
+  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const router = useRouter();
 
+  // Check if the user is authenticated by looking for the authToken in cookies
+  //const isAuthenticated = !!Cookies.get("authToken");
+  const isAuthenticated = true;
+
+  // Handlers for navigation menu
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -28,39 +30,85 @@ function NavBar() {
   };
 
   const handleNavigation = (page) => {
-    router.push(`/${page.toLowerCase()}`); // Navegar programáticamente
-    handleCloseNavMenu(); // Cerrar el menú
+    router.push(`/${page.toLowerCase()}`);
+    handleCloseNavMenu();
+  };
+
+  // Handlers for user menu
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleLogOut = () => {
+    Cookies.remove("authToken"); // Remove the auth token
+    router.push("/"); // Redirect to login page
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="sticky" sx={{ backgroundColor: "#0D47A1", borderRadius: 0 }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          {/* LOGO (IZQUIERDA) */}
-          <Box sx={{ flexGrow: 0, display: "flex", alignItems: "center" }}>
+          {/* Logo and Title */}
+          <Box sx={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => router.push("/")}>
             <SvgIcon
               component={Logo}
               inheritViewBox
-              sx={{ width: 40, height: 40, color: "inherit", ml: 0 }}
+              sx={{ width: 40, height: 40, color: "inherit", marginRight: 1 }}
             />
             <Typography
               variant="h6"
               noWrap
-              onClick={() => router.push("/")} // Navegar al inicio
               sx={{
-                ml: 2,
                 fontWeight: 700,
                 color: "inherit",
                 textDecoration: "none",
-                cursor: "pointer",
               }}
             >
-              UTN
+              UTN SANTA FE
             </Typography>
           </Box>
 
-          {/* MENÚ HAMBURGUESA (MOBILE) */}
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" }, justifyContent: "flex-end" }}>
+          {/* Desktop Navigation Links */}
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: "none", md: "flex" }, // Hidden on small screens
+              justifyContent: "center",
+            }}
+          >
+            {isAuthenticated &&
+              pages.map((page) => (
+                <Button
+                  key={page}
+                  onClick={() => handleNavigation(page)}
+                  sx={{
+                    my: 2,
+                    color: "white",
+                    display: "block",
+                    fontWeight: 600,
+                    textTransform: "capitalize",
+                    "&:hover": {
+                      backgroundColor: "#1976D2",
+                    },
+                  }}
+                >
+                  {page}
+                </Button>
+              ))}
+          </Box>
+
+          {/* Mobile Navigation Links */}
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: { xs: "flex", md: "none" }, // Visible only on small screens
+              justifyContent: "flex-end",
+            }}
+          >
             <IconButton
               size="large"
               aria-label="menu"
@@ -85,32 +133,54 @@ function NavBar() {
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
-              sx={{ display: { xs: "block", md: "none" } }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={() => handleNavigation(page)}>
-                  <Typography sx={{ textAlign: "center", width: "100%" }}>{page}</Typography>
+              {isAuthenticated &&
+                pages.map((page) => (
+                  <MenuItem key={page} onClick={() => handleNavigation(page)}>
+                    <Typography textAlign="center">{page}</Typography>
+                  </MenuItem>
+                ))}
+              {isAuthenticated && (
+                <MenuItem onClick={handleLogOut}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <AccountCircleIcon sx={{ marginRight: 1 }} />
+                    <Typography textAlign="center">Log Out</Typography>
+                  </Box>
                 </MenuItem>
-              ))}
+              )}
             </Menu>
           </Box>
 
-          {/* MENÚ PRINCIPAL (ESCRITORIO) */}
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, justifyContent: "flex-end" }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={() => handleNavigation(page)} // Navegar programáticamente
-                sx={{ my: 2, color: "white", display: "block" }}
+          {/* User Menu for Desktop */}
+          {isAuthenticated && (
+            <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, color: "white" }}>
+                <AccountCircleIcon fontSize="large" />
+              </IconButton>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
               >
-                {page}
-              </Button>
-            ))}
-          </Box>
+                <MenuItem onClick={handleLogOut}>
+                  <Typography textAlign="center">Log Out</Typography>
+                </MenuItem>
+              </Menu>
+            </Box>
+          )}
         </Toolbar>
       </Container>
     </AppBar>
   );
 }
-
-export default NavBar;

@@ -10,8 +10,7 @@ export default function PedidosPage() {
       <NavBar />
       <Container>
         <Typography
-          variant="h3"
-          color="primary"
+          variant="h1"
           gutterBottom
           sx={{ margin: 2, textAlign: "center" }}
         >
