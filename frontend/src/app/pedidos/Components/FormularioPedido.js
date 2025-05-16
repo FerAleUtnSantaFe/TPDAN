@@ -3,9 +3,12 @@
 import { createPedido } from "@/app/APIs/PedidosAPI";
 import {
     Alert,
+    Box,
     Button,
     Card,
     CardContent,
+    Divider,
+    Grid,
     List,
     ListItem,
     ListItemText,
@@ -80,137 +83,181 @@ const FormularioPedido = ({ cliente, obra, listaProductos }) => {
     };
 
     return (
-        <>
-            <Card sx={{ marginBottom: 4, marginTop: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <Card sx={{ width: "100%", maxWidth: 700, boxShadow: 4 }}>
                 <CardContent>
                     <Typography
-                        variant="h3"
+                        variant="h2"
                         gutterBottom
-                        color="primary"
-                        sx={{ margin: 1, textAlign: "center" }}
+                        sx={{ textAlign: "center", fontWeight: 700, mb: 3 }}
                     >
                         Detalle del Pedido
                     </Typography>
 
+                    <Divider sx={{ mb: 2 }} />
+
                     {/* Información del Cliente */}
-                    <Typography variant="h5" gutterBottom color="secondary">
+                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
                         Información del Cliente
                     </Typography>
-                    <TextField
-                        fullWidth
-                        label="Nombre"
-                        value={cliente.nombre}
-                        margin="normal"
-                        slotProps={{ readOnly: true }}
-                    />
-                    <TextField
-                        fullWidth
-                        label="CUIT"
-                        value={cliente.cuit}
-                        margin="normal"
-                        slotProps={{ readOnly: true }}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Correo Electrónico"
-                        value={cliente.correoElectronico}
-                        margin="normal"
-                        slotProps={{ readOnly: true }}
-                    />
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Nombre"
+                                value={cliente?.nombre || ""}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="CUIT"
+                                value={cliente?.cuit || ""}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Correo Electrónico"
+                                value={cliente?.correoElectronico || ""}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                    </Grid>
+
+                    <Divider sx={{ my: 2 }} />
 
                     {/* Información de la Obra */}
-                    <Typography
-                        variant="h5"
-                        gutterBottom
-                        color="secondary"
-                        sx={{ marginTop: 3 }}
-                    >
+                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
                         Información de la Obra
                     </Typography>
-                    <TextField
-                        fullWidth
-                        label="ID de la Obra"
-                        value={obra.id}
-                        margin="normal"
-                        slotProps={{ readOnly: true }}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Dirección"
-                        value={obra.direccion}
-                        margin="normal"
-                        slotProps={{ readOnly: true }}
-                    />
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="ID de la Obra"
+                                value={obra?.id || ""}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Dirección"
+                                value={obra?.direccion || ""}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                    </Grid>
+
+                    <Divider sx={{ my: 2 }} />
 
                     {/* Lista de Productos */}
-                    <Typography
-                        variant="h5"
-                        gutterBottom
-                        color="secondary"
-                        sx={{ marginTop: 3 }}
-                    >
-                        Productos
+                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                        Productos del Pedido
                     </Typography>
-                    <List>
+                    <List dense>
                         {(Array.isArray(listaProductos) ? listaProductos : []).map(
                             (producto, index) => (
-                                <ListItem key={index}>
+                                <ListItem key={index} sx={{ pl: 0 }}>
                                     <ListItemText
-                                        primary={`${producto.nombre} - Cantidad: ${producto.cantidad}`}
-                                        secondary={`Precio unitario: $${producto.precio
-                                            }, Total: $${(producto.precio * producto.cantidad).toFixed(
-                                                2
-                                            )}`}
+                                        primary={
+                                            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                                                <span>
+                                                    {producto.nombre} (x{producto.cantidad})
+                                                </span>
+                                                <span>
+                                                    ${producto.precio.toFixed(2)} c/u &nbsp;|&nbsp; Total: $
+                                                    {(producto.precio * producto.cantidad).toFixed(2)}
+                                                </span>
+                                            </Box>
+                                        }
                                     />
                                 </ListItem>
                             )
                         )}
                     </List>
 
+                    <Divider sx={{ my: 2 }} />
+
                     {/* Información del Pedido */}
-                    <Typography
-                        variant="h5"
-                        gutterBottom
-                        color="secondary"
-                        sx={{ marginTop: 3 }}
-                    >
+                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
                         Información del Pedido
                     </Typography>
-                    <TextField
-                        fullWidth
-                        label="Fecha"
-                        value={pedido.fecha}
-                        margin="normal"
-                        slotProps={{ readOnly: true }}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Número de Pedido"
-                        value={pedido.numeroPedido}
-                        margin="normal"
-                        slotProps={{ readOnly: true }}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Usuario"
-                        value={pedido.usuario}
-                        margin="normal"
-                        slotProps={{ readOnly: true }}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Observaciones"
-                        value={pedido.observaciones}
-                        margin="normal"
-                        slotProps={{ readOnly: true }}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Total"
-                        value={`$${pedido.total}`}
-                        margin="normal"
-                        slotProps={{ readOnly: true }}
-                    />
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Fecha"
+                                value={pedido.fecha}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Número de Pedido"
+                                value={pedido.numeroPedido}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Usuario"
+                                value={pedido.usuario}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField
+                                fullWidth
+                                label="Estado"
+                                value={pedido.estado}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Observaciones"
+                                value={pedido.observaciones}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Total"
+                                value={`$${pedido.total.toFixed(2)}`}
+                                margin="normal"
+                                InputProps={{ readOnly: true }}
+                                variant="filled"
+                            />
+                        </Grid>
+                    </Grid>
 
                     {/* Botón Finalizar */}
                     <Button
@@ -224,6 +271,7 @@ const FormularioPedido = ({ cliente, obra, listaProductos }) => {
                     </Button>
                 </CardContent>
             </Card>
+        
 
             <Snackbar
                 open={alert.open}
@@ -232,7 +280,7 @@ const FormularioPedido = ({ cliente, obra, listaProductos }) => {
             >
                 <Alert severity={alert.severity}>{alert.message}</Alert>
             </Snackbar>
-        </>
+        </Box>
     );
 };
 

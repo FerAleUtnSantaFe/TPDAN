@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { findbyIdCliente, createCliente, updateCliente } from '../../APIs/ClientesAPI';
 import { useClienteContext } from './ClienteContext';
 
-/*
+/** 
  * Custom hook for managing the state and logic of the FormularioCliente component.
  * Directly uses `clienteSeleccionado` from ClienteContext as the source of truth.
  *

@@ -19,8 +19,6 @@ export default function TopBar({
         router.push("/productos/nuevo");
     };
 
-    
-
     return (
         <Box
             sx={{

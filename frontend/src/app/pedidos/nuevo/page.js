@@ -12,37 +12,75 @@ import { useState } from 'react';
 import FormularioPedido from '../Components/FormularioPedido';
 import { CargandoPedido } from '../Components/CargandoPedido';
 import { ClienteProvider } from '@/app/clientes/Hooks/ClienteContext';
+import SnackbarComponent from '@/app/Components/SnackBarComponent';
 
 export default function PedidosPage() {
 
-    const [currentStep, setCurrentStep] = useState(0); // Paso actual
-    const [selectedCliente, setSelectedCliente] = useState(null); // Cliente seleccionado
-    const [selectedObra, setSelectedObra] = useState(null); // Obra seleccionada
-    const [selectedProductos, setSelectedProductos] = useState([]); // Productos seleccionados
+    // Step and selection state
+    const [currentStep, setCurrentStep] = useState(0);
+    const [selectedCliente, setSelectedCliente] = useState(null);
+    const [selectedObra, setSelectedObra] = useState(null);
+    const [selectedProductos, setSelectedProductos] = useState([]);
 
+    // Snackbar state
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'info'
+    });
 
+    /**
+     * Shows a snackbar with the given message and severity.
+     * @param {string} message - The message to display.
+     * @param {'success'|'warning'|'error'|'info'} severity - The severity of the snackbar.
+     */
+    const showSnackbar = (message, severity = 'info') => {
+        setSnackbar({ open: true, message, severity });
+    };
+
+    /**
+    * Handles closing the snackbar.
+    */
+    const handleSnackbarClose = () => {
+        setSnackbar({ ...snackbar, open: false });
+    };
+
+    
+    /**
+     * Handles client selection.
+     * @param {object} cliente - The selected client.
+     */
     const handleClienteSelect = (cliente) => {
         if (cliente) {
             setSelectedCliente(cliente);
             setCurrentStep(1); // Move to the next step
         } else {
-            alert('Debe seleccionar un cliente para continuar.');
+            showSnackbar('Debe seleccionar un cliente para continuar.', 'warning');
         }
     };
 
-    // Handle obra selection
+
+    /**
+     * Handles obra (project) selection.
+     * @param {object} obra - The selected obra.
+     */
     const handleObraSelect = (obra) => {
         if (obra && obra.estado === 'HABILITADA') {
             setSelectedObra(obra);
             setCurrentStep(2); // Move to the next step
         } else {
-            alert('Debe seleccionar una obra con estado HABILITADA.');
+            showSnackbar('Debe seleccionar una obra con estado HABILITADA.', 'warning');
         }
     };
 
     const handleProductosSelect = (productosSeleccionados) => {
-        setSelectedProductos(productosSeleccionados);
-        setCurrentStep(3);
+        if (cliente) {
+            setSelectedProductos(productosSeleccionados);
+            setCurrentStep(3);
+        }
+        else {
+            showSnackbar('Debe seleccionar al menos un producto para continuar.', 'warning');
+        }
     };
 
     return (
@@ -93,6 +131,13 @@ export default function PedidosPage() {
                         />
                     )}
                 </Container>
+                {/* Snackbar for user feedback */}
+                <SnackbarComponent
+                    open={snackbar.open}
+                    message={snackbar.message}
+                    severity={snackbar.severity}
+                    onClose={handleSnackbarClose}
+                />
             </ClienteProvider>
         </div>
     );

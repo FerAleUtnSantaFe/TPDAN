@@ -2,7 +2,6 @@ import { useReducer, useEffect } from 'react';
 import { findClientes, deleteCliente } from "@/app/APIs/ClientesAPI";
 import { useClienteContext } from './ClienteContext';
 
-
 /* 
     Client state management using useReducer.
     This hook manages the state of clients, including fetching, filtering, and deleting clients.

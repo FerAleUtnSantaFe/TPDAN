@@ -18,7 +18,7 @@ import { useFormularioCliente } from '../Hooks/useFormularioCliente';
 import SnackbarComponent from '@/app/Components/SnackBarComponent';
 import { useClienteContext } from '../Hooks/ClienteContext';
 
-/*
+/**
  * FormularioCliente Component
  * Handles the creation and modification of a client.
  * @param {string} modo - Determines if the form is in "nuevo" (new) or "modificar" (edit) mode.
