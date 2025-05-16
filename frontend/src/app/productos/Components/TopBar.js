@@ -18,7 +18,7 @@ export default function TopBar({
         router.push("/productos/nuevo");
     };
 
-
+    
 
     return (
         <Box marginTop={1}>

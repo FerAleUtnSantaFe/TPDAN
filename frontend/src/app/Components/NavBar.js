@@ -7,7 +7,6 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useRouter } from "next/navigation";
 import Logo from "../../../public/Logo.svg";
 import { SvgIcon } from "@mui/material";
-import Cookies from "js-cookie";
 
 const pages = ["Clientes", "Productos", "Pedidos"];
 
@@ -15,10 +14,6 @@ export default function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const router = useRouter();
-
-  // Check if the user is authenticated by looking for the authToken in cookies
-  //const isAuthenticated = !!Cookies.get("authToken");
-  const isAuthenticated = true;
 
   // Handlers for navigation menu
   const handleOpenNavMenu = (event) => {
@@ -80,8 +75,7 @@ export default function NavBar() {
               justifyContent: "center",
             }}
           >
-            {isAuthenticated &&
-              pages.map((page) => (
+            {pages.map((page) => (
                 <Button
                   key={page}
                   onClick={() => handleNavigation(page)}
@@ -134,51 +128,46 @@ export default function NavBar() {
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
             >
-              {isAuthenticated &&
-                pages.map((page) => (
+              {pages.map((page) => (
                   <MenuItem key={page} onClick={() => handleNavigation(page)}>
                     <Typography textAlign="center">{page}</Typography>
                   </MenuItem>
                 ))}
-              {isAuthenticated && (
                 <MenuItem onClick={handleLogOut}>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <AccountCircleIcon sx={{ marginRight: 1 }} />
                     <Typography textAlign="center">Log Out</Typography>
                   </Box>
                 </MenuItem>
-              )}
             </Menu>
           </Box>
 
           {/* User Menu for Desktop */}
-          {isAuthenticated && (
-            <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, color: "white" }}>
-                <AccountCircleIcon fontSize="large" />
-              </IconButton>
-              <Menu
-                sx={{ mt: "45px" }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                <MenuItem onClick={handleLogOut}>
-                  <Typography textAlign="center">Log Out</Typography>
-                </MenuItem>
-              </Menu>
-            </Box>
-          )}
+          <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
+            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, color: "white" }}>
+              <AccountCircleIcon fontSize="large" />
+            </IconButton>
+            <Menu
+              sx={{ mt: "45px" }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+              <MenuItem onClick={handleLogOut}>
+                <Typography textAlign="center">Log Out</Typography>
+              </MenuItem>
+            </Menu>
+          </Box>
         </Toolbar>
       </Container>
     </AppBar>

@@ -1,4 +1,3 @@
-
 package isi.dan.msclientes.controller;
 
 import java.util.List;
@@ -57,7 +56,7 @@ public class ClienteController {
         return clienteService.save(cliente);
     }
 
-    //@Secured(roles = {"ADMIN", "USER"})
+    // @Secured(roles = {"ADMIN", "USER"})
     @GetMapping
     @LogExecutionTime
     public List<Cliente> getAll() {
@@ -102,29 +101,6 @@ public class ClienteController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/{monto}")
-    @LogExecutionTime
-    public ResponseEntity<Boolean> verificarSaldo(@PathVariable Integer id, @PathVariable Double monto) {
-        log.info("Verificando saldo para cliente con ID: {} y monto: {}", id, monto);
-
-        Optional<Cliente> clienteOpt = clienteService.findById(id);
-        if (!clienteOpt.isPresent()) {
-            log.warn("Cliente con ID {} no encontrado", id);
-            return ResponseEntity.notFound().build();
-        }
-
-        Cliente cliente = clienteOpt.get();
-        Double saldoDisponible = cliente.getMaximoDescubierto() - monto;
-
-        log.info("Saldo disponible para cliente con ID {}: {}", id, saldoDisponible);
-
-        if (cliente.getMaximoDescubierto() >= monto) {
-            return ResponseEntity.ok(true);
-        } else {
-            return ResponseEntity.ok(false);
-        }
-    }
-
     @PutMapping("/{clienteId}/{obraId}/")
     @LogExecutionTime
     public ResponseEntity<Void> actualizarEstadoObra(
@@ -160,6 +136,29 @@ public class ClienteController {
         } catch (IllegalStateException | IllegalArgumentException e) {
             log.error("Error al actualizar el estado de la obra: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/4AD4-$y38r6mD5TmqQ6=/{id}/{monto}")
+    @LogExecutionTime
+    public ResponseEntity<Boolean> verificarSaldo(@PathVariable Integer id, @PathVariable Double monto) {
+        log.info("Verificando saldo para cliente con ID: {} y monto: {}", id, monto);
+
+        Optional<Cliente> clienteOpt = clienteService.findById(id);
+        if (!clienteOpt.isPresent()) {
+            log.warn("Cliente con ID {} no encontrado", id);
+            return ResponseEntity.notFound().build();
+        }
+
+        Cliente cliente = clienteOpt.get();
+        Double saldoDisponible = cliente.getMaximoDescubierto() - monto;
+
+        log.info("Saldo disponible para cliente con ID {}: {}", id, saldoDisponible);
+
+        if (cliente.getMaximoDescubierto() >= monto) {
+            return ResponseEntity.ok(true);
+        } else {
+            return ResponseEntity.ok(false);
         }
     }
 }

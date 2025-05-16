@@ -40,12 +40,20 @@ public class SecurityConfig {
         this.jwtUtil = jwtUtil;
     }
 
+    /**
+     * Configures the security filter chain for the application.
+     *
+     * @param http The ServerHttpSecurity object to configure.
+     * @return The configured SecurityWebFilterChain.
+     */
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http.csrf(csrf -> csrf.disable()) // Disable CSRF protection for simplicity
                 .authorizeExchange(authz -> authz
                         .pathMatchers("/login").permitAll() // Allow public access to login endpoint
-                        .pathMatchers("/actuator/**").permitAll() // Allow public access to actuator endpoints
+                        .pathMatchers("/api/clientes/4AD4-$y38r6mD5TmqQ6=/**").permitAll()
+                        .pathMatchers("/api/productos/4AD4-$y38r6mD5TmqQ6=/**").permitAll()
+                        .pathMatchers("/api/pedidos/4AD4-$y38r6mD5TmqQ6=/**").permitAll()
                         .anyExchange().authenticated() // Secure all other endpoints
                 )
                 .addFilterAt(jwtAuthenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION) // Add JWT validation

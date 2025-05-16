@@ -138,7 +138,7 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.updateProducto(producto));
     }
 
-    @PutMapping("/actualizar-stock")
+    @PutMapping("/4AD4-$y38r6mD5TmqQ6=/actualizar-stock")
     @LogExecutionTime
     public ResponseEntity<Boolean> actualizarStock(@RequestBody List<Map<String, Object>> productos) {
         log.info("Actualizando stock para los productos: {}", productos);
@@ -182,6 +182,7 @@ public class ProductoController {
         }
     }
 
+    @LogExecutionTime
     @RabbitListener(queues = "cola_actualizar-stock")
     public void actualizarStockRabbit(List<Map<String, Object>> productos) {
         log.info("Mensaje recibido para actualizar stock: {}", productos);

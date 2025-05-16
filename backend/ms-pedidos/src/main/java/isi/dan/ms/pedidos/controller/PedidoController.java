@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import isi.dan.ms.pedidos.aop.LogExecutionTime;
 import isi.dan.ms.pedidos.exception.PedidoNotFoundException;
 import isi.dan.ms.pedidos.modelo.Estado;
 import isi.dan.ms.pedidos.modelo.EstadoDTO;
@@ -43,12 +44,13 @@ public class PedidoController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    private static final String URL_MS_CLIENTES = "http://ms-gateway-svc:8080/api/clientes/";
-    private static final String URL_MS_PRODUCTOS = "http://ms-gateway-svc:8080/api/productos/actualizar-stock";
+    private static final String URL_MS_CLIENTES = "http://ms-gateway-svc:8080/api/clientes/4AD4-$y38r6mD5TmqQ6=/";
+    private static final String URL_MS_PRODUCTOS = "http://ms-gateway-svc:8080/api/productos/4AD4-$y38r6mD5TmqQ6=/actualizar-stock";
     private static final Logger log = LoggerFactory.getLogger(PedidoController.class);
 
     // EJEMPLO DE RUTA /api/pedidos/?clienteId=5&estado=EN_PROCESO
     @GetMapping
+    @LogExecutionTime
     public List<Pedido> getAllPedidos(
             @RequestParam(required = false) Integer clienteId,
             @RequestParam(required = false) Estado estado) {
@@ -65,12 +67,14 @@ public class PedidoController {
     }
 
     @GetMapping("/{id}")
+    @LogExecutionTime
     public ResponseEntity<Pedido> getPedidoById(@PathVariable String id) {
         Pedido pedido = pedidoService.getPedido(id);
         return pedido != null ? ResponseEntity.ok(pedido) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
+    @LogExecutionTime
     public Pedido createPedido(@RequestBody @Validated Pedido pedidoNuevo) {
         // Verificar saldo con ms-clientes
         boolean saldoSuficiente = verificarSaldoConCliente(pedidoNuevo.getCliente(), pedidoNuevo.getTotal());
@@ -91,6 +95,7 @@ public class PedidoController {
     }
 
     @PutMapping("/{id}")
+    @LogExecutionTime
     public ResponseEntity<Pedido> updatePedido(@PathVariable final String id, @RequestBody EstadoDTO nuevoEstado)
             throws PedidoNotFoundException {
         Pedido pedido = pedidoService.getPedido(id);
@@ -130,6 +135,7 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoActualizado);
     }
 
+    @LogExecutionTime
     private boolean verificarSaldoConCliente(Integer clienteId, Double totalPedido) {
         // Calcula el total de los pedidos en estado "ACEPTADO" o "EN_PREPARACION"
         Double totalPedidosCliente = calcularTotalPedidosCliente(clienteId);
@@ -146,6 +152,7 @@ public class PedidoController {
         }
     }
 
+    @LogExecutionTime
     private Double calcularTotalPedidosCliente(Integer clienteId) {
         List<Pedido> pedidosCliente = pedidoService.getPedidos(clienteId);
         return pedidosCliente.stream()
@@ -154,7 +161,7 @@ public class PedidoController {
                 .sum();
     }
 
-    
+    @LogExecutionTime
     private boolean actualizarStockConProductos(Pedido pedido) {
         try {
             ResponseEntity<Boolean> response = restTemplate.exchange(
