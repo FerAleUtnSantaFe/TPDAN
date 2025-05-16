@@ -56,7 +56,7 @@ export default function ModificarProductoModal({
       newErrors.stockActual = "Valor de stock actual no válido.";
     if (!stockMinimo || stockMinimo < 0)
       newErrors.stockMinimo = "Valor de stock mínimo no válido.";
-    if (!descuentoPromocional || descuentoPromocional < 0)
+    if (descuentoPromocional < 0)
       newErrors.descuentoPromocional =
         "Valor de descuento promocional no válido.";
     setErrors(newErrors);

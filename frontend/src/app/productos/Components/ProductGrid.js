@@ -4,7 +4,7 @@ import SidebarFilter from "@/app/productos/Components/SidebarFilter";
 import TopBar from "@/app/productos/Components/TopBar";
 import { handleDelete } from "@/app/productos/controllers/Controllers";
 import ModificarProductoModal from "@/app/productos/modificar/ModificarProducto";
-import { Box, useMediaQuery } from "@mui/material";
+import { Box, Fade, MenuItem, Select, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 
 export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
@@ -93,17 +93,48 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
     }, []);
 
     return (
+
         <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
             {/* Top Bar */}
             <TopBar
                 isPedidoMode={isPedidoMode}
                 onListaProductosSelect={onListaProductosSelect}
                 productosSeleccionados={productosSeleccionados}
-                orden={orden}
-                setOrden={setOrden}
             />
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1, mb: 1, displayDirection: "row", gap: 1, alignItems: "center" }}>
+                <Typography
+                    variant="body1"
+                    gutterBottom
+                    align="center"
+                    justifyContent={"center"}
+                    sx={{
+                        fontWeight: "bold",
+                        marginTop: 0.5,
+                    }}
+                >
+                    Ordenar por:
+                </Typography>
+                <Select
+                    value={orden}
+                    onChange={(e) => setOrden(e.target.value)}
+                    displayEmpty
+                    variant="standard"
+                    sx={{
+                        maxWidth: 200,
+                        height: 40,
+                        backgroundColor: "#F5F5F5",
+                        borderRadius: 2,
+                        //boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                    }}
+                >
+                    <MenuItem value="nombre">Nombre</MenuItem>
+                    <MenuItem value="precioAsc">Menor Precio</MenuItem>
+                    <MenuItem value="precioDesc">Mayor Precio</MenuItem>
+                </Select>
+            </Box>
 
             {/* Main Content */}
+
             <Box sx={{ display: "flex", flex: 1, gap: 2, marginTop: 2 }}>
                 {/* Sidebar Filter */}
                 {!isSmallScreen && (
@@ -116,28 +147,37 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
                 )}
 
                 {/* Product Grid */}
-                <Box
-                    sx={{
-                        flex: 1,
-                        display: "grid",
-                        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", // Asegura que las tarjetas se alineen correctamente
-                        gap: 8, // Espaciado entre tarjetas
-                        alignItems: "start", // Alinea las tarjetas al inicio
-                    }}
-                >
-                    {productosFiltrados.map((producto) => (
-                        <ProductCard
-                            key={producto.id}
-                            producto={producto}
-                            handleEdit={handleEdit}
-                            handleDelete={handleDeleteProducto}
-                            isPedidoMode={isPedidoMode}
-                            onCantidadChange={handleCantidadChange}
-                        />
-                    ))}
-                </Box>
+                <Fade in={true} timeout={1000}>
+                    <Box
+                        sx={{
+                            flex: 1,
+                            display: "grid",
+                            gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", // Asegura que las tarjetas se alineen correctamente
+                            gap: 0, // Espaciado entre tarjetas
+                            alignItems: "start", // <-- alinea la card arriba
+                            height: 600,
+                        }}
+                    >
+                        {productosFiltrados.map((producto) => (
+                            <Box sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "flex-start",
+                                //height: "70%",
+                            }}>
+                                <ProductCard
+                                    key={producto.id}
+                                    producto={producto}
+                                    handleEdit={handleEdit}
+                                    handleDelete={handleDeleteProducto}
+                                    isPedidoMode={isPedidoMode}
+                                    onCantidadChange={handleCantidadChange}
+                                />
+                            </Box>
+                        ))}
+                    </Box>
+                </Fade>
             </Box>
-
             {/* Modificar Producto Modal */}
             {isModalOpen && (
                 <ModificarProductoModal
