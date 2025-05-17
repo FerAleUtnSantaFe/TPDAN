@@ -44,7 +44,7 @@ export default function ProductCard({
     return (
         <Card
             sx={{
-                width: hovered ? 270 : 250,
+                width: hovered ? 300 : 270,
                 height: hovered ? 300 : 250,
                 display: "flex",
                 flexDirection: "column",
@@ -53,15 +53,21 @@ export default function ProductCard({
                 overflow: "hidden",
                 boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)", // Sombra sutil
                 transition: "all 0.3s ease-in-out", // Transición para el hover
-                backgroundColor: producto.stockActual > 0 ? "white" : "#f5f5f5", // Fondo gris si no hay stock
-                opacity: producto.stockActual > 0 ? 1 : 0.6, // Reducir opacidad si no hay stock
-                pointerEvents: producto.stockActual > 0 ? "auto" : "none", // Deshabilitar interacciones si no hay stock
+                backgroundColor: isPedidoMode
+                    ? (producto.stockActual > 0 ? "white" : "#f5f5f5") // Fondo gris si no hay stock
+                    : "white",
+                opacity: isPedidoMode
+                    ? (producto.stockActual > 0 ? 1 : 0.6) // Reducir opacidad si no hay stock
+                    : 1,
+                pointerEvents: isPedidoMode
+                    ? (producto.stockActual > 0 ? "auto" : "none") // Deshabilitar interacciones si no hay stock
+                    : "auto",
             }}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
         >
             {/* Imagen */}
-            <Box
+            < Box
                 component="img"
                 src={`/productos/icons/${producto.categoria.toLowerCase()}.png`}
                 alt={producto.nombre}
@@ -202,6 +208,6 @@ export default function ProductCard({
                     </>
                 )}
             </Box>
-        </Card>
+        </Card >
     );
 }
