@@ -26,7 +26,6 @@ const initialState = {
 // Reducer function
 const clienteReducer = (state, action) => {
     switch (action.type) {
-        
         case ACTIONS.UPDATE_CLIENTES:
             return { ...state, clientes: action.payload, clientesOriginales: action.payload };
         case ACTIONS.SELECT_CLIENTE:
