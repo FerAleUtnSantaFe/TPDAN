@@ -19,7 +19,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/public/**").permitAll()
-                .requestMatchers("/api/pedidos/actuator/prometheus").permitAll()
+                .requestMatchers("/actuator/prometheus/**").permitAll()
                 .requestMatchers("/api/pedidos/4AD4-$y38r6mD5TmqQ6=/**").permitAll()
                 .anyRequest().authenticated()
             )

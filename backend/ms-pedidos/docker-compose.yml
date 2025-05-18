@@ -38,7 +38,7 @@ services:
 
   ms-pedidos-svc:
     image: ms-pedidos-svc:latest
-    container_name: ms-pedidos-svc
+    # container_name: ms-pedidos-svc
     build:
       context: .
       dockerfile: Dockerfile

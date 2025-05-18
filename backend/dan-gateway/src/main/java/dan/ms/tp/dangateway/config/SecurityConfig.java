@@ -51,9 +51,11 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable()) // Disable CSRF protection for simplicity
                 .authorizeExchange(authz -> authz
                         .pathMatchers("/login").permitAll() // Allow public access to login endpoint
+                        .pathMatchers("/actuator/prometheus/**").permitAll() // Allow public access to Prometheus metrics
                         .pathMatchers("/api/clientes/4AD4-$y38r6mD5TmqQ6=/**").permitAll()
                         .pathMatchers("/api/productos/4AD4-$y38r6mD5TmqQ6=/**").permitAll()
                         .pathMatchers("/api/pedidos/4AD4-$y38r6mD5TmqQ6=/**").permitAll()
+                        .pathMatchers("/api/v1/**").permitAll()
                         .anyExchange().authenticated() // Secure all other endpoints
                 )
                 .addFilterAt(jwtAuthenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION) // Add JWT validation

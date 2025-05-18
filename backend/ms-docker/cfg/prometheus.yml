@@ -29,9 +29,9 @@ scrape_configs:
       - targets: ["localhost:9090"]
 
   - job_name: "ms-clientes"
-    scheme: https
+    scheme: http
     scrape_interval: 5s
-    metrics_path: "api/clientes/4AD4-$y38r6mD5TmqQ6=/actuator/prometheus"
+    metrics_path: "/actuator/prometheus"
     static_configs:
       - targets: 
         - "ms-clientes-svc-1:8080"
@@ -39,15 +39,15 @@ scrape_configs:
         - "ms-clientes-svc-3:8080"
 
   - job_name: "ms-productos"
-    scheme: https
+    scheme: http
     scrape_interval: 5s
-    metrics_path: "api/productos/4AD4-$y38r6mD5TmqQ6=/actuator/prometheus"
+    metrics_path: "/actuator/prometheus"
     static_configs:
       - targets: ["ms-productos-svc-1:8080"]
 
   - job_name: "ms-pedidos"
-    scheme: https
+    scheme: http
     scrape_interval: 5s
-    metrics_path: "api/pedidos/4AD4-$y38r6mD5TmqQ6=/actuator/prometheus"
+    metrics_path: "/actuator/prometheus"
     static_configs:
-      - targets: ["ms-productos-svc-1:8080"]
+      - targets: ["ms-pedidos-svc:8080"]
