@@ -1,9 +1,10 @@
 import { fetchProductos } from "@/app/APIs/ProductosAPI";
+import ModificarProductoModal from "@/app/productos/Components/ModificarProducto";
 import ProductCard from "@/app/productos/Components/ProductCard";
+import ProvisionProductoModal from "@/app/productos/Components/ProvisionProducto";
 import SidebarFilter from "@/app/productos/Components/SidebarFilter";
 import TopBar from "@/app/productos/Components/TopBar";
 import { handleDelete } from "@/app/productos/controllers/Controllers";
-import ModificarProductoModal from "@/app/productos/modificar/ModificarProducto";
 import { Box, Fade, MenuItem, Select, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 
@@ -16,6 +17,18 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
     const [orden, setOrden] = useState("nombre");
 
     const isSmallScreen = useMediaQuery("(max-width: 768px)");
+
+    const [openProvision, setOpenProvision] = useState(false);
+
+    const handleOpenProvision = () => setOpenProvision(true);
+    const handleCloseProvision = async () => {
+        setOpenProvision(false);
+        // Refresca productos después de una provisión
+        const updatedProductos = await fetchProductos();
+        setProductosOriginales(updatedProductos);
+        actualizarProductosFiltrados(updatedProductos);
+    };
+
 
     const ordenarProductos = (lista) => {
         const sorted = [...lista];
@@ -100,6 +113,7 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
                 isPedidoMode={isPedidoMode}
                 onListaProductosSelect={onListaProductosSelect}
                 productosSeleccionados={productosSeleccionados}
+                onProvisionClick={handleOpenProvision}
             />
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1, mb: 1, displayDirection: "row", gap: 1, alignItems: "center" }}>
                 <Typography
@@ -184,6 +198,8 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
                     </Box>
                 </Fade>
             </Box>
+
+            <ProvisionProductoModal open={openProvision} onClose={handleCloseProvision} />
             {/* Modificar Producto Modal */}
             {isModalOpen && (
                 <ModificarProductoModal

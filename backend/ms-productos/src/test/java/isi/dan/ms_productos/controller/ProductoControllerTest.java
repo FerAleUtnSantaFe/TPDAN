@@ -3,7 +3,6 @@ package isi.dan.ms_productos.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,7 @@ public class ProductoControllerTest {
         producto = new Producto();
         producto.setNombre("Producto1");
         producto.setCategoria(Categoria.CEMENTOS);
-        producto.setPrecio(new BigDecimal("100.00"));
+        producto.setPrecio(new Double("100.00"));
         producto.setStockActual(10);
         producto.setStockMinimo(1);
         producto.setDescripcion("Descripcion");

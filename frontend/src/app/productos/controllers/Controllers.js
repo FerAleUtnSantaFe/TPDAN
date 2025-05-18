@@ -1,4 +1,4 @@
-import { deleteProducto, editProducto } from "../../APIs/ProductosAPI";
+import { deleteProducto, editProducto } from "@/app/APIs/ProductosAPI";
 
 // Editar producto
 

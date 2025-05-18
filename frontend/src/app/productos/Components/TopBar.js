@@ -1,3 +1,4 @@
+import { AddShoppingCart } from "@mui/icons-material";
 import AddIcon from "@mui/icons-material/Add";
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -6,6 +7,7 @@ export default function TopBar({
     isPedidoMode,
     onListaProductosSelect,
     productosSeleccionados,
+    onProvisionClick,
 
 }) {
     const GenerarPedido = () => {
@@ -17,8 +19,6 @@ export default function TopBar({
     const handleNew = () => {
         router.push("/productos/nuevo");
     };
-
-    
 
     return (
         <Box marginTop={1}>
@@ -37,6 +37,16 @@ export default function TopBar({
 
                     {/* Controles a la derecha */}
                     <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                        {!isPedidoMode && (
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={onProvisionClick}
+                                startIcon={<AddShoppingCart />}
+                                sx={{ ml: 'auto' }}
+                            >
+                                Nueva provisión
+                            </Button>)}
                         <Button
                             variant="contained"
                             color="success"

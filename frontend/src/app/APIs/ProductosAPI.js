@@ -99,6 +99,19 @@ export async function editProducto(id, producto) {
   }
 }
 
+// Provisión de producto
+export async function provisionProducto(id, data) {
+  const response = await fetch(`${BASE_URL}/${id}/provision`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error("Error al realizar la provisión");
+  }
+  return await response.json();
+}
+
 // Eliminar producto
 export async function deleteProducto(id) {
   try {

@@ -94,7 +94,7 @@ export default function ModificarProductoModal({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Modificar Producto</DialogTitle>
+      <DialogTitle variant="h3" gutterBottom>Modificar Producto</DialogTitle>
       <DialogContent>
         <Box
           sx={{
@@ -177,7 +177,7 @@ export default function ModificarProductoModal({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
+        <Button onClick={onClose} variant='contained' color="error">
           Cancelar
         </Button>
         <Button onClick={guardarProducto} variant="contained" color="primary">

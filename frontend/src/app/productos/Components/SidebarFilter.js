@@ -65,10 +65,10 @@ export default function SidebarFilter({ productos, setProductosFiltrados }) {
         >
             <Box>
                 <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1, ml: 0.5 }}>
-                    Buscar Producto
+                    Buscar producto
                 </Typography>
                 <TextField
-                    placeholder="Producto"
+                    placeholder="Buscar producto..."
                     value={searchProducto}
                     onChange={(e) => setSearchProducto(e.target.value)}
                     fullWidth

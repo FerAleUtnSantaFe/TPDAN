@@ -115,9 +115,6 @@ export default function ProductCard({
                         <Typography variant="body2" color="text.secondary">
                             {producto.descripcion}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            Categoría: {producto.categoria}
-                        </Typography>
                     </>
                 )}
             </CardContent>

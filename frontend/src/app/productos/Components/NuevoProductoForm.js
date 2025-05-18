@@ -74,7 +74,6 @@ export default function NuevoProductoForm({ handleSubmit }) {
         <CardContent>
           <Typography
             variant="h3"
-            color="primary"
             gutterBottom
             sx={{ margin: 1, textAlign: "center" }}
           >

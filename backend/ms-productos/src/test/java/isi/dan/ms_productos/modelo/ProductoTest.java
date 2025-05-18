@@ -16,7 +16,7 @@ public class ProductoTest {
             producto.setDescripcion("Descripción para " + categoria.name());
             producto.setStockActual(10);
             producto.setStockMinimo(2);
-            producto.setPrecio(new BigDecimal("99.99"));
+            producto.setPrecio(new Double("99.99"));
             producto.setCategoria(categoria);
             producto.setDescuentoPromocional(5);
 

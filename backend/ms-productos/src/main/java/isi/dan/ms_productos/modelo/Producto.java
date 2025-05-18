@@ -1,5 +1,4 @@
 package isi.dan.ms_productos.modelo;
-import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,28 +21,28 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name ="NOMBRE")
+    @Column(name = "NOMBRE")
     @NotBlank(message = "El nombre no puede estar vacio")
     private String nombre;
 
-    @Column(name ="DESCRIPCION")
+    @Column(name = "DESCRIPCION")
     private String descripcion;
 
-    @Column(name ="STOCK_ACTUAL")
+    @Column(name = "STOCK_ACTUAL")
     @NotNull
     @Min(value = 0, message = "El stock actual no puede ser menor a 0")
     private Integer stockActual = 0;
 
-    @Column(name ="STOCK_MINIMO")
+    @Column(name = "STOCK_MINIMO")
     @NotNull
     @Min(value = 0, message = "El stock minimo no puede ser menor a 0")
     private Integer stockMinimo;
 
-    @Column(name ="PRECIO")
+    @Column(name = "PRECIO")
     @Min(value = 0, message = "El stock actual no puede ser menor a 0")
-    private BigDecimal precio;
+    private Double precio;
 
-    @Column(name ="CATEGORIA")
+    @Column(name = "CATEGORIA")
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
 

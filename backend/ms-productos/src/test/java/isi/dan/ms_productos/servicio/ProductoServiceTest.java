@@ -3,7 +3,6 @@ package isi.dan.ms_productos.servicio;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +38,7 @@ class ProductoServiceTest {
         producto.setDescripcion("Bolsa de 25kg");
         producto.setStockActual(50);
         producto.setStockMinimo(10);
-        producto.setPrecio(new BigDecimal("1500.50"));
+        producto.setPrecio(new Double("1500.50"));
         producto.setCategoria(Categoria.YESERIA);
         producto.setDescuentoPromocional(5);
     }

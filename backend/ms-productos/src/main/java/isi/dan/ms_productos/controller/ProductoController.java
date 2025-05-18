@@ -1,6 +1,5 @@
 package isi.dan.ms_productos.controller;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -124,15 +123,18 @@ public class ProductoController {
         Producto producto = productoOptional.get();
 
         // Obtener y sumar el stock
-        Integer stock = (Integer) request.get("stock");
+        Object stockObj = request.get("stock");
+        Integer stock = stockObj != null ? Integer.valueOf(stockObj.toString()) : null;
         if (stock != null) {
             producto.setStockActual(producto.getStockActual() + stock);
         }
 
         // Actualizar el precio
-        BigDecimal precio = new BigDecimal(request.get("precio").toString());
-        producto.setPrecio(precio);
-
+        Object precioObj = request.get("precio");
+        Double precio = precioObj != null ? new Double(precioObj.toString()) : null;
+        if (precio != null) {
+            producto.setPrecio(precio);
+        }
         // Guardar los cambios
 
         return ResponseEntity.ok(productoService.updateProducto(producto));
