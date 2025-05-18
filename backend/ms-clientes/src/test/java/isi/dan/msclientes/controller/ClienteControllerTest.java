@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -21,8 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import isi.dan.msclientes.model.Cliente;
 import isi.dan.msclientes.model.Obra;
 import isi.dan.msclientes.model.Usuario;
+import isi.dan.msclientes.security.JwTokenProvider;
+import isi.dan.msclientes.security.JwtAuthenticationFilter;
 import isi.dan.msclientes.servicios.ClienteService;
 
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(ClienteController.class)
 public class ClienteControllerTest {
 
@@ -32,6 +36,12 @@ public class ClienteControllerTest {
     @MockBean
     private ClienteService clienteService;
     private Cliente cliente;
+
+    @MockBean
+    private JwTokenProvider jwTokenProvider;
+
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @BeforeEach
     void setUp() {

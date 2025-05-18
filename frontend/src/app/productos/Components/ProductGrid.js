@@ -158,23 +158,29 @@ export default function ProductGrid({ isPedidoMode, onListaProductosSelect }) {
                             height: 600,
                         }}
                     >
-                        {productosFiltrados.map((producto) => (
-                            <Box sx={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "flex-start",
-                                //height: "70%",
-                            }}>
-                                <ProductCard
+                        {productosFiltrados.map((producto) => {
+                            const seleccionado = productosSeleccionados.find(p => p.id === producto.id);
+                            const cantidadSeleccionada = seleccionado ? seleccionado.cantidad : 0;
+                            return (
+                                <Box
                                     key={producto.id}
-                                    producto={producto}
-                                    handleEdit={handleEdit}
-                                    handleDelete={handleDeleteProducto}
-                                    isPedidoMode={isPedidoMode}
-                                    onCantidadChange={handleCantidadChange}
-                                />
-                            </Box>
-                        ))}
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "flex-start",
+                                    }}
+                                >
+                                    <ProductCard
+                                        producto={producto}
+                                        cantidadSeleccionada={cantidadSeleccionada}
+                                        handleEdit={handleEdit}
+                                        handleDelete={handleDeleteProducto}
+                                        isPedidoMode={isPedidoMode}
+                                        onCantidadChange={handleCantidadChange}
+                                    />
+                                </Box>
+                            );
+                        })}
                     </Box>
                 </Fade>
             </Box>

@@ -1,34 +1,44 @@
 package isi.dan.msclientes.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import isi.dan.msclientes.model.Usuario;
-import isi.dan.msclientes.servicios.UsuarioService;
+import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Collections;
-import java.util.Optional;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import isi.dan.msclientes.model.Usuario;
+import isi.dan.msclientes.security.JwTokenProvider;
+import isi.dan.msclientes.security.JwtAuthenticationFilter;
+import isi.dan.msclientes.servicios.UsuarioService;
 
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(UsuarioController.class)
 public class UsuarioControllerTest {
-    
+
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private UsuarioService usuarioService;
     private Usuario usuario;
+
+    @MockBean
+    private JwTokenProvider jwTokenProvider;
+
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @BeforeEach
     void setUp() {

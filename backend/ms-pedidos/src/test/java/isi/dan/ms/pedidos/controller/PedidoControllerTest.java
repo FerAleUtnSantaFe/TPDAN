@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import isi.dan.ms.pedidos.modelo.Pedido;
 import isi.dan.ms.pedidos.modelo.Producto;
 import isi.dan.ms.pedidos.servicio.PedidoService;
 
+@AutoConfigureMockMvc(addFilters = false)
 class PedidoControllerTest {
 
     @InjectMocks
@@ -138,19 +140,22 @@ class PedidoControllerTest {
     }
 
     // @Test
-    // void testUpdatePedidoCanceladoEnPreparacion() throws PedidoNotFoundException {
-    //     pedido.setEstado(Estado.EN_PREPARACION);
-    //     when(pedidoService.getPedido("1")).thenReturn(pedido);
-    //     when(pedidoService.savePedido(any(Pedido.class))).thenReturn(pedido);
+    // void testUpdatePedidoCanceladoEnPreparacion() throws PedidoNotFoundException
+    // {
+    // pedido.setEstado(Estado.EN_PREPARACION);
+    // when(pedidoService.getPedido("1")).thenReturn(pedido);
+    // when(pedidoService.savePedido(any(Pedido.class))).thenReturn(pedido);
 
-    //     EstadoDTO estadoDTO = new EstadoDTO();
-    //     estadoDTO.setEstado("CANCELADO");
+    // EstadoDTO estadoDTO = new EstadoDTO();
+    // estadoDTO.setEstado("CANCELADO");
 
-    //     ResponseEntity<Pedido> response = pedidoController.updatePedido("1", estadoDTO);
+    // ResponseEntity<Pedido> response = pedidoController.updatePedido("1",
+    // estadoDTO);
 
-    //     assertEquals(HttpStatus.OK, response.getStatusCode());
-    //     assertEquals(Estado.CANCELADO, response.getBody().getEstado());
-    //     verify(rabbitTemplate, times(1)).convertAndSend(eq("cola_actualizar-stock"), any());
+    // assertEquals(HttpStatus.OK, response.getStatusCode());
+    // assertEquals(Estado.CANCELADO, response.getBody().getEstado());
+    // verify(rabbitTemplate, times(1)).convertAndSend(eq("cola_actualizar-stock"),
+    // any());
     // }
 
     @Test

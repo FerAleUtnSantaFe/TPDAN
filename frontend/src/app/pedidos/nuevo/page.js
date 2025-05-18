@@ -1,18 +1,17 @@
 'use client';
 
+import DataGridCliente from '@/app/clientes/Components/DataGridCliente';
+import DataGridObras from '@/app/clientes/Components/DataGridObras';
+import { ClienteProvider } from '@/app/clientes/Hooks/ClienteContext';
+import SnackbarComponent from '@/app/Components/SnackBarComponent';
 import ProductGrid from '@/app/productos/Components/ProductGrid';
 import { Container } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import * as React from 'react';
-import NavBar from "../../Components/NavBar";
-import ProgressBarPedido from '../Components/ProgressBarPedido';
-import DataGridCliente from '@/app/clientes/Components/DataGridCliente';
-import DataGridObras from '@/app/clientes/Components/DataGridObras';
 import { useState } from 'react';
-import FormularioPedido from '../Components/FormularioPedido';
+import NavBar from "../../Components/NavBar";
 import { CargandoPedido } from '../Components/CargandoPedido';
-import { ClienteProvider } from '@/app/clientes/Hooks/ClienteContext';
-import SnackbarComponent from '@/app/Components/SnackBarComponent';
+import FormularioPedido from '../Components/FormularioPedido';
+import ProgressBarPedido from '../Components/ProgressBarPedido';
 
 export default function PedidosPage() {
 
@@ -74,7 +73,7 @@ export default function PedidosPage() {
     };
 
     const handleProductosSelect = (productosSeleccionados) => {
-        if (cliente) {
+        if (productosSeleccionados.length > 0) {
             setSelectedProductos(productosSeleccionados);
             setCurrentStep(3);
         }

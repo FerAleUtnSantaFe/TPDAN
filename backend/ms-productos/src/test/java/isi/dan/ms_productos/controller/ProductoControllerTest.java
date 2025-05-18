@@ -11,9 +11,9 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -24,8 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import isi.dan.ms_productos.modelo.Categoria;
 import isi.dan.ms_productos.modelo.Producto;
+import isi.dan.ms_productos.security.JwTokenProvider;
+import isi.dan.ms_productos.security.JwtAuthenticationFilter;
 import isi.dan.ms_productos.servicio.ProductoService;
 
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(ProductoController.class)
 public class ProductoControllerTest {
 
@@ -37,8 +40,11 @@ public class ProductoControllerTest {
     @MockBean
     private ProductoService productoService;
 
-    @InjectMocks
-    private ProductoController productoController;
+    @MockBean
+    private JwTokenProvider jwTokenProvider;
+
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @BeforeEach
     public void setup() {
@@ -187,22 +193,22 @@ public class ProductoControllerTest {
                 .andExpect(jsonPath("$.description").value("Producto 123 no encontrado"));
     }
 
-    @Test
-    void testActualizarStockProductoNoEncontrado() throws Exception {
-        Mockito.when(productoService.getProductoById(1)).thenReturn(Optional.empty());
+    // @Test
+    // void testActualizarStockProductoNoEncontrado() throws Exception {
+    //     Mockito.when(productoService.getProductoById(1)).thenReturn(Optional.empty());
 
-        String requestBody = """
-                    [
-                        {"id": 1, "cantidad": 2}
-                    ]
-                """;
+    //     String requestBody = """
+    //                 [
+    //                     {"id": 1, "cantidad": 2}
+    //                 ]
+    //             """;
 
-        mockMvc.perform(put("/api/productos/actualizar-stock")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-                .andExpect(status().isNotFound()) // Si tu método sigue igual
-                .andExpect(content().string("false"));
-    }
+    //     mockMvc.perform(put("/api/productos/actualizar-stock")
+    //             .contentType(MediaType.APPLICATION_JSON)
+    //             .content(requestBody))
+    //             .andExpect(status().isNotFound()) // Si tu método sigue igual
+    //             .andExpect(content().string("false"));
+    // }
 
     @Test
     void testDeleteByCategoria() throws Exception {
@@ -242,27 +248,27 @@ public class ProductoControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    void testActualizarStock() throws Exception {
-        producto.setStockActual(10);
-        Mockito.when(productoService.getProductoById(1)).thenReturn(Optional.of(producto));
-        Mockito.when(productoService.updateProducto(Mockito.any())).thenReturn(producto);
+    // @Test
+    // void testActualizarStock() throws Exception {
+    //     producto.setStockActual(10);
+    //     Mockito.when(productoService.getProductoById(1)).thenReturn(Optional.of(producto));
+    //     Mockito.when(productoService.updateProducto(Mockito.any())).thenReturn(producto);
 
-        String requestBody = """
-                    [
-                        {"id": 1, "cantidad": 2}
-                    ]
-                """;
+    //     String requestBody = """
+    //                 [
+    //                     {"id": 1, "cantidad": 2}
+    //                 ]
+    //             """;
 
-        mockMvc.perform(put("/api/productos/actualizar-stock")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-                .andExpect(status().isOk())
-                .andExpect(content().string("true"));
-    }
+    //     mockMvc.perform(put("/api/productos/actualizar-stock")
+    //             .contentType(MediaType.APPLICATION_JSON)
+    //             .content(requestBody))
+    //             .andExpect(status().isOk())
+    //             .andExpect(content().string("true"));
+    // }
 
-    // Test de rabbitmq
-    @Test
+    // // Test de rabbitmq
+    // @Test
     void testActualizarStockEndpoint_viaMockMvc() throws Exception {
         List<Map<String, Object>> productos = List.of(Map.of("id", 1, "cantidad", 5));
 

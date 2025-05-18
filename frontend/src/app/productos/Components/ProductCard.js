@@ -9,17 +9,22 @@ import {
     IconButton,
     Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProductCard({
     producto,
+    cantidadSeleccionada,
     handleEdit,
     handleDelete,
     onCantidadChange,
     isPedidoMode,
 }) {
-    const [cantidad, setCantidad] = useState(0);
+    const [cantidad, setCantidad] = useState(cantidadSeleccionada || 0);
     const [hovered, setHovered] = useState(false);
+
+    useEffect(() => {
+        setCantidad(cantidad);
+    }, [cantidad]);
 
     const handleAdd = () => {
         const nuevaCantidad = cantidad + 1;

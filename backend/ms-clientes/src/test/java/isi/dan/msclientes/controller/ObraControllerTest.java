@@ -1,26 +1,30 @@
 package isi.dan.msclientes.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import isi.dan.msclientes.model.Obra;
-import isi.dan.msclientes.servicios.ObraService;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import isi.dan.msclientes.model.Obra;
+import isi.dan.msclientes.security.JwTokenProvider;
+import isi.dan.msclientes.security.JwtAuthenticationFilter;
+import isi.dan.msclientes.servicios.ObraService;
+
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(ObraController.class)
 public class ObraControllerTest {
 
@@ -31,6 +35,12 @@ public class ObraControllerTest {
     private ObraService obraService;
 
     private Obra obra;
+
+    @MockBean
+    private JwTokenProvider jwTokenProvider;
+
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @BeforeEach
     void setUp() {
@@ -99,4 +109,3 @@ public class ObraControllerTest {
         }
     }
 }
-
