@@ -74,7 +74,7 @@ export default function PedidosPage() {
     };
 
     const handleProductosSelect = (productosSeleccionados) => {
-        if (cliente) {
+        if (productosSeleccionados.length > 0) {
             setSelectedProductos(productosSeleccionados);
             setCurrentStep(3);
         }
