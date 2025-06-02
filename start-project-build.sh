@@ -26,8 +26,3 @@ cd ..
 cd frontend
 docker network create frontend-net
 docker-compose up -d --build
-
-#docker-compose -f ms-docker/docker-compose-rabbit.yml up -d
-#docker-compose -f ms-docker/docker-compose-graylog.yml up -d 
-#docker-compose -f ms-docker/docker-compose-zipin.yml up -d 
-#docker-compose -f ms-docker/docker-compose-perf.yml up -d 

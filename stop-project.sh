@@ -1,6 +1,10 @@
 cd backend
 cd ms-docker
 docker-compose -f docker-compose-rabbit.yml down
+docker-compose -f docker-compose-rabbit.yml down
+docker-compose -f docker-compose-graylog.yml down
+docker-compose -f docker-compose-zipin.yml down
+docker-compose -f docker-compose-perf.yml down
 cd ..
 cd dan-eureka-srv
 docker-compose down
@@ -20,7 +24,3 @@ cd ..
 cd ..
 cd frontend
 docker-compose down
-#docker-compose -f ms-docker/docker-compose-rabbit.yml up -d
-#docker-compose -f ms-docker/docker-compose-graylog.yml up -d 
-#docker-compose -f ms-docker/docker-compose-zipin.yml up -d 
-#docker-compose -f ms-docker/docker-compose-perf.yml up -d 

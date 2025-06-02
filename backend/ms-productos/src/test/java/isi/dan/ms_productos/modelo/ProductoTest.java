@@ -16,14 +16,14 @@ public class ProductoTest {
             producto.setDescripcion("Descripción para " + categoria.name());
             producto.setStockActual(10);
             producto.setStockMinimo(2);
-            producto.setPrecio(new Double("99.99"));
+            producto.setPrecio(99.99);
             producto.setCategoria(categoria);
             producto.setDescuentoPromocional(5);
 
             assertEquals("Producto " + categoria.name(), producto.getNombre());
             assertEquals(categoria, producto.getCategoria());
             assertEquals(10, producto.getStockActual());
-            assertEquals(new BigDecimal("99.99"), producto.getPrecio());
+            assertEquals(99.99, producto.getPrecio());
         }
     }
 
