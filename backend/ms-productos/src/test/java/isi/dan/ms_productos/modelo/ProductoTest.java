@@ -2,8 +2,6 @@ package isi.dan.ms_productos.modelo;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.Test;
 
 public class ProductoTest {
@@ -23,7 +21,11 @@ public class ProductoTest {
             assertEquals("Producto " + categoria.name(), producto.getNombre());
             assertEquals(categoria, producto.getCategoria());
             assertEquals(10, producto.getStockActual());
+<<<<<<< HEAD
             assertEquals(99.99, producto.getPrecio());
+=======
+            assertEquals(new Double("99.99"), producto.getPrecio());
+>>>>>>> d0f21b80a56e7b2ec73c9afe9bea715350d8dd9f
         }
     }
 
