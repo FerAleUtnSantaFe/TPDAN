@@ -8,7 +8,7 @@ import { findPedidos, updatePedido } from "@/app/APIs/PedidosAPI";
 export const usePedidos = () => {
   // State for pedidos data
   const [pedidos, setPedidos] = useState([]);
-  const [searchTerm, setSearchTerm] = useState({ id: "", estado: "" });
+  const [searchTerm, setSearchTerm] = useState({ nroPedido: "", estado: "" });
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -64,13 +64,14 @@ export const usePedidos = () => {
     return pedidos.filter((pedido) => {
       const matchesEstado =
         !searchTerm.estado || pedido.estado === searchTerm.estado;
-      const matchesCuil =
-        !searchTerm.id || pedido.cliente.includes(searchTerm.id);
-      return matchesEstado && matchesCuil;
+      const matchesId =
+        !searchTerm.nroPedido || pedido.numeroPedido.toString().includes(searchTerm.nroPedido);
+      return matchesEstado && matchesId;
     });
   }, [pedidos, searchTerm]);
 
   /**
+   * Handles the selection of a pedido for editing.
    * Opens the edit modal for the selected pedido.
    * @param {object} pedido - The pedido to edit.
    */

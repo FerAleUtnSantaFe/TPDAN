@@ -73,8 +73,9 @@ function DataGridPedidos() {
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder="Buscar por ID"
-              value={searchTerm.cuit}
+              name="nroPedido" // <-- add this line
+              placeholder="Numero de pedido…"
+              value={searchTerm.nroPedido}
               onChange={handleSearch}
               inputProps={{ "aria-label": "search" }}
             />

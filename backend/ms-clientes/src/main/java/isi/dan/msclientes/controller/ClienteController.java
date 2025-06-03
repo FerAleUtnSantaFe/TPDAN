@@ -40,14 +40,6 @@ public class ClienteController {
     // @Value("${dan.clientes.instancia}")
     // private String instancia;
 
-    @GetMapping("/test")
-    @RequireRole("ROLE_NOEXIST")
-    public ResponseEntity<String> test(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        System.out.println("Authorization Header: " + authHeader);
-        return ResponseEntity.ok("Header received");
-    }
-
     @PostMapping
     @LogExecutionTime
     @RequireRole("ROLE_ADMIN")

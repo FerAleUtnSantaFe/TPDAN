@@ -6,7 +6,7 @@ import { Container, Typography } from "@mui/material";
 
 export default function ProductosTarjetas() {
   return (
-    <div>
+    <>
       <NavBar />
       <Container>
         <Typography
@@ -21,6 +21,6 @@ export default function ProductosTarjetas() {
         </Typography>
         <ProductGrid isPedidoMode={false} />
       </Container>
-    </div>
+    </>
   );
 }

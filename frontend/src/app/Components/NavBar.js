@@ -39,7 +39,7 @@ export default function NavBar() {
   };
 
   const handleLogOut = () => {
-    Cookies.remove("authToken"); // Remove the auth token
+    
     router.push("/"); // Redirect to login page
   };
 
